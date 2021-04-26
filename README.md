@@ -15,5 +15,7 @@ Specific landmarks are computed through image processing : body length, body dep
 
 All combinations of distances are calculated, and all combinations of triangles are computed to have all possible angles
 
-<img src="https://github.com/RalphMasson/MorphoEpinoche/blob/master/images/illustration2.jpg" width="100">
-<img src="https://github.com/RalphMasson/MorphoEpinoche/blob/master/images/illustration3.jpg" width="100">
+<p float="left">
+  <img src=https://github.com/RalphMasson/MorphoEpinoche/blob/master/images/illustration2.jpg" width="100" />
+  <img src="https://github.com/RalphMasson/MorphoEpinoche/blob/master/images/illustration3.jpg" width="100" /> 
+</p>
