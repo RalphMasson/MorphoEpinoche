@@ -452,43 +452,43 @@ def points5_7(img,pt9):
 '''
 
 
-out,c = contoursCorpsBig(img)
-
+# out,c = contoursCorpsBig(img)
 #
-# out,c = contoursCorps(img)
-[left,right,top,bottom] = pointExtremeContours(c)
-imagerot = rotate_image(out,angleRot(left,right)[0],angleRot(left,right)[1])
+# #
+# # out,c = contoursCorps(img)
+# [left,right,top,bottom] = pointExtremeContours(c)
+# imagerot = rotate_image(out,angleRot(left,right)[0],angleRot(left,right)[1])
+# #
+# _,c = contoursCorpsBig(imagerot)
+# [left,right,top,bottom] = pointExtremeContours(c)
+# #
 #
-_,c = contoursCorpsBig(imagerot)
-[left,right,top,bottom] = pointExtremeContours(c)
+# [pt3,pt19]=points3_19(imagerot)
 #
-
-[pt3,pt19]=points3_19(imagerot)
-
-
-pt9 = point9(c,pt19)
-
-#ne fonctionne pas pour l'instant
-# [pt15,pt13] = points15_13(imagerot)
-# cv2.circle(imagerot, pt15, 4, (255, 0, 0), -1)
-# cv2.circle(imagerot, pt13, 4, (255, 0, 0), -1)
-
-pt5,pt7 = points5_7(imagerot,pt9)
-
+#
+# pt9 = point9(c,pt19)
+#
+# #ne fonctionne pas pour l'instant
+# # [pt15,pt13] = points15_13(imagerot)
+# # cv2.circle(imagerot, pt15, 4, (255, 0, 0), -1)
+# # cv2.circle(imagerot, pt13, 4, (255, 0, 0), -1)
+#
+# pt5,pt7 = points5_7(imagerot,pt9)
+#
 
 
 # cv2.circle(imagerot, left, 12, (0, 50, 255), -1)
 # cv2.circle(imagerot, right, 12, (0, 255, 255), -1)
 # cv2.circle(imagerot, top, 12, (255, 50, 0), -1)
 # cv2.circle(imagerot, bottom, 12, (255, 255, 0), -1)
-cv2.circle(imagerot, pt3, 12, (255, 0, 0), -1)
-cv2.circle(imagerot, pt19, 12, (255, 0, 0), -1)
-cv2.circle(imagerot, pt9, 12, (255, 0, 0), -1)
-cv2.circle(imagerot, pt5, 8, (0, 255, 0), -1)
-cv2.circle(imagerot, pt7, 8, (0, 255, 0), -1)
-plt.imshow(imagerot)
-plt.show()
-
+# cv2.circle(imagerot, pt3, 12, (255, 0, 0), -1)
+# cv2.circle(imagerot, pt19, 12, (255, 0, 0), -1)
+# cv2.circle(imagerot, pt9, 12, (255, 0, 0), -1)
+# cv2.circle(imagerot, pt5, 8, (0, 255, 0), -1)
+# cv2.circle(imagerot, pt7, 8, (0, 255, 0), -1)
+# plt.imshow(imagerot)
+# plt.show()
+#
 
 
 #
