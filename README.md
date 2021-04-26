@@ -8,7 +8,7 @@ The purpose of this project is to classify the gender of a Three Spined Stickleb
 
 Specific landmarks are computed through image processing : body length, body depth, head length, head depth...
 
-<img src="https://github.com/RalphMasson/MorphoEpinoche/blob/master/images/illustration.JPG" width="200">
+<img src="https://github.com/RalphMasson/MorphoEpinoche/blob/master/images/illustration.jpg" width="200">
 
 
 ## 2 ##
