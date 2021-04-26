@@ -4,14 +4,14 @@ The purpose of this project is to classify the gender of a Three Spined Stickleb
 
 <img src="https://github.com/RalphMasson/MorphoEpinoche/blob/master/images/IMGP1152M.JPG" width="200">
 
-## Landmarks detection ## 
+# Landmarks detection #
 
 Specific landmarks are computed through image processing : body length, body depth, head length, head depth...
 
 <img src="https://github.com/RalphMasson/MorphoEpinoche/blob/master/images/illustration.jpg" width="200">
 
 
-## Distances calculation ##
+# Distances calculation #
 
 All combinations of distances are calculated, and all combinations of triangles are computed to have all possible angles
 
