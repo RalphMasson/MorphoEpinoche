@@ -4,7 +4,7 @@ sys.path.insert(0, 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho')
 # Import des bibliothèque (s'assurer qu'elles soient installées)
 import tkinter as tk
 from PIL import Image, ImageTk
-import os,glob,cv2,sys,ArchitectureFondBlanc
+import os,glob,cv2,sys,Placement_Points
 import numpy as np
 
 
@@ -669,11 +669,11 @@ def importImage():
 
     '''' Initialisation des points du corps par détection auto '''
     print("\n### Calcul des points pour la longueur et la largeur ###")
-    out,c = ArchitectureFondBlanc.contoursCorps(CV2_image)
-    [left,right,top,bottom] = ArchitectureFondBlanc.pointExtremeContours(c)
-    imagerot = ArchitectureFondBlanc.rotate_image(out,ArchitectureFondBlanc.angleRot(left,right)[0],ArchitectureFondBlanc.angleRot(left,right)[1])
-    _,c = ArchitectureFondBlanc.contoursCorps(imagerot)
-    [left,right,top,bottom] = ArchitectureFondBlanc.pointExtremeContours(c)
+    out,c = Placement_Points.contoursCorps(CV2_image)
+    [left,right,top,bottom] = Placement_Points.pointExtremeContours(c)
+    imagerot = Placement_Points.rotate_image(out,Placement_Points.angleRot(left,right)[0],Placement_Points.angleRot(left,right)[1])
+    _,c = Placement_Points.contoursCorps(imagerot)
+    [left,right,top,bottom] = Placement_Points.pointExtremeContours(c)
     corpsStandard = [[left[0],left[1]],[top[0],top[1]],[right[0],right[1]],[bottom[0],bottom[1]]]
     print("### OK ###")
 
@@ -708,7 +708,7 @@ def importImage():
 
     ''' Initialisation des points 3 et 19 par détection auto '''
     print("\n### Calcul des points 3 et 19 ###")
-    [pt3,pt19]=ArchitectureFondBlanc.points3_19(CV2_image_big)
+    [pt3,pt19]=Placement_Points.points3_19(CV2_image_big)
     pt3 = [pt3[0],pt3[1]]
     pt19 = [pt19[0],pt19[1]]
 
@@ -717,9 +717,9 @@ def importImage():
 
     '''Initialisation du point 9 par détection auto '''
     print("\n### Calcul du point 9 ###")
-    _,c = ArchitectureFondBlanc.contoursCorpsBig(CV2_image_big)
+    _,c = Placement_Points.contoursCorpsBig(CV2_image_big)
 
-    pt9=ArchitectureFondBlanc.point9(c,pt19)
+    pt9=Placement_Points.point9(c,pt19)
     pt9 = [pt9[0],pt9[1]]
     print(pt9)
     pt9 = [pt9[0]-(HeadFish.centreOeil[0]-300),pt9[1]-(HeadFish.centreOeil[1]-250)]
@@ -728,14 +728,14 @@ def importImage():
     #
     # '''Initialisation du point 15 et 13 par détection auto '''
     # print("\n### Calcul des points 9 ###")
-    # pt15,pt13=ArchitectureFondBlanc.points15_13(imagerot)
+    # pt15,pt13=Placement_Points.points15_13(imagerot)
     # pt15 = [pt15[0],pt15[1]]
     # pt13 = [pt13[0],pt13[1]]
     # print("### OK ###")
 
 
     '''Initialisation des points 5 et 7 par détection auto '''
-    # pt5,pt7 = ArchitectureFondBlanc.points5_7(img)
+    # pt5,pt7 = Placement_Points.points5_7(img)
 
     pt3 = [pt3[0]-(HeadFish.centreOeil[0]-300),pt3[1]-(HeadFish.centreOeil[1]-250)]
     pt19 = [pt19[0]-(HeadFish.centreOeil[0]-300),pt19[1]-(HeadFish.centreOeil[1]-250)]
