@@ -413,7 +413,7 @@ def clearAllCanvas():
 
 def importImage():
     ''' Placement manuel des points'''
-    corps,echelle10mm,echelle3mm = Placement_Points.randomPoints()
+    corps,echelle10mm,echelle3mm = Placement_Points.Placement_Points.randomPoints()
     pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19 = corps
 
     ''' Réinitialisation pour import '''
@@ -433,11 +433,11 @@ def importImage():
 
     '''' Initialisation des points du corps par détection auto '''
     print("\n### Calcul des points pour la longueur et la largeur ###")
-    out,c = Placement_Points.contoursCorps(CV2_image)
-    [left,right,top,bottom] = Placement_Points.pointExtremeContours(c)
-    imagerot = Placement_Points.rotate_image(out,Placement_Points.angleRot(left,right)[0],Placement_Points.angleRot(left,right)[1])
-    _,c = Placement_Points.contoursCorps(imagerot)
-    [left,right,top,bottom] = Placement_Points.pointExtremeContours(c)
+    out,c = Placement_Points.Placement_Points.contoursCorps(CV2_image)
+    [left,right,top,bottom] = Placement_Points.Placement_Points.pointExtremeContours(c)
+    imagerot = Placement_Points.Placement_Points.rotate_image(out,Placement_Points.Placement_Points.angleRot(left,right)[0],Placement_Points.Placement_Points.angleRot(left,right)[1])
+    _,c = Placement_Points.Placement_Points.contoursCorps(imagerot)
+    [left,right,top,bottom] = Placement_Points.Placement_Points.pointExtremeContours(c)
     corpsStandard = [[left[0],left[1]],[top[0],top[1]],[right[0],right[1]],[bottom[0],bottom[1]]]
     print("### OK ###")
 
@@ -472,7 +472,7 @@ def importImage():
 
     ''' Initialisation des points 3 et 19 par détection auto '''
     print("\n### Calcul des points 3 et 19 ###")
-    [pt3,pt19]=Placement_Points.points3_19(CV2_image_big)
+    [pt3,pt19]=Placement_Points.Placement_Points.points3_19(CV2_image_big)
     pt3 = [pt3[0],pt3[1]]
     pt19 = [pt19[0],pt19[1]]
 
@@ -481,9 +481,9 @@ def importImage():
 
     '''Initialisation du point 9 par détection auto '''
     print("\n### Calcul du point 9 ###")
-    _,c = Placement_Points.contoursCorpsBig(CV2_image_big)
+    _,c = Placement_Points.Placement_Points.contoursCorpsBig(CV2_image_big)
 
-    pt9=Placement_Points.point9(c,pt19)
+    pt9=Placement_Points.Placement_Points.point9(c,pt19)
     pt9 = [pt9[0],pt9[1]]
     print(pt9)
     pt9 = [pt9[0]-(HeadFish.centreOeil[0]-300),pt9[1]-(HeadFish.centreOeil[1]-250)]
