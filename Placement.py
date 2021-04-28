@@ -365,7 +365,7 @@ class Points():
         from scipy.interpolate import InterpolatedUnivariateSpline
         from scipy.signal import argrelextrema
 
-        _,c = contoursCorpsBig(img)
+        _,c = Points.contoursCorpsBig(img)
         approxBouche = cv2.approxPolyDP(c,0.00001,closed=False)
         approxBouche2 = []
 
@@ -462,7 +462,35 @@ class Points():
         echelle3mm = [[67,74],[199,74]]
         return corps,echelle10mm,echelle3mm
 
+    def randomPointsBis():
+        pt3 = [1086.0, 1131.0]
+        pt5 = [422.0, 509.0]
+        pt7 = [405.0, 562.0]
+        pt9 = [507.0, 643.0]
+        pt11 = [396.0, 415.0]
+        pt13 = [414.0, 343.0]
+        pt15 = [438.0, 239.0]
+        pt17 = [473.0, 119.0]
+        pt19 = [679.0, 498.0]
+        corps= [pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19]
+        echelle10mm = [[112,181],[300,186]]
+        echelle3mm = [[67,74],[199,74]]
+        return corps,echelle10mm,echelle3mm
 
+    def randomPointsContours(c):
+        pt3 = [1086.0, 1131.0]
+        pt5 = [422.0, 509.0]
+        pt7 = [405.0, 562.0]
+        pt9 = [507.0, 643.0]
+        pt11 = [396.0, 415.0]
+        pt13 = [414.0, 343.0]
+        pt15 = [438.0, 239.0]
+        pt17 = [473.0, 119.0]
+        pt19 = [679.0, 498.0]
+        corps= [pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19]
+        echelle10mm = [[112,181],[300,186]]
+        echelle3mm = [[67,74],[199,74]]
+        return corps,echelle10mm,echelle3mm
 
 
 

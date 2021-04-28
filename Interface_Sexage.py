@@ -31,7 +31,7 @@ class HeadClass():
         self.points = points
         self.x = None
         if points!=None:
-            self.polygon = canvas.create_polygon(self.points,fill='',outline=color,smooth=0,width=6,dash=(1,5))
+            self.polygon = canvas.create_polygon(self.points,fill='',outline=color,smooth=0,width=2,dash=(1,))
             HeadClass.id_polygons.append(self.polygon)
             canvas.tag_bind(self.polygon, '<ButtonPress-1>',   lambda event, tag=self.polygon: self.on_press_tag(event, 0, tag))
             canvas.tag_bind(self.polygon, '<ButtonRelease-1>', lambda event, tag=self.polygon: self.on_release_tag(event, 0, tag))
@@ -186,7 +186,7 @@ class BodyClass():
         self.x = None
 
         if points!=None:
-            self.polygon = canvas1.create_polygon(self.points,fill='',outline=color,smooth=0,width=6,dash=(1,5))
+            self.polygon = canvas1.create_polygon(self.points,fill='',outline=color,smooth=0,width=3,dash=(1,5))
             BodyClass.id_polygons.append(self.polygon)
             canvas1.tag_bind(self.polygon, '<ButtonPress-3>',   lambda event, tag=self.polygon: self.on_press_tag(event, 0, tag))
             canvas1.tag_bind(self.polygon, '<ButtonRelease-3>', lambda event, tag=self.polygon: self.on_release_tag(event, 0, tag))
@@ -413,13 +413,12 @@ def clearAllCanvas():
 
 def importImage():
     ''' Placement manuel des points'''
-    corps,echelle10mm,echelle3mm = Placement.Points.randomPoints()
+    corps,echelle10mm,echelle3mm = Placement.Points.randomPointsBis()
     pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19 = corps
 
     ''' Réinitialisation pour import '''
     print("\n### Reset ###")
     clearAllCanvas()
-
 
     ''' Import de l'image 4000x3000 '''
     print("\n### Import de l'image ###")
@@ -461,8 +460,11 @@ def importImage():
 
     ''' Resize pour la tête '''
     print("\n### Resize de l'image pour la tête")
-    PIL_image_big = PIL_image.resize((3500,2625), Image.ANTIALIAS)
-    CV2_image_big = np.array(Image.open(pathok))
+    PIL_image_big = newPIL_image.resize((3500,2625), Image.ANTIALIAS)
+    PIL_image_big = np.flip(PIL_image_big,axis=2)
+    CV2_image_big = np.array(PIL_image_big)
+    CV2_image_big = CV2_image_big[:, :, ::-1].copy()
+    # CV2_image_big = np.array(Image.open(pathok))
 
     print("\n### Chargement de l'image de la tête' ###")
     newPIL_image_big = Image.fromarray(CV2_image_big)
@@ -472,9 +474,12 @@ def importImage():
 
     ''' Initialisation des points 3 et 19 par détection auto '''
     print("\n### Calcul des points 3 et 19 ###")
-    [pt3,pt19]=Placement.Points.points3_19(CV2_image_big)
-    pt3 = [pt3[0],pt3[1]]
-    pt19 = [pt19[0],pt19[1]]
+    try:
+        [pt3,pt19]=Placement.Points.points3_19(CV2_image_big)
+        pt3 = [pt3[0],pt3[1]]
+        pt19 = [pt19[0],pt19[1]]
+    except:
+        print("Impossible de déterminer les points 3 et 19")
 
 
     print("### OK ###")
@@ -482,11 +487,12 @@ def importImage():
     '''Initialisation du point 9 par détection auto '''
     print("\n### Calcul du point 9 ###")
     _,c = Placement.Points.contoursCorpsBig(CV2_image_big)
-
-    pt9=Placement.Points.point9(c,pt19)
-    pt9 = [pt9[0],pt9[1]]
-    print(pt9)
-    pt9 = [pt9[0]-(HeadFish.centreOeil[0]-300),pt9[1]-(HeadFish.centreOeil[1]-250)]
+    try:
+        pt9=Placement.Points.point9(c,pt19)
+        pt9 = [pt9[0],pt9[1]]
+        print(pt9)
+    except:
+        print("Impossible de déterminer le point 9")
 
     print("### OK ###")
     #
@@ -499,10 +505,22 @@ def importImage():
 
 
     '''Initialisation des points 5 et 7 par détection auto '''
-    # pt5,pt7 = Placement_Points.points5_7(img)
+    print("\n### Calcul des points 5 et 7  ###")
 
+    try:
+        pt7,pt5 = Placement.Points.points5_7(CV2_image_big,pt9)
+        pt5 = [pt5[0],pt5[1]]
+        pt7 = [pt7[0],pt7[1]]
+    except:
+        print("Impossible de détecter les points 5 et 7")
+
+    print(HeadFish.centreOeil)
     pt3 = [pt3[0]-(HeadFish.centreOeil[0]-300),pt3[1]-(HeadFish.centreOeil[1]-250)]
     pt19 = [pt19[0]-(HeadFish.centreOeil[0]-300),pt19[1]-(HeadFish.centreOeil[1]-250)]
+    pt9 = [pt9[0]-(HeadFish.centreOeil[0]-300),pt9[1]-(HeadFish.centreOeil[1]-250)]
+    pt5 = [pt5[0]-(HeadFish.centreOeil[0]-300),pt5[1]-(HeadFish.centreOeil[1]-250)]
+    pt7 = [pt7[0]-(HeadFish.centreOeil[0]-300),pt7[1]-(HeadFish.centreOeil[1]-250)]
+
     print(pt3)
     print(pt19)
     corps= [pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19]
