@@ -1,18 +1,14 @@
+# Pour assurer le bon fonctionnement
+sys.path.insert(0, 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho')
+
+# Import des bibliothèque (s'assurer qu'elles soient installées)
 import tkinter as tk
 from PIL import Image, ImageTk
-import os,glob,cv2
+import os,glob,cv2,sys,ArchitectureFondBlanc
 import numpy as np
-# path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\DATABASE_rotation\\"
-# pathFinal = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\DATABASE_schema\\"
-#
-# listImg = glob.glob(path+"**\\*.JPG",recursive=True)
-import sys
-sys.path.insert(0, 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho')
-import ArchitectureFondBlanc
-# import MorphoPolygon,MorphoImage
-# from MorphoPolygon import HeadClass,BodyClass
-# from MorphoImage import HeadFish,BodyFish
 
+
+# Classe pour les points de la tête
 class HeadClass():
     ''' class Item pour la tete du poisson'''
     ''' Variables globales pour export '''
@@ -257,11 +253,6 @@ class HeadClass():
         head_depth_mm = round(3*head_depth_px/echelle3mm_px,4)
         HeadClass.distance[4]=head_depth_mm
 
-        # print(HeadClass.calculAngle(pt9,pt11,pt13))
-        # print("nez-oeil "+str(snout_eye_mm)+" mm")
-        # print("museau "+str(snout_length_mm)+" mm")
-        # print("diametre eye "+str(eye_diameter_mm)+" mm")
-        # print("longueur tête "+str(head_length_mm)+" mm")
         return HeadClass.distance
 
 
@@ -278,8 +269,6 @@ class BodyClass():
     ''' distance : liste des distances calculées entre les points'''
     nodes1 = []
     poly1 = []
-    # pointsLongueur = []
-    # pointsLargeur = []
     pointsStandard = []
     pointsEchelle10mm = []
     distance = [0 for _ in range(2)]
@@ -307,22 +296,13 @@ class BodyClass():
             for number, point in enumerate(self.points):
                 x, y = point
                 node = canvas1.create_rectangle((x-3, y-3, x+3, y+3), fill=color)
-                label = canvas1.create_text((x+15, y+6),text=str(node%14),font=("Purisa", 12),fill='green')
+                label = canvas1.create_text((x+15, y+6),text=str(node%15),font=("Purisa", 12),fill='green')
                 self.nodes.append(node)
                 self.nonodes.append(label)
                 BodyClass.nodes1.append(node)
                 canvas1.tag_bind(node, '<ButtonPress-3>',   lambda event, number=number, tag=node: self.on_press_tag(event, number, tag))
                 canvas1.tag_bind(node, '<ButtonRelease-3>', lambda event, number=number, tag=node: self.on_release_tag(event, number, tag))
                 canvas1.tag_bind(node, '<B3-Motion>', lambda event, number=number: self.on_move_node(event, number))
-        # canvas1.coords(7,self.pointsCardinauxFish[0][0],self.pointsCardinauxFish[0][1],self.pointsCardinauxFish[1][0],self.pointsCardinauxFish[1][1])
-
-        # listeLongueur = canvas1.coords(7)
-        # listeLargeur = canvas1.coords(12)
-        # listeEchelle = canvas1.coords(2)
-        # print(listeLargeur)
-        # BodyClass.pointsLongueur=[(listeLongueur[i],listeLongueur[i+1]) for i in range(0,len(listeLongueur),2)]
-        # BodyClass.pointsLargeur=[(listeLargeur[i],listeLargeur[i+1]) for i in range(0,len(listeLargeur),2)]
-        # BodyClass.pointsEchelle10mm=[(listeEchelle[i],listeEchelle[i+1]) for i in range(0,len(listeEchelle),2)]
 
         for x in BodyClass.poly1:
             liste = canvas1.coords(x)
@@ -337,15 +317,6 @@ class BodyClass():
         self.previous_x = event.x
         self.previous_y = event.y
         print('press:', event,tag)
-        # listeLongueur = canvas1.coords(7)
-        # listeLargeur = canvas1.coords(12)
-        # listeEchelle = canvas1.coords(2)
-        # print(listeLargeur)
-
-        # BodyClass.pointsLongueur=[(listeLongueur[i],listeLongueur[i+1]) for i in range(0,len(listeLongueur),2)]
-        # BodyClass.pointsLargeur=[(listeLargeur[i],listeLargeur[i+1]) for i in range(0,len(listeLargeur),2)]
-        # BodyClass.pointsEchelle10mm=[(listeEchelle[i],listeEchelle[i+1]) for i in range(0,len(listeEchelle),2)]
-        #
 
         for x in BodyClass.poly1:
             liste = canvas1.coords(x)
@@ -363,14 +334,7 @@ class BodyClass():
             # print(canvas1.coords(x))
             # print("\n")
         print('release:', tag)
-        # listeLongueur = canvas1.coords(7)
-        # listeLargeur = canvas1.coords(12)
-        # listeEchelle = canvas1.coords(2)
-        # # print(listeLargeur)
-        #
-        # BodyClass.pointsLongueur=[(listeLongueur[i],listeLongueur[i+1]) for i in range(0,len(listeLongueur),2)]
-        # BodyClass.pointsLargeur=[(listeLargeur[i],listeLargeur[i+1]) for i in range(0,len(listeLargeur),2)]
-        # BodyClass.pointsEchelle10mm=[(listeEchelle[i],listeEchelle[i+1]) for i in range(0,len(listeEchelle),2)]
+
         for x in BodyClass.poly1:
             liste = canvas1.coords(x)
             if(len(canvas1.coords(x))==8):BodyClass.pointsStandard=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
@@ -392,14 +356,7 @@ class BodyClass():
             canvas1.coords(self.polygon, coords)
             self.previous_x = event.x
             self.previous_y = event.y
-        # listeLongueur = canvas1.coords(7)
-        # listeLargeur = canvas1.coords(12)
-        # listeEchelle = canvas1.coords(2)
-        # # print(listeLargeur)
-        #
-        # BodyClass.pointsLongueur=[(listeLongueur[i],listeLongueur[i+1]) for i in range(0,len(listeLongueur),2)]
-        # BodyClass.pointsLargeur=[(listeLargeur[i],listeLargeur[i+1]) for i in range(0,len(listeLargeur),2)]
-        # BodyClass.pointsEchelle10mm=[(listeEchelle[i],listeEchelle[i+1]) for i in range(0,len(listeEchelle),2)]
+
         for x in BodyClass.poly1:
             liste = canvas1.coords(x)
             if(len(canvas1.coords(x))==8):BodyClass.pointsStandard=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
@@ -430,12 +387,7 @@ class BodyClass():
                 item[1] += dy
             self.previous_x = event.x
             self.previous_y = event.y
-        # listeLongueur = canvas1.coords(7)
-        # listeLargeur = canvas1.coords(12)
-        # listeEchelle = canvas1.coords(2)
-        # BodyClass.pointsLongueur=[(listeLongueur[i],listeLongueur[i+1]) for i in range(0,len(listeLongueur),2)]
-        # BodyClass.pointsLargeur=[(listeLargeur[i],listeLargeur[i+1]) for i in range(0,len(listeLargeur),2)]
-        # BodyClass.pointsEchelle10mm=[(listeEchelle[i],listeEchelle[i+1]) for i in range(0,len(listeEchelle),2)]
+
         for x in BodyClass.poly1:
             liste = canvas1.coords(x)
             if(len(canvas1.coords(x))==8):BodyClass.pointsStandard=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
@@ -458,10 +410,6 @@ class BodyClass():
     def calculDistances():
         pt3 = BodyClass.pointsEchelle10mm[0]
         pt5 = BodyClass.pointsEchelle10mm[1]
-        # pt8 = BodyClass.pointsLongueur[0]
-        # pt10 = BodyClass.pointsLongueur[1]
-        # pt13 = BodyClass.pointsLargeur[0]
-        # pt15 = BodyClass.pointsLargeur[1]
         pt8 = BodyClass.pointsStandard[0]
         pt10 = BodyClass.pointsStandard[1]
         pt12 = BodyClass.pointsStandard[2]
@@ -896,43 +844,6 @@ canvas1 = tk.Canvas(root,bg='#f0f0f0')
 canvas1.config(width=1000, height=500)
 # canvas1.pack(side='left')
 canvas1.grid(column=1,row=8)
-
-#
-#
-#
-# ''' Placement manuel des points'''
-# corps= [[249.0, 250.0], [122.0, 259.0], [105.0, 312.0], [207.0, 393.0], [396.0, 415.0], [414.0, 343.0], [438.0, 239.0], [473.0, 119.0], [379.0, 248.0]]
-# echelle10mm = [[112,181],[300,186]]
-# echelle3mm = [[67,74],[199,74]]
-# longueurStandard = [[178,331],[878,361]]
-# largeurStandard = [[500,420],[475,280]]
-#
-# ''' Import de l'image '''
-# pathok = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\DATABASE\\FEMALE\\IMGP1093F.jpg"
-# pathok = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\gimp_cut\\male\\IMGP1074M.JPG"
-# # listImg[190]
-#
-#
-#
-# '''' Initialisation des points du corps par détection auto '''
-# print("### Calcul des points du corps ###")
-# pointsCardx = BodyFish.pointsCardinaux()
-# # print("liste")
-# # print(pointsCardx)
-# longueurStandard = [[pointsCardx[0][0],pointsCardx[0][1]],[pointsCardx[1][0],pointsCardx[1][1]]]
-# print("### OK ###")
-#
-# print("### Placement des points de la tête ###")
-# HeadClass(canvas, corps,'cyan')
-# HeadClass(canvas,echelle3mm,'red')
-# print("### OK ###")
-# print("### Placement des points du corps ###")
-# BodyClass(canvas1, echelle10mm,'red')
-# BodyClass(canvas1,longueurStandard,'cyan')
-# BodyClass(canvas1,largeurStandard,'cyan')
-# print("### OK ###")
-
-# canvas.pack()
 
 root.mainloop()
 
