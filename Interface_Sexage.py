@@ -5,7 +5,7 @@ sys.path.insert(0, 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho')
 # Import des bibliothèques (s'assurer qu'elles soient installées)
 import tkinter as tk
 from PIL import Image, ImageTk
-import os,glob,cv2,Placement,Fonctions
+import os,cv2,Placement,Fonctions
 import numpy as np
 
 
@@ -320,7 +320,7 @@ class HeadFish():
     def moveDown(self,event):
         canvas.move(self.poisson,0,10)
     def detect_eye(self,img):
-        import matplotlib.pyplot as plt
+        # import matplotlib.pyplot as plt
         img_couleur = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
         img_gray=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
         # img_gray = cv2.resize(img_gray,(3500,2625),Image.ANTIALIAS)
