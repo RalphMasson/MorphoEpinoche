@@ -5,7 +5,7 @@ sys.path.insert(0, 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho')
 # Import des bibliothèques (s'assurer qu'elles soient installées)
 import tkinter as tk
 from PIL import Image, ImageTk
-import os,glob,cv2,Placement_Points,Fonctions_Externes
+import os,glob,cv2,Placement,Fonctions
 import numpy as np
 
 
@@ -109,16 +109,16 @@ class HeadClass():
 
     def genererAllDistancesHead():
 
-        listeCombinaisonsDistance,listeCombinaisonsAngle = Fonctions_Externes.allPointsAngles()
+        listeCombinaisonsDistance,listeCombinaisonsAngle = Fonctions.Externes.allPointsAngles()
         pt22 = HeadClass.pointsEchelle[0]
         pt24 = HeadClass.pointsEchelle[1]
-        echelle3mm_px = Fonctions_Externes.euclideDist(pt22,pt24)
+        echelle3mm_px = Fonctions.Externes.euclideDist(pt22,pt24)
         for x in listeCombinaisonsDistance:
-            distpx = Fonctions_Externes.euclideDist(HeadClass.pointsFish[x[0]],HeadClass.pointsFish[x[1]])
+            distpx = Fonctions.Externes.euclideDist(HeadClass.pointsFish[x[0]],HeadClass.pointsFish[x[1]])
             distmm = round(3*distpx/echelle3mm_px,4)
             HeadClass.distances_all.append(distmm)
         for x in listeCombinaisonsAngle:
-            thetas = Fonctions_Externes.calculAngle(HeadClass.pointsFish[x[0]],HeadClass.pointsFish[x[1]],HeadClass.pointsFish[x[2]])
+            thetas = Fonctions.Externes.calculAngle(HeadClass.pointsFish[x[0]],HeadClass.pointsFish[x[1]],HeadClass.pointsFish[x[2]])
             thetas = np.around(thetas[0],4)
             HeadClass.distances_all.append(thetas)
 
@@ -142,25 +142,25 @@ class HeadClass():
         pt19 = HeadClass.pointsFish[8]
         pt22 = HeadClass.pointsEchelle[0]
         pt24 = HeadClass.pointsEchelle[1]
-        echelle3mm_px = Fonctions_Externes.euclideDist(pt22,pt24)
+        echelle3mm_px = Fonctions.Externes.euclideDist(pt22,pt24)
 
-        snout_eye_px = Fonctions_Externes.euclideDist(pt3,pt5)
+        snout_eye_px = Fonctions.Externes.euclideDist(pt3,pt5)
         snout_eye_mm = round(3*snout_eye_px/echelle3mm_px,4)
         HeadClass.distances_check[0]=snout_eye_mm
 
-        snout_length_px = Fonctions_Externes.euclideDist(pt5,pt7)
+        snout_length_px = Fonctions.Externes.euclideDist(pt5,pt7)
         snout_length_mm = round(3*snout_length_px/echelle3mm_px,4)
         HeadClass.distances_check[1]=snout_length_mm
 
-        eye_diameter_px = Fonctions_Externes.euclideDist(pt3,pt19)
+        eye_diameter_px = Fonctions.Externes.euclideDist(pt3,pt19)
         eye_diameter_mm = round(3*eye_diameter_px/echelle3mm_px,4)
         HeadClass.distances_check[2]=eye_diameter_mm
 
-        head_length_px = Fonctions_Externes.euclideDist(pt5,pt17)
+        head_length_px = Fonctions.Externes.euclideDist(pt5,pt17)
         head_length_mm = round(3*head_length_px/echelle3mm_px,4)
         HeadClass.distances_check[3]=head_length_mm
 
-        head_depth_px = Fonctions_Externes.euclideDist(pt11,pt17)
+        head_depth_px = Fonctions.Externes.euclideDist(pt11,pt17)
         head_depth_mm = round(3*head_depth_px/echelle3mm_px,4)
         HeadClass.distances_check[4]=head_depth_mm
 
@@ -278,10 +278,10 @@ class BodyClass():
         pt10 = BodyClass.pointsFish[1]
         pt12 = BodyClass.pointsFish[2]
         pt14 = BodyClass.pointsFish[3]
-        echelle10mm_px = Fonctions_Externes.euclideDist(pt3,pt5)
-        body_size_px = Fonctions_Externes.euclideDist(pt8,pt12)
+        echelle10mm_px = Fonctions.Externes.euclideDist(pt3,pt5)
+        body_size_px = Fonctions.Externes.euclideDist(pt8,pt12)
         body_size_mm = round(10*body_size_px/echelle10mm_px,4)
-        body_depth_px = Fonctions_Externes.euclideDist(pt10,pt14)
+        body_depth_px = Fonctions.Externes.euclideDist(pt10,pt14)
         body_depth_mm = round(10*body_depth_px/echelle10mm_px,4)
         BodyClass.distances_check[0]=body_size_mm
         BodyClass.distances_check[1]=body_depth_mm
@@ -413,7 +413,7 @@ def clearAllCanvas():
 
 def importImage():
     ''' Placement manuel des points'''
-    corps,echelle10mm,echelle3mm = Placement_Points.Placement_Points.randomPoints()
+    corps,echelle10mm,echelle3mm = Placement.Points.randomPoints()
     pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19 = corps
 
     ''' Réinitialisation pour import '''
@@ -433,11 +433,11 @@ def importImage():
 
     '''' Initialisation des points du corps par détection auto '''
     print("\n### Calcul des points pour la longueur et la largeur ###")
-    out,c = Placement_Points.Placement_Points.contoursCorps(CV2_image)
-    [left,right,top,bottom] = Placement_Points.Placement_Points.pointExtremeContours(c)
-    imagerot = Placement_Points.Placement_Points.rotate_image(out,Placement_Points.Placement_Points.angleRot(left,right)[0],Placement_Points.Placement_Points.angleRot(left,right)[1])
-    _,c = Placement_Points.Placement_Points.contoursCorps(imagerot)
-    [left,right,top,bottom] = Placement_Points.Placement_Points.pointExtremeContours(c)
+    out,c = Placement.Points.contoursCorps(CV2_image)
+    [left,right,top,bottom] = Placement.Points.pointExtremeContours(c)
+    imagerot = Placement.Points.rotate_image(out,Placement.Points.angleRot(left,right)[0],Placement.Points.angleRot(left,right)[1])
+    _,c = Placement.Points.contoursCorps(imagerot)
+    [left,right,top,bottom] = Placement.Points.pointExtremeContours(c)
     corpsStandard = [[left[0],left[1]],[top[0],top[1]],[right[0],right[1]],[bottom[0],bottom[1]]]
     print("### OK ###")
 
@@ -472,7 +472,7 @@ def importImage():
 
     ''' Initialisation des points 3 et 19 par détection auto '''
     print("\n### Calcul des points 3 et 19 ###")
-    [pt3,pt19]=Placement_Points.Placement_Points.points3_19(CV2_image_big)
+    [pt3,pt19]=Placement.Points.points3_19(CV2_image_big)
     pt3 = [pt3[0],pt3[1]]
     pt19 = [pt19[0],pt19[1]]
 
@@ -481,9 +481,9 @@ def importImage():
 
     '''Initialisation du point 9 par détection auto '''
     print("\n### Calcul du point 9 ###")
-    _,c = Placement_Points.Placement_Points.contoursCorpsBig(CV2_image_big)
+    _,c = Placement.Points.contoursCorpsBig(CV2_image_big)
 
-    pt9=Placement_Points.Placement_Points.point9(c,pt19)
+    pt9=Placement.Points.point9(c,pt19)
     pt9 = [pt9[0],pt9[1]]
     print(pt9)
     pt9 = [pt9[0]-(HeadFish.centreOeil[0]-300),pt9[1]-(HeadFish.centreOeil[1]-250)]

@@ -8,10 +8,10 @@ import math
 
 import sys
 sys.path.insert(0, 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho')
-import Fonctions_Externes
+import Fonctions
 
 
-class Placement_Points():
+class Points():
     '''
     * Méthode pour obtenir le contours du poisson
     * input : image img (type numpy.array) de taille 4000x3000 (ou même ratio) --> 1300x975
@@ -295,7 +295,7 @@ class Placement_Points():
             listPointsPotentiels2.append(list(approx[index][0]))
             listPointsPotentiels2_aug.append([list(approx[index-1][0]),list(approx[index][0]),list(approx[(index+1)%(len(approx))][0])])
         for triplet in listPointsPotentiels2_aug:
-            theta = Fonctions_Externes.calculAngleBis(triplet[0],triplet[1],triplet[2])
+            theta = Fonctions.Externes.calculAngleBis(triplet[0],triplet[1],triplet[2])
             anglePointsPotentiels.append(theta)
         [x9,y9] = listPointsPotentiels2[np.argmax(anglePointsPotentiels)]
         pt9 = (x9,y9)
