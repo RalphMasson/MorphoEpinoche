@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 
-img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\gimp_cut\\male\\IMGP1152M.JPG"
-img = cv2.cvtColor(cv2.imread(img_path),cv2.COLOR_BGR2RGB)
+# img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\gimp_cut\\male\\IMGP1152M.JPG"
+# img = cv2.cvtColor(cv2.imread(img_path),cv2.COLOR_BGR2RGB)
 
 '''
 * Méthode pour obtenir le contours du poisson
@@ -359,8 +359,6 @@ def points5_7(img,pt9):
     from scipy.interpolate import InterpolatedUnivariateSpline
     from scipy.signal import argrelextrema
 
-
-
     _,c = contoursCorpsBig(img)
     approxBouche = cv2.approxPolyDP(c,0.00001,closed=False)
     approxBouche2 = []
@@ -427,7 +425,6 @@ def points5_7(img,pt9):
 
     # av erifier
     pt5 = (abscisses[mini],ordonnees[mini])
-
     pt7 = (abscisses[local_maxima],ordonnees[local_maxima])
     print("pt5")
     print(pt5)
@@ -442,6 +439,27 @@ def points5_7(img,pt9):
 
     # plt.show()
     return pt5,pt7
+
+
+def randomPoints():
+    pt3 = [249.0, 250.0]
+    pt5 = [122.0, 259.0]
+    pt7 = [105.0, 312.0]
+    pt9 = [207.0, 393.0]
+    pt11 = [396.0, 415.0]
+    pt13 = [414.0, 343.0]
+    pt15 = [438.0, 239.0]
+    pt17 = [473.0, 119.0]
+    pt19 = [379.0, 248.0]
+    corps= [pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19]
+    echelle10mm = [[112,181],[300,186]]
+    echelle3mm = [[67,74],[199,74]]
+    return corps,echelle10mm,echelle3mm
+
+
+
+
+
 
 
 

@@ -1,49 +1,38 @@
 # Pour assurer le bon fonctionnement
+import sys
 sys.path.insert(0, 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho')
 
-# Import des bibliothèque (s'assurer qu'elles soient installées)
+# Import des bibliothèques (s'assurer qu'elles soient installées)
 import tkinter as tk
 from PIL import Image, ImageTk
-import os,glob,cv2,sys,Placement_Points
+import os,glob,cv2,Placement_Points,Fonctions_Externes
 import numpy as np
 
 
 # Classe pour les points de la tête
 class HeadClass():
-    ''' class Item pour la tete du poisson'''
     ''' Variables globales pour export '''
-    ''' nodes1 : noeuds du polygone convexe de la tête et de l'echelle '''
-    ''' poly1 : liste de tous les points '''
+    ''' id_polygons : liste des id des polygons (la tete et l'echelle) '''
     ''' pointsTete : liste des points de la tête [(x1,y1),(x2,y2)...]'''
     ''' pointsEchelle3mm : liste des points de l'echelle [(x1,y1),(x2,y2)]'''
-    ''' distance : liste des distances calculées entre les points'''
-    ''' angles : liste des angles calculées entre les points'''
+    ''' distances_check : liste des distances caractéristiques affichées '''
+    ''' distances_all : liste de toutes les distances sauvegardés pour le modèle'''
 
-    nodes1 = []
-    poly1 = []
-    pointsTete = []
-    pointsEchelle3mm = []
-    distance = [0 for _ in range(20)]
-    alldistancesHead=[]
-    angles = [0 for _ in range(20)]
-    points=None
+    id_polygons = []
+    pointsFish = []
+    pointsEchelle = []
+    distances_check = [0 for _ in range(20)]
+    distances_all = []
 
     def __init__(self, canvas, points,color):
         self.previous_x = None
         self.previous_y = None
         self.selected = None
-        self.listPoly = [2,21]
-        self.NomsPoly = ["tete","echelle",]
         self.points = points
         self.x = None
         if points!=None:
             self.polygon = canvas.create_polygon(self.points,fill='',outline=color,smooth=0,width=6,dash=(1,5))
-
-            # print(self.polygon)
-            # print("test")
-            HeadClass.poly1.append(self.polygon)
-            # print(HeadClass.poly1)
-            # print("test")
+            HeadClass.id_polygons.append(self.polygon)
             canvas.tag_bind(self.polygon, '<ButtonPress-1>',   lambda event, tag=self.polygon: self.on_press_tag(event, 0, tag))
             canvas.tag_bind(self.polygon, '<ButtonRelease-1>', lambda event, tag=self.polygon: self.on_release_tag(event, 0, tag))
             canvas.tag_bind(self.polygon, '<B1-Motion>', self.on_move_polygon)
@@ -53,51 +42,41 @@ class HeadClass():
             for number, point in enumerate(self.points):
                 x, y = point
                 node = canvas.create_rectangle((x-3, y-3, x+3, y+3), fill=color)
-                # print(node)
                 label = canvas.create_text((x+15, y+6),text=str(node%25),font=("Purisa", 12),fill='yellow')
                 self.nodes.append(node)
                 self.nonodes.append(label)
-                HeadClass.nodes1.append(node)
                 canvas.tag_bind(node, '<ButtonPress-1>',   lambda event, number=number, tag=node: self.on_press_tag(event, number, tag))
                 canvas.tag_bind(node, '<ButtonRelease-1>', lambda event, number=number, tag=node: self.on_release_tag(event, number, tag))
                 canvas.tag_bind(node, '<B1-Motion>', lambda event, number=number: self.on_move_node(event, number))
 
-        print(self.nodes)
-        for x,y in zip(HeadClass.poly1,self.NomsPoly):
-            # print(y)
-            # print(canvas.coords(x))
-            # print("\n")
-            liste = canvas.coords(x)
-            # print("longueur"+str(len(canvas.coords(x))))
-            if(len(canvas.coords(x))==18):HeadClass.pointsTete=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
-            if(len(canvas.coords(x))==4):HeadClass.pointsEchelle3mm=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
-        # print(HeadClass.pointsEchelle3mm)
-        # print(HeadClass.pointsTete)
-        if(len(HeadClass.pointsEchelle3mm)>0):
+        HeadClass.update_points()
+
+        if(len(HeadClass.pointsEchelle)>0):
              afficheLongueur()
+
+    def update_points():
+        for id in HeadClass.id_polygons:
+            liste = canvas.coords(id)
+            if(len(canvas.coords(id))==18):HeadClass.pointsFish=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
+            if(len(canvas.coords(id))==4):HeadClass.pointsEchelle=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
 
     def on_press_tag(self, event, number, tag):
         self.selected = tag
         self.previous_x = event.x
         self.previous_y = event.y
         print(self.selected,event,tag)
+
     def on_release_tag(self, event, number, tag):
         self.selected = None
         self.previous_x = None
         self.previous_y = None
-
-        for x,y in zip(HeadClass.poly1,self.NomsPoly):
-            # print(canvas.coords(x))
-            liste = canvas.coords(x)
-            if(len(canvas.coords(x))==18):HeadClass.pointsTete=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
-            if(len(canvas.coords(x))==4):HeadClass.pointsEchelle3mm=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
+        HeadClass.update_points()
 
     def on_move_node(self, event, number):
         '''move single node in polygon'''
         if self.selected:
             dx = event.x - self.previous_x
             dy = event.y - self.previous_y
-            # print(number)
             canvas.move(self.selected, dx, dy)
             canvas.move(self.nonodes[self.nodes.index(self.selected)],dx,dy)
             self.points[number][0] += dx
@@ -107,10 +86,7 @@ class HeadClass():
             self.previous_x = event.x
             self.previous_y = event.y
 
-        for x,y in zip(HeadClass.poly1,self.NomsPoly):
-            liste = canvas.coords(x)
-            if(len(canvas.coords(x))==18):HeadClass.pointsTete=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
-            if(len(canvas.coords(x))==4):HeadClass.pointsEchelle3mm=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
+        HeadClass.update_points()
         afficheLongueur()
     def on_move_polygon(self, event):
         '''move polygon and red rectangles in nodes'''
@@ -129,165 +105,89 @@ class HeadClass():
                 item[1] += dy
             self.previous_x = event.x
             self.previous_y = event.y
-        for x,y in zip(HeadClass.poly1,self.NomsPoly):
-            # print(list(zip(self.listPoly,self.NomsPoly)))
-            liste = canvas.coords(x)
-            if(len(canvas.coords(x))==18):HeadClass.pointsTete=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
-            if(len(canvas.coords(x))==4):HeadClass.pointsEchelle3mm=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
-    def hide_nodes():
-        for node in HeadClass.nodes1:
-            canvas.itemconfig(node,fill="",outline='')
-        for poly in HeadClass.poly1:
-            canvas.itemconfig(poly,dash=())
-    def euclideDist(a,b):
-        import numpy as np
-        x1 = a[0]
-        y1 = a[1]
-        x2 = b[0]
-        y2 = b[1]
-        norme = np.sqrt((x2-x1)**2+(y2-y1)**2)
-        return norme
-
-    def calculAngle(pt1,pt2,pt3):
-        #calcul par alkashi des angles en degres du triangle reliant les 3 points
-        #        pt2
-        #     b /     \ a
-        #  pt1 ----- pt3
-        #         c
-        #angle au niveau du pt1
-
-        b = HeadClass.euclideDist(pt1,pt2)
-        a = HeadClass.euclideDist(pt2,pt3)
-        c = HeadClass.euclideDist(pt1,pt3)
-
-        from math import acos,pi
-
-        Apt1 = acos((b**2+c**2-a**2)/(2*b*c))*180/pi
-        Apt2 = acos((b**2+a**2-c**2)/(2*b*a))*180/pi
-        Apt3 = acos((a**2+c**2-b**2)/(2*a*c))*180/pi
-
-        listeAngle = [Apt1,Apt2,Apt3]
-        return listeAngle
-
-
-
-
+        HeadClass.update_points()
 
     def genererAllDistancesHead():
-        from itertools import combinations,permutations,combinations_with_replacement
-        atest = list(combinations([i for i in range(9)],3))
-        from functools import partial
-        listeCombinaisonsAngle = []
-        def reorder_from_idx(idx, a):
-            return a[idx:] + a[:idx]
-        def cyclic_perm(a):
-            return [partial(reorder_from_idx, i) for i in range(len(a))]
-        for a in atest:
-            result = cyclic_perm(a)
-            # print("toto"+str(a))
-            for x in range(len(a)):
-                listeCombinaisonsAngle.append(result[x](a))
 
-
-
-        from itertools import combinations
-        pt22 = HeadClass.pointsEchelle3mm[0]
-        pt24 = HeadClass.pointsEchelle3mm[1]
-        echelle3mm_px = HeadClass.euclideDist(pt22,pt24)
-        listeCombinaisonsDistance = list(combinations([i for i in range(9)],2))
-        # listeCombinaisonsAngle = list(combinations([i for i in range(9)],3))
-
+        listeCombinaisonsDistance,listeCombinaisonsAngle = Fonctions_Externes.allPointsAngles()
+        pt22 = HeadClass.pointsEchelle[0]
+        pt24 = HeadClass.pointsEchelle[1]
+        echelle3mm_px = Fonctions_Externes.euclideDist(pt22,pt24)
         for x in listeCombinaisonsDistance:
-            distpx = HeadClass.euclideDist(HeadClass.pointsTete[x[0]],HeadClass.pointsTete[x[1]])
+            distpx = Fonctions_Externes.euclideDist(HeadClass.pointsFish[x[0]],HeadClass.pointsFish[x[1]])
             distmm = round(3*distpx/echelle3mm_px,4)
-            HeadClass.alldistancesHead.append(distmm)
-        print(len(HeadClass.alldistancesHead))
+            HeadClass.distances_all.append(distmm)
         for x in listeCombinaisonsAngle:
-            thetas = HeadClass.calculAngle(HeadClass.pointsTete[x[0]],HeadClass.pointsTete[x[1]],HeadClass.pointsTete[x[2]])
+            thetas = Fonctions_Externes.calculAngle(HeadClass.pointsFish[x[0]],HeadClass.pointsFish[x[1]],HeadClass.pointsFish[x[2]])
             thetas = np.around(thetas[0],4)
-            HeadClass.alldistancesHead.append(thetas)
-        print(len(HeadClass.alldistancesHead))
-
-
-        # for i in range(len(HeadClass.alldistancesHead)):
+            HeadClass.distances_all.append(thetas)
 
         f = open("C:/Users/MASSON/Desktop/STAGE_EPINOCHE/DistancesPourModele.csv", "a")
         header = listeCombinaisonsDistance+listeCombinaisonsAngle
         header = "; ".join(str(i) for i in header)
-        HeadClass.alldistancesHead = "; ".join(str(i) for i in HeadClass.alldistancesHead)
+        HeadClass.distances_all = "; ".join(str(i) for i in HeadClass.distances_all)
         f.write(str(header)+"\n")
-        f.write(str(HeadClass.alldistancesHead))
+        f.write(str(HeadClass.distances_all))
         f.close()
 
     def calculDistances():
-        pt3 = HeadClass.pointsTete[0]
-        pt5 = HeadClass.pointsTete[1]
-        pt7 = HeadClass.pointsTete[2]
-        pt9 = HeadClass.pointsTete[3]
-        pt11 = HeadClass.pointsTete[4]
-        pt13 = HeadClass.pointsTete[5]
-        pt15 = HeadClass.pointsTete[6]
-        pt17 = HeadClass.pointsTete[7]
-        pt19 = HeadClass.pointsTete[8]
-        pt22 = HeadClass.pointsEchelle3mm[0]
-        pt24 = HeadClass.pointsEchelle3mm[1]
-        echelle3mm_px = HeadClass.euclideDist(pt22,pt24)
+        pt3 = HeadClass.pointsFish[0]
+        pt5 = HeadClass.pointsFish[1]
+        pt7 = HeadClass.pointsFish[2]
+        pt9 = HeadClass.pointsFish[3]
+        pt11 = HeadClass.pointsFish[4]
+        pt13 = HeadClass.pointsFish[5]
+        pt15 = HeadClass.pointsFish[6]
+        pt17 = HeadClass.pointsFish[7]
+        pt19 = HeadClass.pointsFish[8]
+        pt22 = HeadClass.pointsEchelle[0]
+        pt24 = HeadClass.pointsEchelle[1]
+        echelle3mm_px = Fonctions_Externes.euclideDist(pt22,pt24)
 
-        snout_eye_px = HeadClass.euclideDist(pt3,pt5)
+        snout_eye_px = Fonctions_Externes.euclideDist(pt3,pt5)
         snout_eye_mm = round(3*snout_eye_px/echelle3mm_px,4)
-        HeadClass.distance[0]=snout_eye_mm
+        HeadClass.distances_check[0]=snout_eye_mm
 
-        snout_length_px = HeadClass.euclideDist(pt5,pt7)
+        snout_length_px = Fonctions_Externes.euclideDist(pt5,pt7)
         snout_length_mm = round(3*snout_length_px/echelle3mm_px,4)
-        HeadClass.distance[1]=snout_length_mm
+        HeadClass.distances_check[1]=snout_length_mm
 
-        eye_diameter_px = HeadClass.euclideDist(pt3,pt19)
+        eye_diameter_px = Fonctions_Externes.euclideDist(pt3,pt19)
         eye_diameter_mm = round(3*eye_diameter_px/echelle3mm_px,4)
-        HeadClass.distance[2]=eye_diameter_mm
+        HeadClass.distances_check[2]=eye_diameter_mm
 
-        head_length_px = HeadClass.euclideDist(pt5,pt17)
+        head_length_px = Fonctions_Externes.euclideDist(pt5,pt17)
         head_length_mm = round(3*head_length_px/echelle3mm_px,4)
-        HeadClass.distance[3]=head_length_mm
+        HeadClass.distances_check[3]=head_length_mm
 
-        head_depth_px = HeadClass.euclideDist(pt11,pt17)
+        head_depth_px = Fonctions_Externes.euclideDist(pt11,pt17)
         head_depth_mm = round(3*head_depth_px/echelle3mm_px,4)
-        HeadClass.distance[4]=head_depth_mm
+        HeadClass.distances_check[4]=head_depth_mm
 
-        return HeadClass.distance
+        return HeadClass.distances_check
 
 
 
 
 
 class BodyClass():
-    ''' Class item2 pour le corps du poisson'''
-    ''' Variables globales pour export '''
-    ''' nodes1 : noeuds du polygone convexe de la tête et de l'echelle '''
-    ''' poly1 : liste de tous les points '''
-    ''' pointsTete : liste des points de la tête [(x1,y1),(x2,y2)...]'''
-    ''' pointsEchelle3mm : liste des points de l'echelle [(x1,y1),(x2,y2)]'''
-    ''' distance : liste des distances calculées entre les points'''
-    nodes1 = []
-    poly1 = []
-    pointsStandard = []
-    pointsEchelle10mm = []
-    distance = [0 for _ in range(2)]
+
+    id_polygons = []
+    pointsFish = []
+    pointsEchelle = []
+    distances_check = [0 for _ in range(2)]
 
     def __init__(self, canvas1, points,color):
 
         self.previous_x = None
         self.previous_y = None
         self.selected = None
-        self.listPoly = [2,7,12]
-        self.NomsPoly = ["echelle","longueur","largeur"]
         self.points = points
         self.x = None
-        self.pointsCardinauxFish = BodyFish.pointsCardinaux()
-        # print(self.pointsCardinauxFish)
 
         if points!=None:
             self.polygon = canvas1.create_polygon(self.points,fill='',outline=color,smooth=0,width=6,dash=(1,5))
-            BodyClass.poly1.append(self.polygon)
+            BodyClass.id_polygons.append(self.polygon)
             canvas1.tag_bind(self.polygon, '<ButtonPress-3>',   lambda event, tag=self.polygon: self.on_press_tag(event, 0, tag))
             canvas1.tag_bind(self.polygon, '<ButtonRelease-3>', lambda event, tag=self.polygon: self.on_release_tag(event, 0, tag))
             canvas1.tag_bind(self.polygon, '<B3-Motion>', self.on_move_polygon)
@@ -299,18 +199,20 @@ class BodyClass():
                 label = canvas1.create_text((x+15, y+6),text=str(node%15),font=("Purisa", 12),fill='green')
                 self.nodes.append(node)
                 self.nonodes.append(label)
-                BodyClass.nodes1.append(node)
                 canvas1.tag_bind(node, '<ButtonPress-3>',   lambda event, number=number, tag=node: self.on_press_tag(event, number, tag))
                 canvas1.tag_bind(node, '<ButtonRelease-3>', lambda event, number=number, tag=node: self.on_release_tag(event, number, tag))
                 canvas1.tag_bind(node, '<B3-Motion>', lambda event, number=number: self.on_move_node(event, number))
 
-        for x in BodyClass.poly1:
-            liste = canvas1.coords(x)
-            if(len(canvas1.coords(x))==8):BodyClass.pointsStandard=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
-            if(len(canvas1.coords(x))==4):BodyClass.pointsEchelle10mm=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
+        BodyClass.update_points()
 
-        if(len(BodyClass.pointsStandard)>0):
+        if(len(BodyClass.pointsFish)>0):
             afficheLongueurBody()
+
+    def update_points():
+        for id in BodyClass.id_polygons:
+            liste = canvas1.coords(id)
+            if(len(canvas1.coords(id))==8):BodyClass.pointsFish=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
+            if(len(canvas1.coords(id))==4):BodyClass.pointsEchelle=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
 
     def on_press_tag(self, event, number, tag):
         self.selected = tag
@@ -318,28 +220,16 @@ class BodyClass():
         self.previous_y = event.y
         print('press:', event,tag)
 
-        for x in BodyClass.poly1:
-            liste = canvas1.coords(x)
-            if(len(canvas1.coords(x))==8):BodyClass.pointsStandard=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
-            if(len(canvas1.coords(x))==4):BodyClass.pointsEchelle10mm=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
-
+        BodyClass.update_points()
         afficheLongueurBody()
 
     def on_release_tag(self, event, number, tag):
         self.selected = None
         self.previous_x = None
         self.previous_y = None
-        # for x,y in zip(self.listPoly,self.NomsPoly):
-            # print(y)
-            # print(canvas1.coords(x))
-            # print("\n")
         print('release:', tag)
 
-        for x in BodyClass.poly1:
-            liste = canvas1.coords(x)
-            if(len(canvas1.coords(x))==8):BodyClass.pointsStandard=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
-            if(len(canvas1.coords(x))==4):BodyClass.pointsEchelle10mm=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
-
+        BodyClass.update_points()
         afficheLongueurBody()
 
     def on_move_node(self, event, number):
@@ -357,10 +247,7 @@ class BodyClass():
             self.previous_x = event.x
             self.previous_y = event.y
 
-        for x in BodyClass.poly1:
-            liste = canvas1.coords(x)
-            if(len(canvas1.coords(x))==8):BodyClass.pointsStandard=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
-            if(len(canvas1.coords(x))==4):BodyClass.pointsEchelle10mm=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
+        BodyClass.update_points()
         afficheLongueurBody()
 
     def on_move_polygon(self, event):
@@ -370,58 +257,35 @@ class BodyClass():
             dy = event.y - self.previous_y
             # move polygon
             canvas1.move(self.selected, dx, dy)
-            print(self.selected)
             # move red nodes
             for item,item1 in zip(self.nodes,self.nonodes):
-                print("move")
-                print(item)
-                print(item1)
                 canvas1.move(item, dx, dy)
                 canvas1.move(item1,dx,dy)
             # recalculate values in self.points
             for item in self.points:
-                print("calculate)")
-                print(item)
-
                 item[0] += dx
                 item[1] += dy
             self.previous_x = event.x
             self.previous_y = event.y
 
-        for x in BodyClass.poly1:
-            liste = canvas1.coords(x)
-            if(len(canvas1.coords(x))==8):BodyClass.pointsStandard=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
-            if(len(canvas1.coords(x))==4):BodyClass.pointsEchelle10mm=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
+        BodyClass.update_points()
         afficheLongueurBody()
 
-    def hide_nodes():
-        for node in Item.nodes1:
-            canvas1.itemconfig(node,fill="",outline='')
-        for poly in Item.poly1:
-            canvas1.itemconfig(poly,dash=())
-    def euclideDist(a,b):
-        import numpy as np
-        x1 = a[0]
-        y1 = a[1]
-        x2 = b[0]
-        y2 = b[1]
-        norme = np.sqrt((x2-x1)**2+(y2-y1)**2)
-        return norme
     def calculDistances():
-        pt3 = BodyClass.pointsEchelle10mm[0]
-        pt5 = BodyClass.pointsEchelle10mm[1]
-        pt8 = BodyClass.pointsStandard[0]
-        pt10 = BodyClass.pointsStandard[1]
-        pt12 = BodyClass.pointsStandard[2]
-        pt14 = BodyClass.pointsStandard[3]
-        echelle10mm_px = BodyClass.euclideDist(pt3,pt5)
-        body_size_px = BodyClass.euclideDist(pt8,pt12)
+        pt3 = BodyClass.pointsEchelle[0]
+        pt5 = BodyClass.pointsEchelle[1]
+        pt8 = BodyClass.pointsFish[0]
+        pt10 = BodyClass.pointsFish[1]
+        pt12 = BodyClass.pointsFish[2]
+        pt14 = BodyClass.pointsFish[3]
+        echelle10mm_px = Fonctions_Externes.euclideDist(pt3,pt5)
+        body_size_px = Fonctions_Externes.euclideDist(pt8,pt12)
         body_size_mm = round(10*body_size_px/echelle10mm_px,4)
-        body_depth_px = BodyClass.euclideDist(pt10,pt14)
+        body_depth_px = Fonctions_Externes.euclideDist(pt10,pt14)
         body_depth_mm = round(10*body_depth_px/echelle10mm_px,4)
-        BodyClass.distance[0]=body_size_mm
-        BodyClass.distance[1]=body_depth_mm
-        return BodyClass.distance
+        BodyClass.distances_check[0]=body_size_mm
+        BodyClass.distances_check[1]=body_depth_mm
+        return BodyClass.distances_check
 
 class HeadFish():
     img1 = None
@@ -513,90 +377,14 @@ class BodyFish():
     def move(self,event):
         if event.char=='q':
             canvas1.move(BodyFish.poisson,-10,0)
-
         if event.char=='s':
             canvas1.move(BodyFish.poisson,10,0)
         if event.char =='z':
             canvas1.move(BodyFish.poisson,0,-10)
 
-    def hideImage():
-        canvas1.move(Fish.img1,0,1000)
-    def saveImage():
-        ps = canvas1.postscript(colormode='color')
-        import io
-        img = Image.open(io.BytesIO(ps.encode('utf-8')))
-        img.save(pathFinal+Fish.pathImg[-13:])
-    def pointsCardinaux():
-        import cv2
-        import matplotlib.pyplot as plt
-        import numpy as np
-        pointsCardinauxFish = []
-        diamond = cv2.getStructuringElement(cv2.MORPH_RECT,(5,5))
-        diamond[0, 0] = 0
-        diamond[0, 1] = 0
-        diamond[1, 0] = 0
-        diamond[4, 4] = 0
-        diamond[4, 3] = 0
-        diamond[3, 4] = 0
-        diamond[4, 0] = 0
-        diamond[4, 1] = 0
-        diamond[3, 0] = 0
-        diamond[0, 3] = 0
-        diamond[0, 4] = 0
-        diamond[1, 4] = 0
-        img = cv2.cvtColor(BodyFish.imgcv2,cv2.COLOR_RGB2BGR)
-        #1500x1125
-        img = cv2.resize(img,(1300,975))
-        # print(img)
-        closing = cv2.morphologyEx(img, cv2.MORPH_CLOSE, diamond,iterations=5)
-        dilated = cv2.dilate(closing,diamond,iterations=1)
-        blured = cv2.medianBlur(dilated,ksize=21)
-        binarized = cv2.adaptiveThreshold(cv2.cvtColor(blured,cv2.COLOR_BGR2GRAY),255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY,51,6)
-
-
-        # plt.imshow(binarized)
-        # plt.show()
-        contours, hierarchy = cv2.findContours(binarized,cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-        list_area = [cv2.contourArea(c) for c in contours]
-        for c in contours:
-            area = cv2.contourArea(c)
-            if area < 100:
-                cv2.fillPoly(binarized, pts=[c], color=0)
-                continue
-        binarized = cv2.morphologyEx(binarized, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (4,4)));
-        contours2, hierarchy2 = cv2.findContours(binarized,cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-        list_area2 = [cv2.contourArea(c) for c in contours2]
-        drawing = np.ones((img.shape[0], img.shape[1], 3), np.uint8)*255
-        cv2.fillPoly(drawing,pts=contours2,color=(0,0,0))
-        drawing = cv2.dilate(drawing,diamond,iterations=7)
-        drawing = cv2.morphologyEx(drawing, cv2.MORPH_CLOSE, diamond,iterations=5)
-        # plt.imshow(drawing)
-        # plt.show()
-        contours3, hierarchy3 = cv2.findContours(cv2.cvtColor(drawing,cv2.COLOR_BGR2GRAY),cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-        out_mask = np.zeros_like(img)
-        contours3 = sorted(contours3, key=cv2.contourArea)
-        out=img.copy()
-        cv2.drawContours(out, [contours3[-1]], -1, (255,0,0), 3)
-        c=max(contours3, key=cv2.contourArea)
-        left = tuple(c[c[:, :, 0].argmin()][0])
-        right = tuple(c[c[:, :, 0].argmax()][0])
-        top = tuple(c[c[:, :, 1].argmin()][0])
-        bottom = tuple(c[c[:, :, 1].argmax()][0])
-        # plt.imshow(out)
-        # plt.show()
-        print(left)
-        print(right)
-        pointsCardinauxFish.append(left)
-        pointsCardinauxFish.append(right)
-        pointsCardinauxFish.append(top)
-        pointsCardinauxFish.append(bottom)
-        # print(pointsCardinauxFish)
-        return pointsCardinauxFish
-
 
 def afficheLongueur():
     distance = HeadClass.calculDistances()
-    # print(distance)
     texte = ""
     texte += "5 <-> 3 : nez oeil : "+str(distance[0])+" mm \n"
     texte += "5 <-> 7 : museau : "+str(distance[1])+" mm \n"
@@ -607,55 +395,38 @@ def afficheLongueur():
 
 def afficheLongueurBody():
     distance = BodyClass.calculDistances()
-    # print(distance)
     texte = ""
     texte += "8 <-> 10 : Longueur Corps : "+str(distance[0])+" mm \n"
     texte += " 13 <-> 15 : Largeur corps : "+str(distance[1])+" mm \n"
     LongueurBody.config(text=texte)
 
-def alignPoints():
-    ptsCardinaux = BodyFish.pointsCardinaux()
 def openfn():
     import tkinter.filedialog
     filepath = tk.filedialog.askopenfilename(title="Ouvrir une image",filetypes=[('jpg files','.jpg'),('jpeg files','.jpeg')])
     return filepath
 def clearAllCanvas():
-    HeadClass.nodes1=[]
-    HeadClass.poly1=[]
-    HeadClass.pointsTete=[]
-    HeadClass.pointsEchelle3mm=[]
-    HeadClass.distance=[0 for _ in range(20)]
-    HeadClass.angles= [0 for _ in range(20)]
-    HeadClass.points=None
+    HeadClass.id_polygons=[]
+    HeadClass.pointsFish=[]
+    HeadClass.pointsEchelle=[]
+    HeadClass.distances_check=[0 for _ in range(20)]
     Longueur.config(text="")
-    BodyClass.nodes1=[]
-    BodyClass.poly1=[]
-    BodyClass.pointsTete=[]
-    BodyClass.pointsEchelle3mm=[]
-    BodyClass.distance=[0 for _ in range(20)]
-    BodyClass.points=None
+    BodyClass.id_polygons=[]
+    BodyClass.pointsFish=[]
+    BodyClass.pointsEchelle=[]
+    BodyClass.distances_check=[0 for _ in range(20)]
     LongueurBody.config(text="")
     canvas.delete('all')
     canvas1.delete('all')
-def importImage():
 
+def importImage():
     ''' Placement manuel des points'''
-    pt3 = [249.0, 250.0]
-    pt5 = [122.0, 259.0]
-    pt7 = [105.0, 312.0]
-    pt9 = [207.0, 393.0]
-    pt11 = [396.0, 415.0]
-    pt13 = [414.0, 343.0]
-    pt15 = [438.0, 239.0]
-    pt17 = [473.0, 119.0]
-    pt19 = [379.0, 248.0]
-    corps= [pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19]
-    echelle10mm = [[112,181],[300,186]]
-    echelle3mm = [[67,74],[199,74]]
+    corps,echelle10mm,echelle3mm = Placement_Points.randomPoints()
+    pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19 = corps
 
     ''' Réinitialisation pour import '''
     print("\n### Reset ###")
     clearAllCanvas()
+
 
     ''' Import de l'image 4000x3000 '''
     print("\n### Import de l'image ###")
@@ -748,23 +519,6 @@ def importImage():
     print("### OK ###")
 
 
-
-def resetCanvas(canvas,canvas1):
-    canvas1.destroy()
-    canvas.destroy()
-    ''' Canvas pour la tête '''
-    canvas = tk.Canvas(root,bg='#f0f0f0',bd=0)
-    canvas.config(width=600, height=500)
-    # canvas.pack(side='left')
-    canvas.grid(column=0,row=8)
-
-
-    ''' Canvas pour le corps '''
-    canvas1 = tk.Canvas(root,bg='#f0f0f0')
-    canvas1.config(width=1000, height=500)
-    # canvas1.pack(side='left')
-    canvas1.grid(column=1,row=8)
-
 ## Main
 
 ''' Fenetre et menu'''
@@ -791,15 +545,11 @@ root.config(menu=menubar)
 
 ''' Label Intro de presentation'''
 intro = tk.Label(root,text="Sexing procedure of three-spined stickleback -- Proof of concept \n")
-# intro.place(x=500,y=0)
 intro.grid(ipadx=2)
 
 ''' Label explications '''
 explanation = tk.Label(root,text="Le positionnement des points est fait automatiquement -- Ajuster si nécessaire \n ")
-# explanation.place(x=10,y=120)
 explanation.grid(column=0,row=1)
-
-
 
 
 ''' Boutons '''
@@ -809,40 +559,28 @@ B = tk.Button(root,text = "Predict",command = None)
 B.place(x=790,y=105)
 B = tk.Button(root,text = "Export (developpers only)",command = HeadClass.genererAllDistancesHead)
 B.place(x=625,y=135)
-# B = tk.Button(root,text="Next image",command = None)
-# B.place(x=775,y=135)
-# B.()
 
-# B.pack()
-
-# B.pack()
-#
-#
 ''' Labels pour les longueurs de la tête '''
 tk.Label(root,text="Longueurs caractéristiques de la tête : \n",justify=tk.LEFT,font=("Purisa",8,"bold","underline")).grid(column=0,row=2)
 Longueur = tk.Label(root,text="",justify=tk.LEFT)
-# Longueur.place(x=200,y=45)
 Longueur.grid(column=0,row=4)
 
 
 ''' Labels pour les longueurs du corps '''
 tk.Label(root,text="Longueurs caractéristiques du corps : \n",justify=tk.LEFT,font=("Purisa",8,"bold","underline")).grid(column=1,row=2)
 LongueurBody = tk.Label(root,text="",justify=tk.LEFT)
-# LongueurBody.place(x=700,y=45)
 LongueurBody.grid(column=1,row=4)
 
 
 ''' Canvas pour la tête '''
 canvas = tk.Canvas(root,bg='#f0f0f0',bd=0)
 canvas.config(width=600, height=500)
-# canvas.pack(side='left')
 canvas.grid(column=0,row=8)
 
 
 ''' Canvas pour le corps '''
 canvas1 = tk.Canvas(root,bg='#f0f0f0')
 canvas1.config(width=1000, height=500)
-# canvas1.pack(side='left')
 canvas1.grid(column=1,row=8)
 
 root.mainloop()
