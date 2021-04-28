@@ -534,7 +534,8 @@ def importImage():
 
 ''' Fenetre et menu'''
 root = tk.Tk()
-root.geometry("1000x800")
+# root.geometry("1000x800")
+root.state('zoomed')
 root.title("Sex Determination for Three Spined Stickleback")
 menubar = tk.Menu(root)
 menuFichier = tk.Menu(menubar,tearoff=0)
