@@ -319,13 +319,6 @@ class HeadFish():
         canvas.move(self.poisson,0,-10)
     def moveDown(self,event):
         canvas.move(self.poisson,0,10)
-    def hideImage():
-        canvas.move(HeadFish.img1,0,1000)
-    def saveImage():
-        ps = canvas.postscript(colormode='color')
-        import io
-        img = Image.open(io.BytesIO(ps.encode('utf-8')))
-        img.save(pathFinal+HeadFish.pathImg[-13:])
     def detect_eye(self,img):
         import matplotlib.pyplot as plt
         img_couleur = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
