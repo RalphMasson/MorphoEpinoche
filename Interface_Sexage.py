@@ -12,13 +12,13 @@ import math,functools,itertools
 
 # Classe pour les points de la tête
 class HeadClass():
-    ''' Variables globales pour export '''
-    ''' id_polygons : liste des id des polygons (la tete et l'echelle) '''
-    ''' pointsTete : liste des points de la tête [(x1,y1),(x2,y2)...]'''
-    ''' pointsEchelle3mm : liste des points de l'echelle [(x1,y1),(x2,y2)]'''
-    ''' distances_check : liste des distances caractéristiques affichées '''
-    ''' distances_all : liste de toutes les distances sauvegardés pour le modèle'''
-
+    """Variables globales pour export
+    id_polygons : liste des id des polygons (la tete et l'echelle)
+    pointsTete : liste des points de la tête [(x1,y1),(x2,y2)...]
+    pointsEchelle3mm : liste des points de l'echelle [(x1,y1),(x2,y2)]
+    distances_check : liste des distances caractéristiques affichées
+    distances_all : liste de toutes les distances sauvegardés pour le modèle
+    """
     id_polygons = []
     pointsFish = []
     pointsEchelle = []
@@ -26,6 +26,12 @@ class HeadClass():
     distances_all = []
 
     def __init__(self, canvas, points,color):
+        """!
+        Constructeur du polygone de la tête
+        @param canvas tk.Canvas : cadre de l'image
+        @param points list : liste des points du polygone
+        @param color String : couleur du polygone
+        """
         self.previous_x = None
         self.previous_y = None
         self.selected = None
@@ -56,12 +62,21 @@ class HeadClass():
              afficheLongueur()
 
     def update_points():
+        """!
+        Methode de mise à jour de la position des points
+        """
         for id in HeadClass.id_polygons:
             liste = canvas.coords(id)
             if(len(canvas.coords(id))==18):HeadClass.pointsFish=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
             if(len(canvas.coords(id))==4):HeadClass.pointsEchelle=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
 
     def on_press_tag(self, event, number, tag):
+        """!
+        Methode pour determiner l'item selectionné
+        @param event event : coordonnees de l'item
+        @param number int : numero de l'id
+        @param tag int : numero de l'id
+        """
         self.selected = tag
         self.previous_x = event.x
         self.previous_y = event.y
@@ -180,12 +195,14 @@ class HeadClass():
 
 
 class BodyClass():
-    ''' Variables globales pour export '''
-    ''' id_polygons : liste des id des polygons (le corps et l'echelle) '''
-    ''' pointsFish : liste des points du corps [(x1,y1),(x2,y2)...]'''
-    ''' pointsEchelle : liste des points de l'echelle [(x1,y1),(x2,y2)]'''
-    ''' distances_check : liste des distances caractéristiques affichées '''
-    ''' distances_all : liste de toutes les distances sauvegardés pour le modèle'''
+    """Variables globales pour export
+    id_polygons : liste des id des polygons (le corps et l'echelle)
+    pointsTete : liste des points du corps [(x1,y1),(x2,y2)...]
+    pointsEchelle3mm : liste des points de l'echelle [(x1,y1),(x2,y2)]
+    distances_check : liste des distances caractéristiques affichées
+    distances_all : liste de toutes les distances sauvegardés pour le modèle
+    """
+
     id_polygons = []
     pointsFish = []
     pointsEchelle = []
@@ -230,6 +247,12 @@ class BodyClass():
             if(len(canvas1.coords(id))==4):BodyClass.pointsEchelle=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
 
     def on_press_tag(self, event, number, tag):
+        """!
+        Methode pour determiner l'item selectionné
+        @param event event : coordonnees de l'item
+        @param number int : numero de l'id
+        @param tag int : numero de l'id
+        """
         self.selected = tag
         self.previous_x = event.x
         self.previous_y = event.y
@@ -303,6 +326,13 @@ class BodyClass():
         return BodyClass.distances_check
 
 class HeadFish():
+    """Variables globales pour export
+    id_polygons : liste des id des polygons (la tete et l'echelle)
+    pointsTete : liste des points de la tête [(x1,y1),(x2,y2)...]
+    pointsEchelle3mm : liste des points de l'echelle [(x1,y1),(x2,y2)]
+    distances_check : liste des distances caractéristiques affichées
+    distances_all : liste de toutes les distances sauvegardés pour le modèle
+    """
     img1 = None
     pathImg = ""
     poisson = None
