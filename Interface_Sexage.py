@@ -180,11 +180,17 @@ class HeadClass():
 
 
 class BodyClass():
-
+    ''' Variables globales pour export '''
+    ''' id_polygons : liste des id des polygons (le corps et l'echelle) '''
+    ''' pointsFish : liste des points du corps [(x1,y1),(x2,y2)...]'''
+    ''' pointsEchelle : liste des points de l'echelle [(x1,y1),(x2,y2)]'''
+    ''' distances_check : liste des distances caractéristiques affichées '''
+    ''' distances_all : liste de toutes les distances sauvegardés pour le modèle'''
     id_polygons = []
     pointsFish = []
     pointsEchelle = []
     distances_check = [0 for _ in range(2)]
+    distances_all = []
 
     def __init__(self, canvas1, points,color):
 
@@ -329,32 +335,12 @@ class HeadFish():
     def moveDown(self,event):
         canvas.move(self.poisson,0,10)
     def detect_eye(self,img):
-        # import matplotlib.pyplot as plt
         img_couleur = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
         img_gray=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-        # img_gray = cv2.resize(img_gray,(3500,2625),Image.ANTIALIAS)
-        # print(type(img_gray))
         img_gray = cv2.medianBlur(img_gray,21)
-        # plt.figure()
-        # plt.imshow(img_gray)
-        # plt.show()
-        # print(type(img_gray))
         circles1 = cv2.HoughCircles(image=img_gray, method=cv2.HOUGH_GRADIENT, dp=2,param1=70,param2=65, minDist=100, minRadius=25,maxRadius=45)
         circles = cv2.HoughCircles(image=img_gray, method=cv2.HOUGH_GRADIENT, dp=2,param1=100,param2=30, minDist=120, minRadius=80,maxRadius=95)
         circles = np.round(circles[0, :]).astype("int32")
-        # print(circles)
-        # print(circles1[0])
-        copy=img_gray.copy()
-        # for (x, y, r) in circles:
-        #     cv2.circle(copy, (x, y), r, (255, 255, 266), 4)
-        # for (x, y, r) in circles1[0]:
-            # cv2.circle(copy, (int(x), int(y)), int(r), (255, 255, 255), 3)
-        #
-        # #
-        # plt.figure()
-        # plt.imshow(copy,cmap="gray")
-        # plt.show()
-
         return circles1[0][0]
 
 
@@ -422,6 +408,7 @@ def clearAllCanvas():
     canvas.delete('all')
     canvas1.delete('all')
 
+
 def importImage():
     ''' Placement manuel des points'''
     corps,echelle10mm,echelle3mm = Placement.Points.randomPointsBis()
@@ -460,14 +447,10 @@ def importImage():
     BodyFish(canvas1,newPIL_image,newCV2_image,(1300,975))
     print(BodyFish.poisson)
     canvas1.move(BodyFish.poisson,-(left[0]-50),-(left[1]-280))
+    canvas1.update()
     print("### OK ###")
 
-    print("\n### Alignement des points sur le corps'  ###")
-    corpsStandard = [[x[0]-(left[0]-50),x[1]-(left[1]-280)] for x in corpsStandard]
-    echelle10mm = [[x[0]-(left[0]-250),x[1]-(left[1]-350)] for x in echelle10mm]
-    BodyClass(canvas1, echelle10mm,'red')
-    BodyClass(canvas1,corpsStandard,'cyan')
-    print("### OK ###")
+
 
     ''' Resize pour la tête '''
 
@@ -479,15 +462,25 @@ def importImage():
     CV2_image_big = np.array(PIL_image_big)
     CV2_image_big = CV2_image_big[:, :, ::-1].copy()
     out,c = Placement.Points.contoursCorpsBig(CV2_image_big)
-    [left,right,top,bottom] = Placement.Points.pointExtremeContours(c)
-    CV2_image_big = Placement.Points.rotate_image(out,Placement.Points.angleRot(left,right)[0],Placement.Points.angleRot(left,right)[1])
+    [left1,right1,top,bottom] = Placement.Points.pointExtremeContours(c)
+    CV2_image_big = Placement.Points.rotate_image(out,Placement.Points.angleRot(left1,right1)[0],Placement.Points.angleRot(left1,right1)[1])
+
+
 
     print("\n### Chargement de l'image de la tête' ###")
     newPIL_image_big = Image.fromarray(CV2_image_big)
     newCV2_image_big = cv2.cvtColor(np.array(newPIL_image_big), cv2.COLOR_BGR2RGB)
     HeadFish(canvas,newPIL_image_big,newCV2_image_big,(3500,2625))
+    canvas.update()
     print("### OK ###")
 
+    print("\n### Alignement des points sur le corps'  ###")
+    corpsStandard = [[x[0]-(left[0]-50),x[1]-(left[1]-280)] for x in corpsStandard]
+    echelle10mm = [[x[0]-(left[0]-250),x[1]-(left[1]-350)] for x in echelle10mm]
+    BodyClass(canvas1, echelle10mm,'red')
+    BodyClass(canvas1,corpsStandard,'cyan')
+    canvas1.update()
+    print("### OK ###")
     ''' Initialisation des points 3 et 19 par détection auto '''
     print("\n### Calcul des points 3 et 19 ###")
     try:
