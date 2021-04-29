@@ -4,8 +4,13 @@ import numpy as np
 import math
 
 # img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\gimp_cut\\male\\IMGP1152M.JPG"
-# img = cv2.cvtColor(cv2.imread(img_path),cv2.COLOR_BGR2RGB)
+# img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/1-1.JPG'
+img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/2.JPG'
+# img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/3-3.JPG'
 
+
+
+img = cv2.cvtColor(cv2.imread(img_path),cv2.COLOR_BGR2RGB)
 import sys
 sys.path.insert(0, 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho')
 import Fonctions
@@ -493,18 +498,96 @@ class Points():
         return corps,echelle10mm,echelle3mm
 
 
+    def contoursCorpsNew(img):
+        img_hsv = cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
+        # img_hsv = cv2.bilateralFilter(img_hsv,15,75,75)
+
+        plt.figure()
+        plt.imshow(img_hsv)
 
 
 
+        low_tail = np.array([90, 30, 160])
+        high_tail = np.array([110, 138, 220])
+        mask_tail = cv2.inRange(img_hsv, low_tail, high_tail)
+        mask_tail = 255-mask_tail
+        res = cv2.bitwise_and(img, img, mask=mask_tail)
+        res_b = res[:,:,0]
+        res_g = res[:,:,1]
+        res_r = res[:,:,2]
+        res_b[np.where(res_b==0)] = 230
+        res_g[np.where(res_g==0)] = 230
+        res_r[np.where(res_r==0)] = 230
+        res[:,:,0]= res_b
+        res[:,:,1]= res_g
+        res[:,:,2]= res_r
+        res = cv2.medianBlur(res,11)
+        res_hsv = cv2.cvtColor(res,cv2.COLOR_BGR2HSV)
 
+
+
+        low_shadow = np.array([107,6,65])
+        high_shadow = np.array([125,30,125])
+        mask_shadow = cv2.inRange(res_hsv,low_shadow,high_shadow)
+        mask_shadow = 255-mask_shadow
+        res = cv2.bitwise_and(res, res, mask=mask_shadow)
+        res_b = res[:,:,0]
+        res_g = res[:,:,1]
+        res_r = res[:,:,2]
+        res_b[np.where(res_b==0)] = 230
+        res_g[np.where(res_g==0)] = 230
+        res_r[np.where(res_r==0)] = 230
+        res[:,:,0]= res_b
+        res[:,:,1]= res_g
+        res[:,:,2]= res_r
+        res = cv2.medianBlur(res,11)
+        res_hsv = cv2.cvtColor(res,cv2.COLOR_BGR2HSV)
+
+        # color = ('b','g','r')
+        # plt.figure()
+        # for i, col in enumerate(color):
+        #     histr = cv2.calcHist([img],[i],None,[256],[0,255])
+        #     plt.plot(histr,color = col,label=str(col))
+        #     plt.xlim([0,256])
+        # plt.legend()
+        # color = ('h','s','v')
+        # plt.figure()
+        # for i, col in enumerate(color):
+        #     histr = cv2.calcHist([img_hsv],[i],None,[256],[0,255])
+        #     plt.plot(histr,label=str(col))
+        #     plt.xlim([0,256])
+        # plt.legend()
+        res_hsv_bgr = cv2.cvtColor(res_hsv,cv2.COLOR_HSV2BGR)
+        res_hsv_gr = cv2.cvtColor(res_hsv_bgr,cv2.COLOR_BGR2GRAY)
+        res_hsv_gr = cv2.dilate(res_hsv_gr,kernel = np.ones((5,5),np.uint8),iterations=3)
+        # plt.imshow(res_hsv_gr)
+        # plt.show()
+        img_out1 = cv2.adaptiveThreshold(res_hsv_gr,220,cv2.ADAPTIVE_THRESH_MEAN_C,\
+            cv2.THRESH_BINARY,21,2)
+        plt.figure()
+        plt.imshow(img_out1)
+        # plt.figure()
+        # plt.imshow(img_out2)
+        # plt.figure()
+        # plt.imshow(img)
+        # plt.figure()
+        # plt.imshow(img_hsv)
+        plt.figure()
+        plt.imshow(res)
+        plt.show()
 '''
 *
 * Main function
 *
 '''
 
-
-# out,c = contoursCorpsBig(img)
+# plt.figure()
+# plt.imshow(img)
+# plt.show()
+# Points.contoursCorpsNew(img)
+# plt.figure()
+# plt.imshow(out)
+# plt.show()
 
 # #
 # # out,c = contoursCorps(img)

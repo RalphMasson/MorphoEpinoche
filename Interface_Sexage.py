@@ -7,6 +7,7 @@ import tkinter as tk
 from PIL import Image, ImageTk
 import os,cv2,Placement,Fonctions
 import numpy as np
+import math,functools,itertools
 
 
 # Classe pour les points de la tête
@@ -163,6 +164,14 @@ class HeadClass():
         head_depth_px = Fonctions.Externes.euclideDist(pt11,pt17)
         head_depth_mm = round(3*head_depth_px/echelle3mm_px,4)
         HeadClass.distances_check[4]=head_depth_mm
+
+        jaw_length_px = Fonctions.Externes.euclideDist(pt7,pt9)
+        jaw_length_mm = round(3*jaw_length_px/echelle3mm_px,4)
+        HeadClass.distances_check[5]=jaw_length_mm
+
+        jaw_length2_px = Fonctions.Externes.euclideDist(pt5,pt9)
+        jaw_length2_mm = round(3*jaw_length2_px/echelle3mm_px,4)
+        HeadClass.distances_check[6]=jaw_length2_mm
 
         return HeadClass.distances_check
 
@@ -379,11 +388,13 @@ class BodyFish():
 def afficheLongueur():
     distance = HeadClass.calculDistances()
     texte = ""
-    texte += "5 <-> 3 : nez oeil : "+str(distance[0])+" mm \n"
-    texte += "5 <-> 7 : museau : "+str(distance[1])+" mm \n"
+    texte += "5 <-> 3 : distance nez oeil : "+str(distance[0])+" mm \n"
+    texte += "5 <-> 7 : longueur museau : "+str(distance[1])+" mm \n"
     texte += "3 <-> 19 : diametre oeil : "+str(distance[2])+" mm \n"
     texte += "5 <-> 17 : longueur tête : "+str(distance[3])+" mm \n"
     texte += "11 <-> 17 : largeur tête : "+str(distance[4])+" mm \n"
+    texte += "7 <-> 9 : bas bouche - menton : "+str(distance[5])+" mm \n"
+    texte += "5 <-> 9 : haut bouche - menton : "+str(distance[6])+" mm \n"
     Longueur.config(text=texte)
 
 def afficheLongueurBody():
@@ -459,12 +470,17 @@ def importImage():
     print("### OK ###")
 
     ''' Resize pour la tête '''
+
     print("\n### Resize de l'image pour la tête")
-    PIL_image_big = newPIL_image.resize((3500,2625), Image.ANTIALIAS)
+
+    PIL_image_big = Image.open(pathok)
+    PIL_image_big = PIL_image_big.resize((3500,2625), Image.ANTIALIAS)
     PIL_image_big = np.flip(PIL_image_big,axis=2)
     CV2_image_big = np.array(PIL_image_big)
     CV2_image_big = CV2_image_big[:, :, ::-1].copy()
-    # CV2_image_big = np.array(Image.open(pathok))
+    out,c = Placement.Points.contoursCorpsBig(CV2_image_big)
+    [left,right,top,bottom] = Placement.Points.pointExtremeContours(c)
+    CV2_image_big = Placement.Points.rotate_image(out,Placement.Points.angleRot(left,right)[0],Placement.Points.angleRot(left,right)[1])
 
     print("\n### Chargement de l'image de la tête' ###")
     newPIL_image_big = Image.fromarray(CV2_image_big)
@@ -495,13 +511,16 @@ def importImage():
         print("Impossible de déterminer le point 9")
 
     print("### OK ###")
-    #
-    # '''Initialisation du point 15 et 13 par détection auto '''
-    # print("\n### Calcul des points 9 ###")
-    # pt15,pt13=Placement_Points.points15_13(imagerot)
-    # pt15 = [pt15[0],pt15[1]]
-    # pt13 = [pt13[0],pt13[1]]
-    # print("### OK ###")
+
+    '''Initialisation du point 15 et 13 par détection auto '''
+    print("\n### Calcul des points 9 ###")
+    try:
+        pt15,pt13=Placement_Points.points15_13(CV2_image_big)
+        pt15 = [pt15[0],pt15[1]]
+        pt13 = [pt13[0],pt13[1]]
+    except:
+        print("Impossible de déterminer les points 15 et 13")
+    print("### OK ###")
 
 
     '''Initialisation des points 5 et 7 par détection auto '''
@@ -565,12 +584,14 @@ explanation.grid(column=0,row=1)
 
 
 ''' Boutons '''
+
+
 B = tk.Button(root,text = "Import image and autoplace",command = importImage)
-B.place(x=625,y=105)
+B.place(x=625,y=65)
 B = tk.Button(root,text = "Predict",command = None)
-B.place(x=790,y=105)
+B.place(x=790,y=65)
 B = tk.Button(root,text = "Export (developpers only)",command = HeadClass.genererAllDistancesHead)
-B.place(x=625,y=135)
+B.place(x=625,y=95)
 
 ''' Labels pour les longueurs de la tête '''
 tk.Label(root,text="Longueurs caractéristiques de la tête : \n",justify=tk.LEFT,font=("Purisa",8,"bold","underline")).grid(column=0,row=2)
