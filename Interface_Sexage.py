@@ -568,32 +568,46 @@ menubar.add_cascade(label="Aide", menu=menuAide)
 root.config(menu=menubar)
 
 ''' Label Intro de presentation'''
-intro = tk.Label(root,text="Sexing procedure of three-spined stickleback -- Proof of concept \n")
+intro = tk.Label(root,text=" ",font=("Purisa",12,"bold"))
 intro.grid(ipadx=2)
-
+intro = tk.Label(root,text=" \t Sexing procedure of three-spined stickleback \n",font=("Purisa",12,"bold"))
+intro.place(x=650,y=30,anchor=tk.CENTER)
 ''' Label explications '''
-explanation = tk.Label(root,text="Le positionnement des points est fait automatiquement -- Ajuster si nécessaire \n ")
+explanation = tk.Label(root,text="\n \n \n \n ")
 explanation.grid(column=0,row=1)
+
 
 
 ''' Boutons '''
 
 
-B = tk.Button(root,text = "Import image and autoplace",command = importImage)
-B.place(x=625,y=65)
-B = tk.Button(root,text = "Predict",command = None)
-B.place(x=790,y=65)
-B = tk.Button(root,text = "Export (developpers only)",command = HeadClass.genererAllDistancesHead)
-B.place(x=625,y=95)
+B = tk.Label(root, text = 'PREDICTION',font=("Purisa",12,"bold"),fg='blue')
+B.place(x=460,y=50)
+B = tk.Button(root,text = "Import image and autoplace",command = importImage,fg='blue')
+B.place(x=400,y=80)
+B = tk.Button(root,text = "Predict",command = None,fg='blue')
+B.place(x=570,y=80)
+B = tk.Label(root, text = 'ADD THESE VALUES TO MODEL',font=("Purisa",12,"bold"),fg='green')
+B.place(x=760,y=50)
+
+B = tk.Button(root,text = "Model Update (developpers only)",command = HeadClass.genererAllDistancesHead,fg='green')
+B.place(x=850,y=80)
+B = tk.Label(root,text='Sex for model: ',fg='green')
+B.place(x=725,y=85)
+sexModel = tk.Entry(root,width=3)
+sexModel.place(x=810,y=85)
+
+explanation = tk.Label(root,text="\n \n ")
+explanation.grid(column=0,row=3)
 
 ''' Labels pour les longueurs de la tête '''
-tk.Label(root,text="Longueurs caractéristiques de la tête : \n",justify=tk.LEFT,font=("Purisa",8,"bold","underline")).grid(column=0,row=2)
+tk.Label(root,text="Longueurs caractéristiques de la tête : \n",justify=tk.LEFT,font=("Purisa",8,"bold","underline")).grid(column=0,row=3)
 Longueur = tk.Label(root,text="",justify=tk.LEFT)
 Longueur.grid(column=0,row=4)
 
 
 ''' Labels pour les longueurs du corps '''
-tk.Label(root,text="Longueurs caractéristiques du corps : \n",justify=tk.LEFT,font=("Purisa",8,"bold","underline")).grid(column=1,row=2)
+tk.Label(root,text="Longueurs caractéristiques du corps : \n",justify=tk.LEFT,font=("Purisa",8,"bold","underline")).grid(column=1,row=3)
 LongueurBody = tk.Label(root,text="",justify=tk.LEFT)
 LongueurBody.grid(column=1,row=4)
 
