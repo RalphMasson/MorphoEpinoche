@@ -572,6 +572,18 @@ def importImage():
     print("### OK ###")
 
 
+def affichePrediction():
+    from random import randrange
+    labels = ('Male','Female')
+    choice = randrange(2)
+    print(choice)
+    if(choice==0):fg='blue'
+    if(choice==1):fg='pink'
+    sexPrediction.config(text="")
+    sexPrediction.config(text=labels[choice],font=("Purisa",16,"bold"),fg=fg)
+
+
+
 ## Main
 
 ''' Fenetre et menu'''
@@ -615,7 +627,7 @@ B = tk.Label(root, text = 'PREDICTION',font=("Purisa",12,"bold"),fg='blue')
 B.place(x=460,y=50)
 B = tk.Button(root,text = "Import image and autoplace",command = importImage,fg='blue')
 B.place(x=400,y=80)
-B = tk.Button(root,text = "Predict",command = None,fg='blue')
+B = tk.Button(root,text = "Predict",command = affichePrediction,fg='blue')
 B.place(x=570,y=80)
 B = tk.Label(root, text = 'ADD THESE VALUES TO MODEL',font=("Purisa",12,"bold"),fg='green')
 B.place(x=760,y=50)
@@ -626,6 +638,9 @@ B = tk.Label(root,text='Sex for model: ',fg='green')
 B.place(x=725,y=85)
 sexModel = tk.Entry(root,width=3)
 sexModel.place(x=810,y=85)
+
+sexPrediction = tk.Label(root,text="")
+sexPrediction.place(x=650,y=145)
 
 explanation = tk.Label(root,text="\n \n ")
 explanation.grid(column=0,row=3)
