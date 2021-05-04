@@ -412,8 +412,8 @@ def afficheLongueur():
     texte += "3 <-> 19 : diametre oeil : "+str(distance[2])+" mm \n"
     texte += "5 <-> 17 : longueur tête : "+str(distance[3])+" mm \n"
     texte += "11 <-> 17 : largeur tête : "+str(distance[4])+" mm \n"
-    texte += "7 <-> 9 : bas bouche - menton : "+str(distance[5])+" mm \n"
-    texte += "5 <-> 9 : haut bouche - menton : "+str(distance[6])+" mm \n"
+    # texte += "7 <-> 9 : bas bouche - menton : "+str(distance[5])+" mm \n"
+    # texte += "5 <-> 9 : haut bouche - menton : "+str(distance[6])+" mm "
     Longueur.config(text=texte)
 
 def afficheLongueurBody():
@@ -438,11 +438,15 @@ def clearAllCanvas():
     BodyClass.pointsEchelle=[]
     BodyClass.distances_check=[0 for _ in range(20)]
     LongueurBody.config(text="")
+    avertissement.config(text="")
+    sexPrediction.config(text="")
     canvas.delete('all')
     canvas1.delete('all')
 
 
 def importImage():
+    nbPointNonDetectes = 0
+
     print("### Initialisation ###")
     corps,echelle10mm,echelle3mm = Placement.Points.randomPointsBis()
     pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19 = corps
@@ -505,6 +509,7 @@ def importImage():
         pt19 = [pt19[0],pt19[1]]
     except:
         print("Impossible de déterminer les points 3 et 19")
+        nbPointNonDetectes+=2
 
 
     print("### OK ###")
@@ -518,6 +523,7 @@ def importImage():
         print(pt9)
     except:
         print("Impossible de déterminer le point 9")
+        nbPointNonDetectes+=1
 
     print("### OK ###")
 
@@ -531,6 +537,8 @@ def importImage():
         print("Impossible de déterminer les points 15 et 13")
         pt13 = [1288, 1228]
         pt15 = [1308, 1098]
+        nbPointNonDetectes+=2
+
     print("### OK ###")
 
 
@@ -543,12 +551,14 @@ def importImage():
         pt7 = [pt7[0],pt7[1]]
     except:
         print("Impossible de détecter les points 5 et 7")
+        nbPointNonDetectes+=2
 
     """Initialisation des points 11 et 17 par détection auto """
     try:
         pt17,pt11 = Placement.Points.points11_17(CV2_image_big,pt13,pt15)
     except:
         print("Impossible de détecter les points 11 et 17")
+        nbPointNonDetectes+=2
 
     corps = Placement.Points.centerPoints([pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19],HeadFish.centreOeil)
 
@@ -558,7 +568,7 @@ def importImage():
     HeadClass(canvas, corps,'#ff00f2')
     HeadClass(canvas,echelle3mm,'red')
     print("### OK ###")
-
+    avertissement.config(text=str(13-nbPointNonDetectes)+" points détectés / 13 ")
 
 def affichePrediction():
     from random import randrange
@@ -600,8 +610,8 @@ root.config(menu=menubar)
 ''' Label Intro de presentation'''
 intro = tk.Label(root,text=" ",font=("Purisa",12,"bold"))
 intro.grid(ipadx=2)
-intro = tk.Label(root,text=" \t Sexing procedure of three-spined stickleback \n",font=("Purisa",12,"bold"))
-intro.place(x=650,y=30,anchor=tk.CENTER)
+intro = tk.Label(root,text=" \t Sexing procedure of three-spined stickleback \n",font=("Andalus",16,"bold"))
+intro.place(x=750,y=40,anchor=tk.CENTER)
 ''' Label explications '''
 explanation = tk.Label(root,text="\n \n \n \n ")
 explanation.grid(column=0,row=1)
@@ -612,37 +622,40 @@ explanation.grid(column=0,row=1)
 
 
 B = tk.Label(root, text = 'PREDICTION',font=("Purisa",12,"bold"),fg='blue')
-B.place(x=460,y=50)
+B.place(x=460,y=70)
 B = tk.Button(root,text = "Import image and autoplace",command = importImage,fg='blue')
-B.place(x=400,y=80)
+B.place(x=400,y=100)
 B = tk.Button(root,text = "Predict",command = affichePrediction,fg='blue')
-B.place(x=570,y=80)
+B.place(x=570,y=100)
 B = tk.Label(root, text = 'ADD THESE VALUES TO MODEL',font=("Purisa",12,"bold"),fg='green')
-B.place(x=760,y=50)
+B.place(x=760,y=70)
 
 B = tk.Button(root,text = "Model Update (developpers only)",command = HeadClass.genererAllDistancesHead,fg='green')
-B.place(x=850,y=80)
+B.place(x=850,y=100)
 B = tk.Label(root,text='Sex for model: ',fg='green')
-B.place(x=725,y=85)
+B.place(x=725,y=105)
 sexModel = tk.Entry(root,width=3)
-sexModel.place(x=810,y=85)
+sexModel.place(x=810,y=105)
 
 sexPrediction = tk.Label(root,text="")
-sexPrediction.place(x=650,y=145)
+sexPrediction.place(x=650,y=190)
 
-explanation = tk.Label(root,text="\n \n ")
+avertissement = tk.Label(root,text="")
+avertissement.place(x=650,y=160)
+
+explanation = tk.Label(root,text="\n ")
 explanation.grid(column=0,row=3)
 
 ''' Labels pour les longueurs de la tête '''
-tk.Label(root,text="Longueurs caractéristiques de la tête : \n",justify=tk.LEFT,font=("Purisa",8,"bold","underline")).grid(column=0,row=3)
+tk.Label(root,text="Longueurs caractéristiques de la tête : \n",justify=tk.LEFT,font=("Purisa",8,"bold","underline")).grid(column=0,row=4)
 Longueur = tk.Label(root,text="",justify=tk.LEFT)
-Longueur.grid(column=0,row=4)
+Longueur.grid(column=0,row=5)
 
 
 ''' Labels pour les longueurs du corps '''
-tk.Label(root,text="Longueurs caractéristiques du corps : \n",justify=tk.LEFT,font=("Purisa",8,"bold","underline")).grid(column=1,row=3)
+tk.Label(root,text="Longueurs caractéristiques du corps : \n",justify=tk.LEFT,font=("Purisa",8,"bold","underline")).grid(column=1,row=4)
 LongueurBody = tk.Label(root,text="",justify=tk.LEFT)
-LongueurBody.grid(column=1,row=4)
+LongueurBody.grid(column=1,row=5)
 
 
 ''' Canvas pour la tête '''
@@ -655,6 +668,16 @@ canvas.grid(column=0,row=8)
 canvas1 = tk.Canvas(root,bg='#f0f0f0')
 canvas1.config(width=1000, height=500)
 canvas1.grid(column=1,row=8)
+
+"""Canvas pour logo"""
+canvas2 = tk.Canvas(root,bg='#f0f0f0')
+canvas2.config(width=157,height=84)
+canvas2.place(x=0,y=0)
+logoPIL = Image.open("C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho/images/logo2.png").resize((157,84))
+
+logoPIL = ImageTk.PhotoImage(logoPIL)
+
+canvas2.create_image(0, 0, anchor=tk.NW,image=logoPIL)
 
 root.mainloop()
 #
