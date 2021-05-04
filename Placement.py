@@ -3,14 +3,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 
-# img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\gimp_cut\\male\\IMGP1152M.JPG"
+img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\images_all\\gimp_cut\\male\\IMGP1152M.JPG"
 # img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/1-1.JPG'
-img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/2.JPG'
+# img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/2.JPG'
 # img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/3-3.JPG'
 
+img = cv2.imread(img_path)
 
-
-img = cv2.cvtColor(cv2.imread(img_path),cv2.COLOR_BGR2RGB)
+img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
 import sys
 sys.path.insert(0, 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho')
 import Fonctions
@@ -575,6 +575,39 @@ class Points():
         plt.figure()
         plt.imshow(res)
         plt.show()
+    def points11_17(img,pt13,pt15):
+        _,c = Points.contoursCorpsBig(img)
+        approxCorps = cv2.approxPolyDP(c,0.0000001,closed=False)
+        slope = (pt15[1]-pt13[1])/(pt15[0]-pt13[0])
+        slopes = []
+        for p11 in approxCorps:
+            p11 = list(p11[0])
+            if (pt13[0]-p11[0]!=0):
+                pente = (pt13[1]-p11[1])/(pt13[0]-p11[0])
+                slopes.append(pente)
+        slopes = [-1*(slopes[i] - slope)**2 for i in range(len(slopes))]
+        slopes = [-30 if x<-30 else x for x in slopes]
+        # print(slopes)
+        x = np.arange(len(slopes))
+        # plt.figure()
+        # plt.plot(x,slopes)
+        from scipy.signal import find_peaks, peak_prominences
+        peaks, _ = find_peaks(slopes,distance=300)
+        pt11 = list(approxCorps[peaks[0]][0])
+        pt17 = list(approxCorps[peaks[1]][0])
+        print(pt11)
+        print(pt17)
+        return pt11,pt17
+
+    def centerPoint(pt,eye):
+        return [pt[0]-(eye[0]-300),pt[1]-(eye[1]-250)]
+
+    def centerPoints(lstpt,eye):
+        new_lstpt = []
+        for x in lstpt:
+            new_lstpt.append(Points.centerPoint(x,eye))
+        return new_lstpt
+
 '''
 *
 * Main function
@@ -588,30 +621,33 @@ class Points():
 # plt.figure()
 # plt.imshow(out)
 # plt.show()
-
+#
+# # #
+# out,c = Points.contoursCorpsBig(img)
+# [left,right,top,bottom] = Points.pointExtremeContours(c)
+# imagerot = Points.rotate_image(out,Points.angleRot(left,right)[0],Points.angleRot(left,right)[1])
+# # #
+# _,c = Points.contoursCorpsBig(imagerot)
+# [left,right,top,bottom] = Points.pointExtremeContours(c)
+# # #
 # #
-# # out,c = contoursCorps(img)
-# [left,right,top,bottom] = pointExtremeContours(c)
-# imagerot = rotate_image(out,angleRot(left,right)[0],angleRot(left,right)[1])
+# [pt3,pt19]=Points.points3_19(imagerot)
 # #
-# _,c = contoursCorpsBig(imagerot)
-# [left,right,top,bottom] = pointExtremeContours(c)
 # #
-#
-# [pt3,pt19]=points3_19(imagerot)
-#
-#
-# pt9 = point9(c,pt19)
-#
-# #ne fonctionne pas pour l'instant
-# # [pt15,pt13] = points15_13(imagerot)
-# # cv2.circle(imagerot, pt15, 4, (255, 0, 0), -1)
-# # cv2.circle(imagerot, pt13, 4, (255, 0, 0), -1)
-#
-# pt5,pt7 = points5_7(imagerot,pt9)
-#
-
-
+# pt9 = Points.point9(c,pt19)
+# #
+# # #ne fonctionne pas pour l'instant
+# # [pt15,pt13] =Points.points15_13(imagerot)
+# pt13 = (1288, 1228)
+# pt15 = (1308, 1098)
+# cv2.circle(imagerot, pt15, 20, (255, 0, 0), -1)
+# cv2.circle(imagerot, pt13, 20, (255, 0, 0), -1)
+# #
+# pt5,pt7 = Points.points5_7(imagerot,pt9)
+# #
+# pt11,pt17 = Points.points11_17(imagerot,pt13,pt15)
+# pt11 = (pt11[0],pt11[1])
+# pt17 = (pt17[0],pt17[1])
 # cv2.circle(imagerot, left, 12, (0, 50, 255), -1)
 # cv2.circle(imagerot, right, 12, (0, 255, 255), -1)
 # cv2.circle(imagerot, top, 12, (255, 50, 0), -1)
@@ -621,9 +657,12 @@ class Points():
 # cv2.circle(imagerot, pt9, 12, (255, 0, 0), -1)
 # cv2.circle(imagerot, pt5, 8, (0, 255, 0), -1)
 # cv2.circle(imagerot, pt7, 8, (0, 255, 0), -1)
+# cv2.circle(imagerot, pt11, 8, (0, 255, 0), -1)
+# cv2.circle(imagerot, pt17, 8, (0, 255, 0), -1)
+#
 # plt.imshow(imagerot)
 # plt.show()
-#
+# #
 
 
 #

@@ -38,7 +38,9 @@ class HeadClass():
         self.points = points
         self.x = None
         if points!=None:
-            self.polygon = canvas.create_polygon(self.points,fill='',outline=color,smooth=0,width=2,dash=(1,))
+            if color=='red':outline='red'
+            else: outline=''
+            self.polygon = canvas.create_polygon(self.points,fill='',outline=outline,smooth=0,width=2,dash=())
             HeadClass.id_polygons.append(self.polygon)
             canvas.tag_bind(self.polygon, '<ButtonPress-1>',   lambda event, tag=self.polygon: self.on_press_tag(event, 0, tag))
             canvas.tag_bind(self.polygon, '<ButtonRelease-1>', lambda event, tag=self.polygon: self.on_release_tag(event, 0, tag))
@@ -49,7 +51,7 @@ class HeadClass():
             for number, point in enumerate(self.points):
                 x, y = point
                 node = canvas.create_rectangle((x-3, y-3, x+3, y+3), fill=color)
-                label = canvas.create_text((x+15, y+6),text=str(node%25),font=("Purisa", 12),fill='yellow')
+                label = canvas.create_text((x+15, y+6),text=str(node%25),font=("Purisa", 1),fill='red')
                 self.nodes.append(node)
                 self.nonodes.append(label)
                 canvas.tag_bind(node, '<ButtonPress-1>',   lambda event, number=number, tag=node: self.on_press_tag(event, number, tag))
@@ -218,7 +220,9 @@ class BodyClass():
         self.x = None
 
         if points!=None:
-            self.polygon = canvas1.create_polygon(self.points,fill='',outline=color,smooth=0,width=3,dash=(1,5))
+            if color=='red':outline='red'
+            else: outline=''
+            self.polygon = canvas1.create_polygon(self.points,fill='',outline=outline,smooth=0,width=3,dash=())
             BodyClass.id_polygons.append(self.polygon)
             canvas1.tag_bind(self.polygon, '<ButtonPress-3>',   lambda event, tag=self.polygon: self.on_press_tag(event, 0, tag))
             canvas1.tag_bind(self.polygon, '<ButtonRelease-3>', lambda event, tag=self.polygon: self.on_release_tag(event, 0, tag))
@@ -228,7 +232,7 @@ class BodyClass():
             for number, point in enumerate(self.points):
                 x, y = point
                 node = canvas1.create_rectangle((x-3, y-3, x+3, y+3), fill=color)
-                label = canvas1.create_text((x+15, y+6),text=str(node%15),font=("Purisa", 12),fill='green')
+                label = canvas1.create_text((x+15, y+6),text=str(node%15),font=("Purisa", 1),fill='green')
                 self.nodes.append(node)
                 self.nonodes.append(label)
                 canvas1.tag_bind(node, '<ButtonPress-3>',   lambda event, number=number, tag=node: self.on_press_tag(event, number, tag))
@@ -440,52 +444,37 @@ def clearAllCanvas():
 
 
 def importImage():
-    ''' Placement manuel des points'''
+    print("### Initialisation ###")
     corps,echelle10mm,echelle3mm = Placement.Points.randomPointsBis()
     pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19 = corps
-
-    ''' Réinitialisation pour import '''
-    print("\n### Reset ###")
     clearAllCanvas()
-
-    ''' Import de l'image 4000x3000 '''
-    print("\n### Import de l'image ###")
     pathok = openfn()
     PIL_image = Image.open(pathok)
 
     ''' Resize pour le corps '''
-    print("\n### Resize de l'image pour le corps")
+    print("\n### Traitement du corps 1/3 ###")
     PIL_image = PIL_image.resize((1300,975), Image.ANTIALIAS)
     CV2_image = np.array(Image.open(pathok))
-
     '''' Initialisation des points du corps par détection auto '''
-    print("\n### Calcul des points pour la longueur et la largeur ###")
+    print("\n### Traitement du corps 2/3 ###")
     out,c = Placement.Points.contoursCorps(CV2_image)
     [left,right,top,bottom] = Placement.Points.pointExtremeContours(c)
     imagerot = Placement.Points.rotate_image(out,Placement.Points.angleRot(left,right)[0],Placement.Points.angleRot(left,right)[1])
     _,c = Placement.Points.contoursCorps(imagerot)
     [left,right,top,bottom] = Placement.Points.pointExtremeContours(c)
     corpsStandard = [[left[0],left[1]],[top[0],top[1]],[right[0],right[1]],[bottom[0],bottom[1]]]
-    print("### OK ###")
-
-    print("\n### Rotation et conversion de l'image ###")
+    """Incrustation de l'image """
+    print("\n### Traitement du corps 3/3 ###")
     newPIL_image = Image.fromarray(imagerot)
     newCV2_image = cv2.cvtColor(np.array(newPIL_image), cv2.COLOR_BGR2RGB)
-    print("### OK ###")
-
-    print("\n### Chargement de l'image du corps et repositionnement' ###")
     BodyFish(canvas1,newPIL_image,newCV2_image,(1300,975))
-    print(BodyFish.poisson)
+    # print(BodyFish.poisson)
     canvas1.move(BodyFish.poisson,-(left[0]-50),-(left[1]-280))
     canvas1.update()
     print("### OK ###")
 
-
-
     ''' Resize pour la tête '''
-
-    print("\n### Resize de l'image pour la tête")
-
+    print("\n### Traitement de la tête 1/3 ### ")
     PIL_image_big = Image.open(pathok)
     PIL_image_big = PIL_image_big.resize((3500,2625), Image.ANTIALIAS)
     PIL_image_big = np.flip(PIL_image_big,axis=2)
@@ -494,8 +483,6 @@ def importImage():
     out,c = Placement.Points.contoursCorpsBig(CV2_image_big)
     [left1,right1,top,bottom] = Placement.Points.pointExtremeContours(c)
     CV2_image_big = Placement.Points.rotate_image(out,Placement.Points.angleRot(left1,right1)[0],Placement.Points.angleRot(left1,right1)[1])
-
-
 
     print("\n### Chargement de l'image de la tête' ###")
     newPIL_image_big = Image.fromarray(CV2_image_big)
@@ -543,6 +530,8 @@ def importImage():
         pt13 = [pt13[0],pt13[1]]
     except:
         print("Impossible de déterminer les points 15 et 13")
+        pt13 = [1288, 1228]
+        pt15 = [1308, 1098]
     print("### OK ###")
 
 
@@ -556,18 +545,33 @@ def importImage():
     except:
         print("Impossible de détecter les points 5 et 7")
 
-    print(HeadFish.centreOeil)
-    pt3 = [pt3[0]-(HeadFish.centreOeil[0]-300),pt3[1]-(HeadFish.centreOeil[1]-250)]
-    pt19 = [pt19[0]-(HeadFish.centreOeil[0]-300),pt19[1]-(HeadFish.centreOeil[1]-250)]
-    pt9 = [pt9[0]-(HeadFish.centreOeil[0]-300),pt9[1]-(HeadFish.centreOeil[1]-250)]
-    pt5 = [pt5[0]-(HeadFish.centreOeil[0]-300),pt5[1]-(HeadFish.centreOeil[1]-250)]
-    pt7 = [pt7[0]-(HeadFish.centreOeil[0]-300),pt7[1]-(HeadFish.centreOeil[1]-250)]
+    """Initialisation des points 11 et 17 par détection auto """
+    try:
+        pt17,pt11 = Placement.Points.points11_17(CV2_image_big,pt13,pt15)
+    except:
+        print("Impossible de détecter les points 11 et 17")
 
-    print(pt3)
-    print(pt19)
-    corps= [pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19]
+    print(HeadFish.centreOeil)
+
+    corps = Placement.Points.centerPoints([pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19],HeadFish.centreOeil)
+
+    # pt3 = [pt3[0]-(HeadFish.centreOeil[0]-300),pt3[1]-(HeadFish.centreOeil[1]-250)]
+    # pt19 = [pt19[0]-(HeadFish.centreOeil[0]-300),pt19[1]-(HeadFish.centreOeil[1]-250)]
+    # pt9 = [pt9[0]-(HeadFish.centreOeil[0]-300),pt9[1]-(HeadFish.centreOeil[1]-250)]
+    # pt5 = [pt5[0]-(HeadFish.centreOeil[0]-300),pt5[1]-(HeadFish.centreOeil[1]-250)]
+    # pt7 = [pt7[0]-(HeadFish.centreOeil[0]-300),pt7[1]-(HeadFish.centreOeil[1]-250)]
+    # pt11 = [pt11[0]-(HeadFish.centreOeil[0]-300),pt11[1]-(HeadFish.centreOeil[1]-250)]
+    # pt17 = [pt17[0]-(HeadFish.centreOeil[0]-300),pt17[1]-(HeadFish.centreOeil[1]-250)]
+    # pt13 = [pt13[0]-(HeadFish.centreOeil[0]-300),pt13[1]-(HeadFish.centreOeil[1]-250)]
+    # pt15 = [pt15[0]-(HeadFish.centreOeil[0]-300),pt15[1]-(HeadFish.centreOeil[1]-250)]
+
+
+    # print(pt3)
+    # print(pt19)
+    # corps= [pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19]
+    # canvas.create_line(pt13[0],pt13[1],pt15[0],pt15[1])
     print("\n### Placement des points de la tête ###")
-    HeadClass(canvas, corps,'cyan')
+    HeadClass(canvas, corps,'#37ff00')
     HeadClass(canvas,echelle3mm,'red')
     print("### OK ###")
 
