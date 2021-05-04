@@ -660,9 +660,9 @@ class Points():
 # cv2.circle(imagerot, pt11, 8, (0, 255, 0), -1)
 # cv2.circle(imagerot, pt17, 8, (0, 255, 0), -1)
 #
-# plt.imshow(imagerot)
+# # plt.imshow(imagerot)
 # plt.show()
-# #
+#
 
 
 #

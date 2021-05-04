@@ -9,7 +9,6 @@ import os,cv2,Placement,Fonctions
 import numpy as np
 import math,functools,itertools
 
-
 # Classe pour les points de la tête
 class HeadClass():
     """Variables globales pour export
@@ -551,27 +550,12 @@ def importImage():
     except:
         print("Impossible de détecter les points 11 et 17")
 
-    print(HeadFish.centreOeil)
-
     corps = Placement.Points.centerPoints([pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19],HeadFish.centreOeil)
 
-    # pt3 = [pt3[0]-(HeadFish.centreOeil[0]-300),pt3[1]-(HeadFish.centreOeil[1]-250)]
-    # pt19 = [pt19[0]-(HeadFish.centreOeil[0]-300),pt19[1]-(HeadFish.centreOeil[1]-250)]
-    # pt9 = [pt9[0]-(HeadFish.centreOeil[0]-300),pt9[1]-(HeadFish.centreOeil[1]-250)]
-    # pt5 = [pt5[0]-(HeadFish.centreOeil[0]-300),pt5[1]-(HeadFish.centreOeil[1]-250)]
-    # pt7 = [pt7[0]-(HeadFish.centreOeil[0]-300),pt7[1]-(HeadFish.centreOeil[1]-250)]
-    # pt11 = [pt11[0]-(HeadFish.centreOeil[0]-300),pt11[1]-(HeadFish.centreOeil[1]-250)]
-    # pt17 = [pt17[0]-(HeadFish.centreOeil[0]-300),pt17[1]-(HeadFish.centreOeil[1]-250)]
-    # pt13 = [pt13[0]-(HeadFish.centreOeil[0]-300),pt13[1]-(HeadFish.centreOeil[1]-250)]
-    # pt15 = [pt15[0]-(HeadFish.centreOeil[0]-300),pt15[1]-(HeadFish.centreOeil[1]-250)]
-
-
-    # print(pt3)
-    # print(pt19)
-    # corps= [pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19]
-    # canvas.create_line(pt13[0],pt13[1],pt15[0],pt15[1])
     print("\n### Placement des points de la tête ###")
-    HeadClass(canvas, corps,'#37ff00')
+#     ancienne  : #37ff00
+#  nouvelle : #ffff00
+    HeadClass(canvas, corps,'#ff00f2')
     HeadClass(canvas,echelle3mm,'red')
     print("### OK ###")
 
@@ -673,8 +657,10 @@ canvas1.config(width=1000, height=500)
 canvas1.grid(column=1,row=8)
 
 root.mainloop()
-
-
+#
+# import inspect
+# src_file_path = inspect.getfile(lambda: None)
+# print(inspect.stack()[0][1])
 
 ''' Documentation
 
