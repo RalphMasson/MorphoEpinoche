@@ -399,7 +399,7 @@ def importImage():
 def affichePrediction():
     choix,couleur = Classification.Prediction.predict()
     sexPrediction.config(text="")
-    sexPrediction.config(text=choix,font=("Purisa",16,"bold"),fg=couleur)
+    sexPrediction.config(text=choix,font=("Purisa",16),fg=couleur)
 
 
 
@@ -411,9 +411,9 @@ root.state('zoomed')
 root.title("Sex Determination for Three Spined Stickleback")
 menubar = tk.Menu(root)
 menuFichier = tk.Menu(menubar,tearoff=0)
-menuFichier.add_command(label="Créer", command=None)
+# menuFichier.add_command(label="Créer", command=None)
 menuFichier.add_command(label="Importer", command=None)
-menuFichier.add_command(label="Editer", command=None)
+# menuFichier.add_command(label="Editer", command=None)
 menuFichier.add_separator()
 menuFichier.add_command(label="Quitter", command=root.destroy)
 menubar.add_cascade(label="Fichier", menu=menuFichier)
@@ -428,9 +428,9 @@ tk.Label(root,text=" \t Sexing procedure of three-spined stickleback \n",font=("
 tk.Label(root,text="\n \n \n \n ").grid(column=0,row=1)
 
 ''' Boutons '''
-tk.Label(root, text = 'PREDICTION',font=("Purisa",12,"bold"),fg='blue').place(x=460,y=70)
-tk.Button(root,text = "Import image and autoplace",command = importImage,fg='blue').place(x=400,y=100)
-tk.Button(root,text = "Predict",command = affichePrediction,fg='blue').place(x=570,y=100)
+tk.Label(root, text = 'PREDICTION',font=("Purisa",12,"bold"),fg='purple').place(x=460,y=70)
+tk.Button(root,text = "Import image and autoplace",command = importImage,fg='purple').place(x=400,y=100)
+tk.Button(root,text = "Predict",command = affichePrediction,fg='purple').place(x=570,y=100)
 tk.Label(root, text = 'ADD THESE VALUES TO MODEL',font=("Purisa",12,"bold"),fg='green').place(x=760,y=70)
 tk.Button(root,text = "Model Update (developpers only)",command = HeadClass.genererAllDistancesHead,fg='green').place(x=850,y=100)
 tk.Label(root,text='Sex for model: ',fg='green').place(x=725,y=105)
@@ -457,13 +457,13 @@ LongueurBody = tk.Label(root,text="",justify=tk.LEFT)
 LongueurBody.grid(column=1,row=5)
 
 ''' Canvas pour la tête '''
-canvas = tk.Canvas(root,bg='#f0f0f0',bd=0)
+canvas = tk.Canvas(root,bg='#f0f0f0',bd=0,highlightthickness=1, highlightbackground="black")
 canvas.config(width=600, height=500)
 canvas.grid(column=0,row=8)
 
 ''' Canvas pour le corps '''
-canvas1 = tk.Canvas(root,bg='#f0f0f0')
-canvas1.config(width=1000, height=500)
+canvas1 = tk.Canvas(root,bg='#f0f0f0',highlightthickness=1, highlightbackground="black")
+canvas1.config(width=960, height=500)
 canvas1.grid(column=1,row=8)
 
 """Canvas pour logo"""

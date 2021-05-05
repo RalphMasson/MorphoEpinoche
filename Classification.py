@@ -4,5 +4,5 @@ class Prediction():
         labels = ('Male','Female')
         choice = randrange(2)
         if(choice==0):fg='blue'
-        if(choice==1):fg='pink'
+        if(choice==1):fg='red'
         return labels[choice],fg
