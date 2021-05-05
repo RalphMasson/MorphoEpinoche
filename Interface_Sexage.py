@@ -148,47 +148,16 @@ class HeadClass():
         f.close()
 
     def calculDistances():
-        pt3 = HeadClass.pointsFish[0]
-        pt5 = HeadClass.pointsFish[1]
-        pt7 = HeadClass.pointsFish[2]
-        pt9 = HeadClass.pointsFish[3]
-        pt11 = HeadClass.pointsFish[4]
-        pt13 = HeadClass.pointsFish[5]
-        pt15 = HeadClass.pointsFish[6]
-        pt17 = HeadClass.pointsFish[7]
-        pt19 = HeadClass.pointsFish[8]
-        pt22 = HeadClass.pointsEchelle[0]
-        pt24 = HeadClass.pointsEchelle[1]
-        echelle3mm_px = Fonctions.Externes.euclideDist(pt22,pt24)
-
-        snout_eye_px = Fonctions.Externes.euclideDist(pt3,pt5)
-        snout_eye_mm = round(3*snout_eye_px/echelle3mm_px,4)
-        HeadClass.distances_check[0]=snout_eye_mm
-
-        snout_length_px = Fonctions.Externes.euclideDist(pt5,pt7)
-        snout_length_mm = round(3*snout_length_px/echelle3mm_px,4)
-        HeadClass.distances_check[1]=snout_length_mm
-
-        eye_diameter_px = Fonctions.Externes.euclideDist(pt3,pt19)
-        eye_diameter_mm = round(3*eye_diameter_px/echelle3mm_px,4)
-        HeadClass.distances_check[2]=eye_diameter_mm
-
-        head_length_px = Fonctions.Externes.euclideDist(pt5,pt17)
-        head_length_mm = round(3*head_length_px/echelle3mm_px,4)
-        HeadClass.distances_check[3]=head_length_mm
-
-        head_depth_px = Fonctions.Externes.euclideDist(pt11,pt17)
-        head_depth_mm = round(3*head_depth_px/echelle3mm_px,4)
-        HeadClass.distances_check[4]=head_depth_mm
-
-        jaw_length_px = Fonctions.Externes.euclideDist(pt7,pt9)
-        jaw_length_mm = round(3*jaw_length_px/echelle3mm_px,4)
-        HeadClass.distances_check[5]=jaw_length_mm
-
-        jaw_length2_px = Fonctions.Externes.euclideDist(pt5,pt9)
-        jaw_length2_mm = round(3*jaw_length2_px/echelle3mm_px,4)
-        HeadClass.distances_check[6]=jaw_length2_mm
-
+        echelle3mm = Fonctions.Externes.euclideDist(HeadClass.pointsEchelle[0],HeadClass.pointsEchelle[1])
+        snout_eye = Fonctions.Externes.euclideDist(HeadClass.pointsFish[0],HeadClass.pointsFish[1])
+        snout_length = Fonctions.Externes.euclideDist(HeadClass.pointsFish[1],HeadClass.pointsFish[2])
+        eye_diameter = Fonctions.Externes.euclideDist(HeadClass.pointsFish[0],HeadClass.pointsFish[8])
+        head_length = Fonctions.Externes.euclideDist(HeadClass.pointsFish[1],HeadClass.pointsFish[7])
+        head_depth = Fonctions.Externes.euclideDist(HeadClass.pointsFish[4],HeadClass.pointsFish[7])
+        jaw_length = Fonctions.Externes.euclideDist(HeadClass.pointsFish[2],HeadClass.pointsFish[3])
+        jaw_length2 = Fonctions.Externes.euclideDist(HeadClass.pointsFish[1],HeadClass.pointsFish[3])
+        HeadClass.distances_check = [snout_eye,snout_length,eye_diameter,head_length,head_depth,jaw_length,jaw_length2]
+        HeadClass.distances_check = Fonctions.Externes.px3mmListe(HeadClass.distances_check,echelle3mm)
         return HeadClass.distances_check
 
 

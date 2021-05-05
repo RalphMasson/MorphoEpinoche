@@ -53,3 +53,14 @@ class Externes():
         listeCombinaisonsDistance = list(combinations([i for i in range(9)],2))
         return listeCombinaisonsDistance,listeCombinaisonsAngle
 
+    def px3mm(distance_px,echelle):
+        return round(3*distance_px/echelle,4)
+
+    def px3mmListe(distances_px,echelle):
+        distances = []
+        for x in distances_px:
+            distances.append(Externes.px3mm(x,echelle))
+        return distances
+
+    def px10mm(distance_px,echelle):
+        return round(10*distance_px/echelle,4)
