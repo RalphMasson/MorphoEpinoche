@@ -602,6 +602,9 @@ class Points():
     def centerPoint(pt,eye):
         return [pt[0]-(eye[0]-300),pt[1]-(eye[1]-250)]
 
+    def decenterPoint(A,eye):
+        return [A[0]+eye[0]-300,A[1]+eye[1]-250]
+
     def centerPoints(lstpt,eye):
         new_lstpt = []
         for x in lstpt:

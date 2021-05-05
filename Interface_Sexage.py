@@ -19,7 +19,7 @@ class HeadClass():
     distances_all : liste de toutes les distances sauvegardés pour le modèle
     """
     id_polygons = pointsFish = pointsEchelle = distances_check = distances_all = []
-
+    coords_brut = None
     def __init__(self, canvas, points,color):
         """!
         Constructeur du polygone de la tête
@@ -86,13 +86,41 @@ class HeadClass():
             dx = event.x - self.previous_x
             dy = event.y - self.previous_y
             canvas.move(self.selected, dx, dy)
+            # print(self.selected)
             canvas.move(self.nonodes[self.nodes.index(self.selected)],dx,dy)
             self.points[number][0] += dx
             self.points[number][1] += dy
             coords = sum(self.points, [])
             canvas.coords(self.polygon, coords)
+            # print(canvas.coords(self.selected))
             self.previous_x = event.x
             self.previous_y = event.y
+            try:
+                if( (self.selected%25==13) or (self.selected%25==15)):
+                    if(self.selected%25==13):
+                        id13 = self.selected
+                        id11 = id13-2
+                        id15 = id13+2
+                        id17 = id15+2
+                    if(self.selected%25==15):
+                        id15 = self.selected
+                        id13 = id15-2
+                        id11 = id13-2
+                        id17 = id15+2
+                    pt13_image = [canvas.coords(id13)[0]+3,canvas.coords(id13)[1]+3]
+                    pt15_image = [canvas.coords(id15)[0]+3,canvas.coords(id15)[1]+3]
+                    pt13_calcul = Placement.Points.decenterPoint(pt13_image,HeadFish.centreOeil)
+                    pt15_calcul = Placement.Points.decenterPoint(pt15_image,HeadFish.centreOeil)
+                    pt17,pt11 = Placement.Points.points11_17(HeadFish.CV2_image_big,pt13_calcul,pt15_calcul)
+                    pt11_old = [canvas.coords(id11)[0]+3,canvas.coords(id11)[1]+3]
+                    pt17_old = [canvas.coords(id17)[0]+3,canvas.coords(id17)[1]+3]
+                    pt11,pt17 = Placement.Points.centerPoints([pt11,pt17],HeadFish.centreOeil)
+                    canvas.move(id11,pt11[0]-pt11_old[0],pt11[1]-pt11_old[1])
+                    canvas.move(id17,pt17[0]-pt17_old[0],pt17[1]-pt17_old[1])
+                    canvas.update()
+            except:
+                None
+
 
         HeadClass.update_points()
         afficheLongueur()
@@ -241,11 +269,13 @@ class HeadFish():
     """
     poisson = None
     centreOeil=None
+    CV2_image_big = None
     def __init__(self, canvas,PIL_image,CV2_image,size):
         self.img = ImageTk.PhotoImage(PIL_image.resize(size, Image.ANTIALIAS))
         self.circle = Fonctions.Externes.detect_eye(cv2.resize(CV2_image,size,Image.ANTIALIAS))
         HeadFish.centreOeil = [self.circle[0],self.circle[1]]
         HeadFish.poisson = canvas.create_image(0, 0, anchor=tk.NW,image=self.img)
+        HeadFish.CV2_image_big = CV2_image
         canvas.move(HeadFish.poisson,-(self.circle[0]-300),-(self.circle[1]-250))
         root.bind("<Left>",self.moveLeft)
         root.bind("<Right>",self.moveRight)
@@ -388,6 +418,7 @@ def importImage():
         print("Impossible de détecter les points 11 et 17")
         nbPointNonDetectes+=2
 
+    HeadClass.coords_brut = [pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19]
     tete = Placement.Points.centerPoints([pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19],HeadFish.centreOeil)
 
     print("\n### Placement des points de la tête ###")
@@ -395,6 +426,7 @@ def importImage():
     HeadClass(canvas,echelle3mm,'red')
     print("### OK ###")
     avertissement.config(text=str(13-nbPointNonDetectes)+" points détectés / 13 ")
+
 
 def affichePrediction():
     choix,couleur = Classification.Prediction.predict()
@@ -422,6 +454,7 @@ menuAide.add_command(label="A propos", command=None)
 menubar.add_cascade(label="Aide", menu=menuAide)
 root.config(menu=menubar)
 
+CV2_image_big = None
 ''' Label Intro de presentation'''
 tk.Label(root,text=" ",font=("Purisa",12,"bold")).grid(ipadx=2)
 tk.Label(root,text=" \t Sexing procedure of three-spined stickleback \n",font=("Andalus",16,"bold")).place(x=750,y=40,anchor=tk.CENTER)
