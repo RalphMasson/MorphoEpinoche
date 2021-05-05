@@ -19,7 +19,7 @@ class HeadClass():
     distances_all : liste de toutes les distances sauvegardés pour le modèle
     """
     id_polygons = pointsFish = pointsEchelle = distances_check = distances_all = []
-    coords_brut = None
+
     def __init__(self, canvas, points,color):
         """!
         Constructeur du polygone de la tête
@@ -418,7 +418,6 @@ def importImage():
         print("Impossible de détecter les points 11 et 17")
         nbPointNonDetectes+=2
 
-    HeadClass.coords_brut = [pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19]
     tete = Placement.Points.centerPoints([pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19],HeadFish.centreOeil)
 
     print("\n### Placement des points de la tête ###")
@@ -519,7 +518,7 @@ root.mainloop()
 
 generate diagramm class
 
-in powershell : Pyreverse -o dot placementCorps.py
+in powershell : Pyreverse -o dot Interface_Sexage.py
 in pyzo : render('dot','png','C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\classes.dot')
 
 file:///C:/Users/MASSON/Downloads/Admixture_mapping_of_male_nuptial_color_and_body_s.pdf
