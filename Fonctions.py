@@ -32,9 +32,6 @@ class Externes():
         Apt2 = acos((b**2+a**2-c**2)/(2*b*a))*180/pi
         return Apt2
 
-
-
-
     def reorder_from_idx(idx, a):
         return a[idx:] + a[:idx]
     def cyclic_perm(a):
@@ -64,6 +61,12 @@ class Externes():
 
     def px10mm(distance_px,echelle):
         return round(10*distance_px/echelle,4)
+
+    def px10mmListe(distances_px,echelle):
+        distances = []
+        for x in distances_px:
+            distances.append(Externes.px10mm(x,echelle))
+        return distances
 
     def genererAllDistancesHead(ptsEchelle,ptsFish):
         import numpy as np
@@ -102,3 +105,44 @@ class Externes():
         distances_check = [snout_eye,snout_length,eye_diameter,head_length,head_depth,jaw_length,jaw_length2]
         distances_check = Externes.px3mmListe(distances_check,echelle3mm)
         return distances_check
+
+    def calculDistances2(ptsEchelle,ptsFish):
+        echelle10mm = Externes.euclideDist(ptsEchelle[0],ptsEchelle[1])
+        body_size = Externes.euclideDist(ptsFish[0],ptsFish[2])
+        body_depth = Externes.euclideDist(ptsFish[1],ptsFish[3])
+        distances_check = [body_size,body_depth]
+        distances_check = Externes.px10mmListe(distances_check,echelle10mm)
+        return distances_check
+
+    def detect_eye(img):
+        import cv2
+        import numpy as np
+        img_couleur = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
+        img_gray=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+        img_gray = cv2.medianBlur(img_gray,21)
+        circles1 = cv2.HoughCircles(image=img_gray, method=cv2.HOUGH_GRADIENT, dp=2,param1=70,param2=65, minDist=100, minRadius=25,maxRadius=45)
+        circles = cv2.HoughCircles(image=img_gray, method=cv2.HOUGH_GRADIENT, dp=2,param1=100,param2=30, minDist=120, minRadius=80,maxRadius=95)
+        circles = np.round(circles[0, :]).astype("int32")
+        return circles1[0][0]
+
+    def openfn():
+        import tkinter.filedialog,tkinter as tk
+        filepath = tk.filedialog.askopenfilename(title="Ouvrir une image",filetypes=[('jpg files','.jpg'),('jpeg files','.jpeg')])
+        return filepath
+
+    def Longueur(distance):
+        texte = ""
+        texte += "5 <-> 3 : distance nez oeil : "+str(distance[0])+" mm \n"
+        texte += "5 <-> 7 : longueur museau : "+str(distance[1])+" mm \n"
+        texte += "3 <-> 19 : diametre oeil : "+str(distance[2])+" mm \n"
+        texte += "5 <-> 17 : longueur tête : "+str(distance[3])+" mm \n"
+        texte += "11 <-> 17 : largeur tête : "+str(distance[4])+" mm \n"
+        # texte += "7 <-> 9 : bas bouche - menton : "+str(distance[5])+" mm \n"
+        # texte += "5 <-> 9 : haut bouche - menton : "+str(distance[6])+" mm "
+        return texte
+
+    def LongueurBody(distance):
+        texte = ""
+        texte += "8 <-> 10 : Longueur Corps : "+str(distance[0])+" mm \n"
+        texte += " 13 <-> 15 : Largeur corps : "+str(distance[1])+" mm \n"
+        return texte

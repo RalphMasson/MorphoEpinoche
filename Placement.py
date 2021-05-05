@@ -608,6 +608,32 @@ class Points():
             new_lstpt.append(Points.centerPoint(x,eye))
         return new_lstpt
 
+    def ImageCorps(imgPIL):
+        from PIL import Image
+        PIL_image = imgPIL.resize((1300,975), Image.ANTIALIAS)
+        CV2_image = np.array(imgPIL)
+        out,c = Points.contoursCorps(CV2_image)
+        [left,right,top,bottom] = Points.pointExtremeContours(c)
+        imagerot = Points.rotate_image(out,Points.angleRot(left,right)[0],Points.angleRot(left,right)[1])
+        _,c = Points.contoursCorps(imagerot)
+        [left,right,top,bottom] = Points.pointExtremeContours(c)
+        corpsStandard = [[left[0],left[1]],[top[0],top[1]],[right[0],right[1]],[bottom[0],bottom[1]]]
+        newPIL_image = Image.fromarray(imagerot)
+        return corpsStandard,newPIL_image,left
+
+    def ImageTete(imgPIL):
+        from PIL import Image
+        PIL_image_big = imgPIL.resize((3500,2625), Image.ANTIALIAS)
+        PIL_image_big = np.flip(PIL_image_big,axis=2)
+        CV2_image_big = np.array(PIL_image_big)
+        CV2_image_big = CV2_image_big[:, :, ::-1].copy()
+        out,c = Points.contoursCorpsBig(CV2_image_big)
+        [left1,right1,top,bottom] = Points.pointExtremeContours(c)
+        CV2_image_big = Points.rotate_image(out,Points.angleRot(left1,right1)[0],Points.angleRot(left1,right1)[1])
+
+        print("\n### Chargement de l'image de la tête' ###")
+        PIL_image_big = Image.fromarray(CV2_image_big)
+        return PIL_image_big,CV2_image_big
 '''
 *
 * Main function

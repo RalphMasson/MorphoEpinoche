@@ -5,7 +5,8 @@ sys.path.insert(0, 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho')
 # Import des bibliothèques (s'assurer qu'elles soient installées)
 import tkinter as tk
 from PIL import Image, ImageTk
-import math,functools,itertools,os,cv2,Placement,Fonctions
+import math,functools,itertools,os,cv2
+import Placement,Fonctions,Classification
 import numpy as np
 
 # Classe pour les points de la tête
@@ -37,7 +38,6 @@ class HeadClass():
             canvas.tag_bind(self.polygon, '<ButtonPress-1>',   lambda event, tag=self.polygon: self.on_press_tag(event, 0, tag))
             canvas.tag_bind(self.polygon, '<ButtonRelease-1>', lambda event, tag=self.polygon: self.on_release_tag(event, 0, tag))
             canvas.tag_bind(self.polygon, '<B1-Motion>', self.on_move_polygon)
-
             self.nodes = []
             self.nonodes = []
             for number, point in enumerate(self.points):
@@ -123,9 +123,6 @@ class HeadClass():
         return HeadClass.distances_check
 
 
-
-
-
 class BodyClass():
     """Variables globales pour export
     id_polygons : liste des id des polygons (le corps et l'echelle)
@@ -135,19 +132,12 @@ class BodyClass():
     distances_all : liste de toutes les distances sauvegardés pour le modèle
     """
 
-    id_polygons = []
-    pointsFish = []
-    pointsEchelle = []
-    distances_check = [0 for _ in range(2)]
-    distances_all = []
+    id_polygons = pointsFish = pointsEchelle = distances_all = distances_check = []
 
     def __init__(self, canvas1, points,color):
 
-        self.previous_x = None
-        self.previous_y = None
-        self.selected = None
+        self.previous_x = self.previous_y = self.selected = self.x = None
         self.points = points
-        self.x = None
 
         if points!=None:
             if color=='red':outline='red'
@@ -190,17 +180,11 @@ class BodyClass():
         self.selected = tag
         self.previous_x = event.x
         self.previous_y = event.y
-        print('press:', event,tag)
-
         BodyClass.update_points()
         afficheLongueurBody()
 
     def on_release_tag(self, event, number, tag):
-        self.selected = None
-        self.previous_x = None
-        self.previous_y = None
-        print('release:', tag)
-
+        self.selected = self.previous_x = self.previous_y = None
         BodyClass.update_points()
         afficheLongueurBody()
 
@@ -244,19 +228,7 @@ class BodyClass():
         afficheLongueurBody()
 
     def calculDistances():
-        pt3 = BodyClass.pointsEchelle[0]
-        pt5 = BodyClass.pointsEchelle[1]
-        pt8 = BodyClass.pointsFish[0]
-        pt10 = BodyClass.pointsFish[1]
-        pt12 = BodyClass.pointsFish[2]
-        pt14 = BodyClass.pointsFish[3]
-        echelle10mm_px = Fonctions.Externes.euclideDist(pt3,pt5)
-        body_size_px = Fonctions.Externes.euclideDist(pt8,pt12)
-        body_size_mm = round(10*body_size_px/echelle10mm_px,4)
-        body_depth_px = Fonctions.Externes.euclideDist(pt10,pt14)
-        body_depth_mm = round(10*body_depth_px/echelle10mm_px,4)
-        BodyClass.distances_check[0]=body_size_mm
-        BodyClass.distances_check[1]=body_depth_mm
+        BodyClass.distances_check = Fonctions.Externes.calculDistances2(BodyClass.pointsEchelle,BodyClass.pointsFish)
         return BodyClass.distances_check
 
 class HeadFish():
@@ -267,56 +239,32 @@ class HeadFish():
     distances_check : liste des distances caractéristiques affichées
     distances_all : liste de toutes les distances sauvegardés pour le modèle
     """
-    img1 = None
-    pathImg = ""
     poisson = None
     centreOeil=None
     def __init__(self, canvas,PIL_image,CV2_image,size):
-        self.img = PIL_image
-        self.img = self.img.resize(size, Image.ANTIALIAS)
-        self.tatras = ImageTk.PhotoImage(self.img)
-        toto = CV2_image
-        self.circle = self.detect_eye(cv2.resize(toto,size,Image.ANTIALIAS))
+        self.img = ImageTk.PhotoImage(PIL_image.resize(size, Image.ANTIALIAS))
+        self.circle = Fonctions.Externes.detect_eye(cv2.resize(CV2_image,size,Image.ANTIALIAS))
         HeadFish.centreOeil = [self.circle[0],self.circle[1]]
-        HeadFish.poisson = canvas.create_image(0, 0, anchor=tk.NW,image=self.tatras)
+        HeadFish.poisson = canvas.create_image(0, 0, anchor=tk.NW,image=self.img)
         canvas.move(HeadFish.poisson,-(self.circle[0]-300),-(self.circle[1]-250))
-        HeadFish.img1 = HeadFish.poisson
         root.bind("<Left>",self.moveLeft)
         root.bind("<Right>",self.moveRight)
         root.bind("<Up>",self.moveUp)
         root.bind("<Down>",self.moveDown)
     def moveLeft(self,event):
-        canvas.move(self.poisson,-10,0)
+        canvas.move(HeadFish.poisson,-10,0)
     def moveRight(self,event):
-        canvas.move(self.poisson,10,0)
+        canvas.move(HeadFish.poisson,10,0)
     def moveUp(self,event):
-        canvas.move(self.poisson,0,-10)
+        canvas.move(HeadFish.poisson,0,-10)
     def moveDown(self,event):
-        canvas.move(self.poisson,0,10)
-    def detect_eye(self,img):
-        img_couleur = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
-        img_gray=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-        img_gray = cv2.medianBlur(img_gray,21)
-        circles1 = cv2.HoughCircles(image=img_gray, method=cv2.HOUGH_GRADIENT, dp=2,param1=70,param2=65, minDist=100, minRadius=25,maxRadius=45)
-        circles = cv2.HoughCircles(image=img_gray, method=cv2.HOUGH_GRADIENT, dp=2,param1=100,param2=30, minDist=120, minRadius=80,maxRadius=95)
-        circles = np.round(circles[0, :]).astype("int32")
-        return circles1[0][0]
-
+        canvas.move(HeadFish.poisson,0,10)
 
 class BodyFish():
-    img1 = None
-    imgcv2 = None
-    pathImg = ""
-    pointsEchelle10mm = []
     poisson = None
-    def __init__(self, canvas1,PIL_image,CV2_image,size):
-        self.img = PIL_image
-        self.img = self.img.resize(size, Image.ANTIALIAS)
-        print(self.img.size)
-        self.tatras = ImageTk.PhotoImage(self.img)
-        BodyFish.poisson = canvas1.create_image(0, 0, anchor=tk.NW, image=self.tatras)
-        BodyFish.img1 = BodyFish.poisson
-        BodyFish.imgcv2 = CV2_image
+    def __init__(self, canvas1,PIL_image,size):
+        self.img = ImageTk.PhotoImage(PIL_image.resize(size, Image.ANTIALIAS))
+        BodyFish.poisson = canvas1.create_image(0, 0, anchor=tk.NW, image=self.img)
         root.bind("<Key>",self.move)
         root.bind("<Key>",self.move)
         root.bind("<Key>",self.move)
@@ -331,28 +279,10 @@ class BodyFish():
 
 
 def afficheLongueur():
-    distance = HeadClass.calculDistances()
-    texte = ""
-    texte += "5 <-> 3 : distance nez oeil : "+str(distance[0])+" mm \n"
-    texte += "5 <-> 7 : longueur museau : "+str(distance[1])+" mm \n"
-    texte += "3 <-> 19 : diametre oeil : "+str(distance[2])+" mm \n"
-    texte += "5 <-> 17 : longueur tête : "+str(distance[3])+" mm \n"
-    texte += "11 <-> 17 : largeur tête : "+str(distance[4])+" mm \n"
-    # texte += "7 <-> 9 : bas bouche - menton : "+str(distance[5])+" mm \n"
-    # texte += "5 <-> 9 : haut bouche - menton : "+str(distance[6])+" mm "
-    Longueur.config(text=texte)
+    Longueur.config(text=Fonctions.Externes.Longueur(HeadClass.calculDistances()))
 
 def afficheLongueurBody():
-    distance = BodyClass.calculDistances()
-    texte = ""
-    texte += "8 <-> 10 : Longueur Corps : "+str(distance[0])+" mm \n"
-    texte += " 13 <-> 15 : Largeur corps : "+str(distance[1])+" mm \n"
-    LongueurBody.config(text=texte)
-
-def openfn():
-    import tkinter.filedialog
-    filepath = tk.filedialog.askopenfilename(title="Ouvrir une image",filetypes=[('jpg files','.jpg'),('jpeg files','.jpeg')])
-    return filepath
+    LongueurBody.config(text=Fonctions.Externes.LongueurBody(BodyClass.calculDistances()))
 
 def clearAllCanvas():
     HeadClass.id_polygons=[]
@@ -375,49 +305,24 @@ def importImage():
     nbPointNonDetectes = 0
 
     print("### Initialisation ###")
-    corps,echelle10mm,echelle3mm = Placement.Points.randomPointsBis()
-    pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19 = corps
+    tete,echelle10mm,echelle3mm = Placement.Points.randomPointsBis()
+    pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19 = tete
     clearAllCanvas()
-    pathok = openfn()
-    PIL_image = Image.open(pathok)
+    pathok = Fonctions.Externes.openfn()
+    ImagePIL = Image.open(pathok)
 
     ''' Resize pour le corps '''
-    print("\n### Traitement du corps 1/3 ###")
-    PIL_image = PIL_image.resize((1300,975), Image.ANTIALIAS)
-    CV2_image = np.array(Image.open(pathok))
-    '''' Initialisation des points du corps par détection auto '''
-    print("\n### Traitement du corps 2/3 ###")
-    out,c = Placement.Points.contoursCorps(CV2_image)
-    [left,right,top,bottom] = Placement.Points.pointExtremeContours(c)
-    imagerot = Placement.Points.rotate_image(out,Placement.Points.angleRot(left,right)[0],Placement.Points.angleRot(left,right)[1])
-    _,c = Placement.Points.contoursCorps(imagerot)
-    [left,right,top,bottom] = Placement.Points.pointExtremeContours(c)
-    corpsStandard = [[left[0],left[1]],[top[0],top[1]],[right[0],right[1]],[bottom[0],bottom[1]]]
-    """Incrustation de l'image """
-    print("\n### Traitement du corps 3/3 ###")
-    newPIL_image = Image.fromarray(imagerot)
-    newCV2_image = cv2.cvtColor(np.array(newPIL_image), cv2.COLOR_BGR2RGB)
-    BodyFish(canvas1,newPIL_image,newCV2_image,(1300,975))
-    # print(BodyFish.poisson)
+    print("\n### Traitement du corps ###")
+    corpsStandard,newPIL_image,left = Placement.Points.ImageCorps(ImagePIL)
+    BodyFish(canvas1,newPIL_image,(1300,975))
     canvas1.move(BodyFish.poisson,-(left[0]-50),-(left[1]-280))
     canvas1.update()
     print("### OK ###")
 
     ''' Resize pour la tête '''
     print("\n### Traitement de la tête 1/3 ### ")
-    PIL_image_big = Image.open(pathok)
-    PIL_image_big = PIL_image_big.resize((3500,2625), Image.ANTIALIAS)
-    PIL_image_big = np.flip(PIL_image_big,axis=2)
-    CV2_image_big = np.array(PIL_image_big)
-    CV2_image_big = CV2_image_big[:, :, ::-1].copy()
-    out,c = Placement.Points.contoursCorpsBig(CV2_image_big)
-    [left1,right1,top,bottom] = Placement.Points.pointExtremeContours(c)
-    CV2_image_big = Placement.Points.rotate_image(out,Placement.Points.angleRot(left1,right1)[0],Placement.Points.angleRot(left1,right1)[1])
-
-    print("\n### Chargement de l'image de la tête' ###")
-    newPIL_image_big = Image.fromarray(CV2_image_big)
-    newCV2_image_big = cv2.cvtColor(np.array(newPIL_image_big), cv2.COLOR_BGR2RGB)
-    HeadFish(canvas,newPIL_image_big,newCV2_image_big,(3500,2625))
+    PIL_image_big,CV2_image_big = Placement.Points.ImageTete(ImagePIL)
+    HeadFish(canvas,PIL_image_big,CV2_image_big,(3500,2625))
     canvas.update()
     print("### OK ###")
 
@@ -428,6 +333,7 @@ def importImage():
     BodyClass(canvas1,corpsStandard,'cyan')
     canvas1.update()
     print("### OK ###")
+
     ''' Initialisation des points 3 et 19 par détection auto '''
     print("\n### Calcul des points 3 et 19 ###")
     try:
@@ -437,8 +343,6 @@ def importImage():
     except:
         print("Impossible de déterminer les points 3 et 19")
         nbPointNonDetectes+=2
-
-
     print("### OK ###")
 
     '''Initialisation du point 9 par détection auto '''
@@ -451,7 +355,6 @@ def importImage():
     except:
         print("Impossible de déterminer le point 9")
         nbPointNonDetectes+=1
-
     print("### OK ###")
 
     '''Initialisation du point 15 et 13 par détection auto '''
@@ -465,13 +368,11 @@ def importImage():
         pt13 = [1288, 1228]
         pt15 = [1308, 1098]
         nbPointNonDetectes+=2
-
     print("### OK ###")
 
 
     '''Initialisation des points 5 et 7 par détection auto '''
     print("\n### Calcul des points 5 et 7  ###")
-
     try:
         pt7,pt5 = Placement.Points.points5_7(CV2_image_big,pt9)
         pt5 = [pt5[0],pt5[1]]
@@ -487,25 +388,18 @@ def importImage():
         print("Impossible de détecter les points 11 et 17")
         nbPointNonDetectes+=2
 
-    corps = Placement.Points.centerPoints([pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19],HeadFish.centreOeil)
+    tete = Placement.Points.centerPoints([pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19],HeadFish.centreOeil)
 
     print("\n### Placement des points de la tête ###")
-#     ancienne  : #37ff00
-#  nouvelle : #ffff00
-    HeadClass(canvas, corps,'#ff00f2')
+    HeadClass(canvas, tete,'#ff00f2')
     HeadClass(canvas,echelle3mm,'red')
     print("### OK ###")
     avertissement.config(text=str(13-nbPointNonDetectes)+" points détectés / 13 ")
 
 def affichePrediction():
-    from random import randrange
-    labels = ('Male','Female')
-    choice = randrange(2)
-    print(choice)
-    if(choice==0):fg='blue'
-    if(choice==1):fg='pink'
+    choix,couleur = Classification.Prediction.predict()
     sexPrediction.config(text="")
-    sexPrediction.config(text=labels[choice],font=("Purisa",16,"bold"),fg=fg)
+    sexPrediction.config(text=choix,font=("Purisa",16,"bold"),fg=couleur)
 
 
 
@@ -513,7 +407,6 @@ def affichePrediction():
 
 ''' Fenetre et menu'''
 root = tk.Tk()
-# root.geometry("1000x800")
 root.state('zoomed')
 root.title("Sex Determination for Three Spined Stickleback")
 menubar = tk.Menu(root)
@@ -524,43 +417,23 @@ menuFichier.add_command(label="Editer", command=None)
 menuFichier.add_separator()
 menuFichier.add_command(label="Quitter", command=root.destroy)
 menubar.add_cascade(label="Fichier", menu=menuFichier)
-menuEditer = tk.Menu(menubar, tearoff=0)
-menuEditer.add_command(label="Couper", command=None)
-menuEditer.add_command(label="Copier", command=None)
-menuEditer.add_command(label="Coller", command=None)
-menubar.add_cascade(label="Editer", menu=menuEditer)
 menuAide = tk.Menu(menubar, tearoff=0)
 menuAide.add_command(label="A propos", command=None)
 menubar.add_cascade(label="Aide", menu=menuAide)
 root.config(menu=menubar)
 
 ''' Label Intro de presentation'''
-intro = tk.Label(root,text=" ",font=("Purisa",12,"bold"))
-intro.grid(ipadx=2)
-intro = tk.Label(root,text=" \t Sexing procedure of three-spined stickleback \n",font=("Andalus",16,"bold"))
-intro.place(x=750,y=40,anchor=tk.CENTER)
-''' Label explications '''
-explanation = tk.Label(root,text="\n \n \n \n ")
-explanation.grid(column=0,row=1)
-
-
+tk.Label(root,text=" ",font=("Purisa",12,"bold")).grid(ipadx=2)
+tk.Label(root,text=" \t Sexing procedure of three-spined stickleback \n",font=("Andalus",16,"bold")).place(x=750,y=40,anchor=tk.CENTER)
+tk.Label(root,text="\n \n \n \n ").grid(column=0,row=1)
 
 ''' Boutons '''
-
-
-B = tk.Label(root, text = 'PREDICTION',font=("Purisa",12,"bold"),fg='blue')
-B.place(x=460,y=70)
-B = tk.Button(root,text = "Import image and autoplace",command = importImage,fg='blue')
-B.place(x=400,y=100)
-B = tk.Button(root,text = "Predict",command = affichePrediction,fg='blue')
-B.place(x=570,y=100)
-B = tk.Label(root, text = 'ADD THESE VALUES TO MODEL',font=("Purisa",12,"bold"),fg='green')
-B.place(x=760,y=70)
-
-B = tk.Button(root,text = "Model Update (developpers only)",command = HeadClass.genererAllDistancesHead,fg='green')
-B.place(x=850,y=100)
-B = tk.Label(root,text='Sex for model: ',fg='green')
-B.place(x=725,y=105)
+tk.Label(root, text = 'PREDICTION',font=("Purisa",12,"bold"),fg='blue').place(x=460,y=70)
+tk.Button(root,text = "Import image and autoplace",command = importImage,fg='blue').place(x=400,y=100)
+tk.Button(root,text = "Predict",command = affichePrediction,fg='blue').place(x=570,y=100)
+tk.Label(root, text = 'ADD THESE VALUES TO MODEL',font=("Purisa",12,"bold"),fg='green').place(x=760,y=70)
+tk.Button(root,text = "Model Update (developpers only)",command = HeadClass.genererAllDistancesHead,fg='green').place(x=850,y=100)
+tk.Label(root,text='Sex for model: ',fg='green').place(x=725,y=105)
 sexModel = tk.Entry(root,width=3)
 sexModel.place(x=810,y=105)
 
@@ -578,18 +451,15 @@ tk.Label(root,text="Longueurs caractéristiques de la tête : \n",justify=tk.LEF
 Longueur = tk.Label(root,text="",justify=tk.LEFT)
 Longueur.grid(column=0,row=5)
 
-
 ''' Labels pour les longueurs du corps '''
 tk.Label(root,text="Longueurs caractéristiques du corps : \n",justify=tk.LEFT,font=("Purisa",8,"bold","underline")).grid(column=1,row=4)
 LongueurBody = tk.Label(root,text="",justify=tk.LEFT)
 LongueurBody.grid(column=1,row=5)
 
-
 ''' Canvas pour la tête '''
 canvas = tk.Canvas(root,bg='#f0f0f0',bd=0)
 canvas.config(width=600, height=500)
 canvas.grid(column=0,row=8)
-
 
 ''' Canvas pour le corps '''
 canvas1 = tk.Canvas(root,bg='#f0f0f0')
@@ -600,17 +470,17 @@ canvas1.grid(column=1,row=8)
 canvas2 = tk.Canvas(root,bg='#f0f0f0')
 canvas2.config(width=157,height=84)
 canvas2.place(x=0,y=0)
-logoPIL = Image.open("C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho/images/logo2.png").resize((157,84))
-
-logoPIL = ImageTk.PhotoImage(logoPIL)
-
+logoPIL = ImageTk.PhotoImage(Image.open("C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho/images/logo2.png").resize((157,84)))
 canvas2.create_image(0, 0, anchor=tk.NW,image=logoPIL)
+
 
 root.mainloop()
 #
 # import inspect
 # src_file_path = inspect.getfile(lambda: None)
 # print(inspect.stack()[0][1])
+
+
 
 ''' Documentation
 
