@@ -64,3 +64,41 @@ class Externes():
 
     def px10mm(distance_px,echelle):
         return round(10*distance_px/echelle,4)
+
+    def genererAllDistancesHead(ptsEchelle,ptsFish):
+        import numpy as np
+        distances_all = []
+        listeCombinaisonsDistance,listeCombinaisonsAngle = Externes.allPointsAngles()
+        pt22 = ptsEchelle[0]
+        pt24 = ptsEchelle[1]
+        echelle3mm_px = Externes.euclideDist(pt22,pt24)
+        for x in listeCombinaisonsDistance:
+            distpx = Externes.euclideDist(ptsFish[x[0]],ptsFish[x[1]])
+            distmm = round(3*distpx/echelle3mm_px,4)
+            distances_all.append(distmm)
+        for x in listeCombinaisonsAngle:
+            thetas = Externes.calculAngle(ptsFish[x[0]],ptsFish[x[1]],ptsFish[x[2]])
+            thetas = np.around(thetas[0],4)
+            distances_all.append(thetas)
+
+        f = open("C:/Users/MASSON/Desktop/STAGE_EPINOCHE/DistancesPourModele.csv", "a")
+        header = listeCombinaisonsDistance+listeCombinaisonsAngle
+        header = "; ".join(str(i) for i in header)
+        distances_all = "; ".join(str(i) for i in distances_all)
+        f.write(str(header)+"\n")
+        f.write(str(distances_all))
+        f.close()
+        return distances_all
+
+    def calculDistances(ptsEchelle,ptsFish):
+        echelle3mm = Externes.euclideDist(ptsEchelle[0],ptsEchelle[1])
+        snout_eye = Externes.euclideDist(ptsFish[0],ptsFish[1])
+        snout_length = Externes.euclideDist(ptsFish[1],ptsFish[2])
+        eye_diameter = Externes.euclideDist(ptsFish[0],ptsFish[8])
+        head_length = Externes.euclideDist(ptsFish[1],ptsFish[7])
+        head_depth = Externes.euclideDist(ptsFish[4],ptsFish[7])
+        jaw_length = Externes.euclideDist(ptsFish[2],ptsFish[3])
+        jaw_length2 = Externes.euclideDist(ptsFish[1],ptsFish[3])
+        distances_check = [snout_eye,snout_length,eye_diameter,head_length,head_depth,jaw_length,jaw_length2]
+        distances_check = Externes.px3mmListe(distances_check,echelle3mm)
+        return distances_check

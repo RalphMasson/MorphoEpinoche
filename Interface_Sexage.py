@@ -5,9 +5,8 @@ sys.path.insert(0, 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho')
 # Import des bibliothèques (s'assurer qu'elles soient installées)
 import tkinter as tk
 from PIL import Image, ImageTk
-import os,cv2,Placement,Fonctions
+import math,functools,itertools,os,cv2,Placement,Fonctions
 import numpy as np
-import math,functools,itertools
 
 # Classe pour les points de la tête
 class HeadClass():
@@ -18,11 +17,7 @@ class HeadClass():
     distances_check : liste des distances caractéristiques affichées
     distances_all : liste de toutes les distances sauvegardés pour le modèle
     """
-    id_polygons = []
-    pointsFish = []
-    pointsEchelle = []
-    distances_check = [0 for _ in range(20)]
-    distances_all = []
+    id_polygons = pointsFish = pointsEchelle = distances_check = distances_all = []
 
     def __init__(self, canvas, points,color):
         """!
@@ -31,11 +26,9 @@ class HeadClass():
         @param points list : liste des points du polygone
         @param color String : couleur du polygone
         """
-        self.previous_x = None
-        self.previous_y = None
-        self.selected = None
+        self.previous_x = self.previous_y = self.selected = self.x = None
         self.points = points
-        self.x = None
+
         if points!=None:
             if color=='red':outline='red'
             else: outline=''
@@ -84,9 +77,7 @@ class HeadClass():
         print(self.selected,event,tag)
 
     def on_release_tag(self, event, number, tag):
-        self.selected = None
-        self.previous_x = None
-        self.previous_y = None
+        self.selected = self.previous_x = self.previous_y = None
         HeadClass.update_points()
 
     def on_move_node(self, event, number):
@@ -125,39 +116,10 @@ class HeadClass():
         HeadClass.update_points()
 
     def genererAllDistancesHead():
-
-        listeCombinaisonsDistance,listeCombinaisonsAngle = Fonctions.Externes.allPointsAngles()
-        pt22 = HeadClass.pointsEchelle[0]
-        pt24 = HeadClass.pointsEchelle[1]
-        echelle3mm_px = Fonctions.Externes.euclideDist(pt22,pt24)
-        for x in listeCombinaisonsDistance:
-            distpx = Fonctions.Externes.euclideDist(HeadClass.pointsFish[x[0]],HeadClass.pointsFish[x[1]])
-            distmm = round(3*distpx/echelle3mm_px,4)
-            HeadClass.distances_all.append(distmm)
-        for x in listeCombinaisonsAngle:
-            thetas = Fonctions.Externes.calculAngle(HeadClass.pointsFish[x[0]],HeadClass.pointsFish[x[1]],HeadClass.pointsFish[x[2]])
-            thetas = np.around(thetas[0],4)
-            HeadClass.distances_all.append(thetas)
-
-        f = open("C:/Users/MASSON/Desktop/STAGE_EPINOCHE/DistancesPourModele.csv", "a")
-        header = listeCombinaisonsDistance+listeCombinaisonsAngle
-        header = "; ".join(str(i) for i in header)
-        HeadClass.distances_all = "; ".join(str(i) for i in HeadClass.distances_all)
-        f.write(str(header)+"\n")
-        f.write(str(HeadClass.distances_all))
-        f.close()
+        HeadClass.distances_all = Fonctions.Externes.genererAllDistancesHead(HeadClass.pointsEchelle,HeadClass.pointsFish)
 
     def calculDistances():
-        echelle3mm = Fonctions.Externes.euclideDist(HeadClass.pointsEchelle[0],HeadClass.pointsEchelle[1])
-        snout_eye = Fonctions.Externes.euclideDist(HeadClass.pointsFish[0],HeadClass.pointsFish[1])
-        snout_length = Fonctions.Externes.euclideDist(HeadClass.pointsFish[1],HeadClass.pointsFish[2])
-        eye_diameter = Fonctions.Externes.euclideDist(HeadClass.pointsFish[0],HeadClass.pointsFish[8])
-        head_length = Fonctions.Externes.euclideDist(HeadClass.pointsFish[1],HeadClass.pointsFish[7])
-        head_depth = Fonctions.Externes.euclideDist(HeadClass.pointsFish[4],HeadClass.pointsFish[7])
-        jaw_length = Fonctions.Externes.euclideDist(HeadClass.pointsFish[2],HeadClass.pointsFish[3])
-        jaw_length2 = Fonctions.Externes.euclideDist(HeadClass.pointsFish[1],HeadClass.pointsFish[3])
-        HeadClass.distances_check = [snout_eye,snout_length,eye_diameter,head_length,head_depth,jaw_length,jaw_length2]
-        HeadClass.distances_check = Fonctions.Externes.px3mmListe(HeadClass.distances_check,echelle3mm)
+        HeadClass.distances_check = Fonctions.Externes.calculDistances(HeadClass.pointsEchelle,HeadClass.pointsFish)
         return HeadClass.distances_check
 
 
@@ -310,17 +272,12 @@ class HeadFish():
     poisson = None
     centreOeil=None
     def __init__(self, canvas,PIL_image,CV2_image,size):
-        # HeadFish.pathImg = path
         self.img = PIL_image
         self.img = self.img.resize(size, Image.ANTIALIAS)
-        print(self.img.size)
-        # self.img.putalpha(200)
         self.tatras = ImageTk.PhotoImage(self.img)
         toto = CV2_image
         self.circle = self.detect_eye(cv2.resize(toto,size,Image.ANTIALIAS))
         HeadFish.centreOeil = [self.circle[0],self.circle[1]]
-        # print(self.circle)
-        # canvas.delete()
         HeadFish.poisson = canvas.create_image(0, 0, anchor=tk.NW,image=self.tatras)
         canvas.move(HeadFish.poisson,-(self.circle[0]-300),-(self.circle[1]-250))
         HeadFish.img1 = HeadFish.poisson
@@ -396,6 +353,7 @@ def openfn():
     import tkinter.filedialog
     filepath = tk.filedialog.askopenfilename(title="Ouvrir une image",filetypes=[('jpg files','.jpg'),('jpeg files','.jpeg')])
     return filepath
+
 def clearAllCanvas():
     HeadClass.id_polygons=[]
     HeadClass.pointsFish=[]
