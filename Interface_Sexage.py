@@ -351,7 +351,7 @@ def importImage():
 
     ''' Resize pour la tête '''
     print("\n### Traitement de la tête 1/3 ### ")
-    PIL_image_big,CV2_image_big = Placement.Points.ImageTete(ImagePIL)
+    PIL_image_big,CV2_image_big,left1 = Placement.Points.ImageTete(ImagePIL)
     HeadFish(canvas,PIL_image_big,CV2_image_big,(3500,2625))
     canvas.update()
     print("### OK ###")
@@ -381,7 +381,10 @@ def importImage():
     try:
         pt9=Placement.Points.point9(c,pt19)
         pt9 = [pt9[0],pt9[1]]
+        print("pt9")
         print(pt9)
+        print("left")
+        print(left)
     except:
         print("Impossible de déterminer le point 9")
         nbPointNonDetectes+=1
@@ -404,12 +407,12 @@ def importImage():
     '''Initialisation des points 5 et 7 par détection auto '''
     print("\n### Calcul des points 5 et 7  ###")
     try:
-        pt7,pt5 = Placement.Points.points5_7(CV2_image_big,pt9)
+        pt7,pt5 = Placement.Points.points5_7(CV2_image_big,pt9,left1)
         pt5 = [pt5[0],pt5[1]]
         pt7 = [pt7[0],pt7[1]]
     except:
-        print("Impossible de détecter les points 5 et 7")
-        nbPointNonDetectes+=2
+         print("Impossible de détecter les points 5 et 7")
+         nbPointNonDetectes+=2
 
     """Initialisation des points 11 et 17 par détection auto """
     try:

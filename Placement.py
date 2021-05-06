@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 
-img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\images_all\\gimp_cut\\male\\IMGP1152M.JPG"
+img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\images_all\\gimp_cut\\male\\IMGP1107M.JPG"
 # img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/1-1.JPG'
 # img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/2.JPG'
 # img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/3-3.JPG'
@@ -203,7 +203,16 @@ class Points():
         return result
 
 
-
+    def detect_eye(img):
+        import cv2
+        import numpy as np
+        img_couleur = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
+        img_gray=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+        img_gray = cv2.medianBlur(img_gray,21)
+        circles1 = cv2.HoughCircles(image=img_gray, method=cv2.HOUGH_GRADIENT, dp=2,param1=70,param2=65, minDist=100, minRadius=25,maxRadius=45)
+        circles = cv2.HoughCircles(image=img_gray, method=cv2.HOUGH_GRADIENT, dp=2,param1=100,param2=30, minDist=120, minRadius=80,maxRadius=95)
+        circles = np.round(circles[0, :]).astype("int32")
+        return circles1[0][0]
 
 
     '''
@@ -213,6 +222,9 @@ class Points():
     '''
     def points3_19(img):
         img = cv2.resize(img,(3500,2625))
+        pupille = Points.detect_eye(img)
+        # print("toto")
+        # print(pupille)
         imgNB = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
         # imgNB = cv2.GaussianBlur(imgNB,(15,15),0)
         imgNB = cv2.addWeighted(imgNB, 4, imgNB, 0, 1)
@@ -221,21 +233,26 @@ class Points():
         # plt.show()
         #95 et minRAdius 30
         # 40 et minRadius 20
-        circles = cv2.HoughCircles(imgNB, cv2.HOUGH_GRADIENT, 2, 100,minRadius=65,maxRadius=85)
-        print(circles)
-        # print(circles)
+        circles = cv2.HoughCircles(imgNB, cv2.HOUGH_GRADIENT, 2.8, 300,minRadius=60,maxRadius=90)
+        # circles = cv2.HoughCircles(imgNB, cv2.HOUGH_GRADIENT, 2.8, 300,minRadius=60,maxRadius=90)
+
         if circles is not None:
             circles = np.round(circles[0, :]).astype("int")
+        listPotentiels = [x[0] for x in circles]
+
+        i = Fonctions.Externes.find_nearest(listPotentiels,pupille[0])
+        print(circles[i][0])
         # points 3 et 19
         # cv2.line(out,(circles[0][0],circles[0][1]),(circles[0][0]+circles[0][2],circles[0][1]),(255, 0, 0), 1)
         # cv2.line(out,(circles[0][0],circles[0][1]),(circles[0][0]-circles[0][2],circles[0][1]),(255, 0, 0), 1)
         # plt.imshow(out)
         # plt.show()
-        pt3 = (circles[0][0]-circles[0][2],circles[0][1])
-        pt19 = (circles[0][0]+circles[0][2],circles[0][1])
+        pt3 = (circles[i][0]-circles[i][2],circles[i][1])
+        pt19 = (circles[i][0]+circles[i][2],circles[i][1])
         print(pt3)
         print(pt19)
         return [pt3,pt19]
+        # return circles
 
 
 
@@ -283,9 +300,9 @@ class Points():
     * return : pt9
     '''
     def point9(c,pt19):
-        approx = cv2.approxPolyDP(c,20,closed=True)
+        approx = cv2.approxPolyDP(c,25,closed=True)
         # cv2.drawContours(out,approx,-1,(255,0,0),2)
-        # cv2.polylines(imagerot, [approx], True, (255,0,0), 1)
+        # cv2.polylines(imagerot, [approx], True, (255,0,0), 4)
         # approx = approx.flatten()
         x19,y19 = pt19
         # plt.imshow(imagerot)
@@ -304,6 +321,7 @@ class Points():
             anglePointsPotentiels.append(theta)
         [x9,y9] = listPointsPotentiels2[np.argmax(anglePointsPotentiels)]
         pt9 = (x9,y9)
+        print(pt9)
         return pt9
 
 
@@ -363,7 +381,7 @@ class Points():
         return pt15,pt13
 
 
-    def points5_7(img,pt9):
+    def points5_7(img,pt9,left):
         import scipy.signal
         from scipy.signal import savgol_filter
         from scipy import interpolate
@@ -371,35 +389,81 @@ class Points():
         from scipy.signal import argrelextrema
 
         _,c = Points.contoursCorpsBig(img)
-        approxBouche = cv2.approxPolyDP(c,0.00001,closed=False)
+        approxBouche = cv2.approxPolyDP(c,0.1e-10,closed=False)
+
         approxBouche2 = []
 
         i=0
         for x in approxBouche:
-            if x[0][0]<pt9[0]:
+            if (x[0][0]<pt9[0] and x[0][1]<left[1]):
                 approxBouche2.append(x)
                 i+=1
         approxBouche2 = np.asarray(approxBouche2)
-
         pt5 = [0,0]
         pt7 = [0,0]
 
         blank = np.ones_like(img)*255
         # cv2.polylines(blank, [approxBouche2], False, (255,0,0), 3)
         approxBouche2 = approxBouche2[:,0,:]
+        # cv2.drawContours(img, [approxBouche2], -1, (0, 255, 0), 3)
+        # plt.imshow(img)
+        # print("toto")
+        # print(approxBouche2)
+        # plt.figure()
+        # plt.plot(approxBouche2.T[0],-approxBouche2.T[1])
+        # approxBouche2 = approxBouche[::2]
+        approxBouche2 = np.array([list(approxBouche2[::2][i]) for i in range(len(approxBouche2)//2)])
+        # print("toto")
+        # print(approxBouche2)
+        # cv2.drawContours(img, [approxBouche2], -1, (0, 0, 255), 1)
+        # plt.imshow(img)
         abscisses = approxBouche2.T[0]
         ordonnees = approxBouche2.T[1]
         # plt.figure()
-        # plt.plot(ordonnees,abscisses,'r.',label='Contour bouche')
+        # plt.plot(-ordonnees,-1*abscisses,'r',label='Contour bouche')
 
         #smoothing the contours of the mouth
-        tck,u = interpolate.splprep([ordonnees,abscisses],k=3,s=16)
+        tck,u = interpolate.splprep([ordonnees,-1*abscisses],k=3,s=16)
         u=np.linspace(0,1,num=len(ordonnees),endpoint=True)
         outBouche = interpolate.splev(u,tck)
-        # plt.plot(outBouche[0], outBouche[1], 'b',label='Contour bouche lissé' )
+        # plt.plot(- outBouche[0], outBouche[1], 'b',label='Contour bouche lissé' )
         # plt.legend()
         # print(len(outBouche[0]))
+        # print(outBouche[1])
 
+        ''' zscore '''
+        zscore=scipy.stats.zscore(outBouche[1])
+        # print(len(outBouche[1]))
+        input = zscore
+        signal = (input > np.roll(input,1)) & (input > np.roll(input,-1))
+        # plt.plot(input)
+        # print(signal)
+        # plt.plot(signal.nonzero()[0], input[signal], 'ro')
+        # plt.plot(X2,F2)
+
+        ''' wavelet transform and zerocrossing '''
+        # import pywt
+        # swt = pywt.swt(outBouche[1][:-1], 'rbio3.1')
+        # cA = [x for x in swt[0][0]]
+        # cD = [x for x in swt[0][1]]
+        # # plt.figure()
+        # # plt.plot(cD)
+        # zc = np.where(np.diff(np.sign(cD)))[0]
+        # # plt.figure()
+        # # plt.plot(ordonnees,abscisses, 'b')
+        # # plt.plot(ordonnees[zc+1],abscisses[zc+1],'ro')
+        # print(zc)
+        # # plt.figure()
+        # # plt.plot(outBouche[0],zscore)
+        # # plt.figure()
+
+        '''find peak cwt'''
+        peakind = scipy.signal.find_peaks(-1*abscisses,prominence=0.)
+        # print(ordonnees)
+        # print(peakind[0])
+        # plt.figure()
+        # plt.plot(ordonnees,-1*abscisses, 'b')
+        # plt.plot(ordonnees[peakind[0]],-1*abscisses[peakind[0]],'ro')
         # compute the 1st derivative
         f_prime = np.gradient (outBouche[1])
         # plt.figure()
@@ -413,6 +477,44 @@ class Points():
         # plt.figure()
         # plt.plot(out[0],out[1],label='dérivée première lissée')
         # plt.legend()
+
+        ''' distance to line'''
+        pente =(approxBouche2[0][1]-left[1])/(approxBouche2[0][0]-left[0])
+        intercept = approxBouche2[0][1]-pente*approxBouche2[0][0]
+        xx = np.linspace(max(approxBouche2[0][0],left[0]),min(approxBouche2[0][0],left[0]),len(abscisses))
+        yy = np.round(pente*xx+intercept)
+        # print(pente)
+        # print(intercept)
+        # plt.figure()
+        # plt.plot(xx,yy,'r')
+        # plt.plot(xx,ordonnees,'b')
+        projete = [np.round(Fonctions.Externes.projeteOrtho(pente,intercept,xx[i],ordonnees[i])) for i in range(len(xx))]
+        projete = [x.flatten().tolist() for x in projete]
+        xxx=np.array(projete).T[0]
+        yyy = np.array(projete).T[1]
+        # plt.plot(xx[10],ordonnees[10],'go')
+        # plt.plot(projete[0],projete[1],'ko')
+        # plt.plot(xxx,yyy,'g')
+        # print("droite")
+        # print(yy)
+        # print("points")
+        # # print(ordonnees)
+        # print("projetés")
+        # print(yyy)
+        # erreur = [(yy[i]-ordonnees[i])**2 for i in range(len(yy))]
+        erreur2 = [(yy[i]-yyy[i])**2 for i in range(len(yyy))]
+        # print("erreur")
+        # print(erreur2)
+        # plt.figure()
+        # plt.plot(xx,erreur)
+        # plt.plot(xx,erreur2)
+
+        print(np.max(erreur2))
+        indx = np.argmax(erreur2)
+        # plt.plot(xx[indx],ordonnees[indx],'yo')
+
+
+
 
         # compute the 2nd derivative
         f_second = np.gradient(out[1])
@@ -437,6 +539,8 @@ class Points():
         # av erifier
         pt5 = (abscisses[mini],ordonnees[mini])
         pt7 = (abscisses[local_maxima],ordonnees[local_maxima])
+        pt5 = (left[0],left[1])
+        pt7 = (int(xx[indx]),int(ordonnees[indx]))
         print("pt5")
         print(pt5)
         print("pt7")
@@ -450,6 +554,7 @@ class Points():
 
         # plt.show()
         return pt5,pt7
+        # return swt
 
 
     def randomPoints():
@@ -633,10 +738,11 @@ class Points():
         out,c = Points.contoursCorpsBig(CV2_image_big)
         [left1,right1,top,bottom] = Points.pointExtremeContours(c)
         CV2_image_big = Points.rotate_image(out,Points.angleRot(left1,right1)[0],Points.angleRot(left1,right1)[1])
-
+        _,c = Points.contoursCorpsBig(CV2_image_big)
+        [left1,_,_,_] = Points.pointExtremeContours(c)
         print("\n### Chargement de l'image de la tête' ###")
         PIL_image_big = Image.fromarray(CV2_image_big)
-        return PIL_image_big,CV2_image_big
+        return PIL_image_big,CV2_image_big,left1
 '''
 *
 * Main function
@@ -651,29 +757,34 @@ class Points():
 # plt.imshow(out)
 # plt.show()
 #
-# # #
-# out,c = Points.contoursCorpsBig(img)
-# [left,right,top,bottom] = Points.pointExtremeContours(c)
-# imagerot = Points.rotate_image(out,Points.angleRot(left,right)[0],Points.angleRot(left,right)[1])
-# # #
-# _,c = Points.contoursCorpsBig(imagerot)
-# [left,right,top,bottom] = Points.pointExtremeContours(c)
-# # #
+# # # # #
+out,c = Points.contoursCorpsBig(img)
+[left,right,top,bottom] = Points.pointExtremeContours(c)
+imagerot = Points.rotate_image(out,Points.angleRot(left,right)[0],Points.angleRot(left,right)[1])
 # #
-# [pt3,pt19]=Points.points3_19(imagerot)
+_,c = Points.contoursCorpsBig(imagerot)
+[left,right,top,bottom] = Points.pointExtremeContours(c)
+print("left")
+print(left)
 # #
-# #
-# pt9 = Points.point9(c,pt19)
-# #
-# # #ne fonctionne pas pour l'instant
-# # [pt15,pt13] =Points.points15_13(imagerot)
+#
+[pt3,pt19]=Points.points3_19(imagerot)
+print(pt3)
+print(pt19)
+# circles = Points.points3_19(imagerot)
+print("pt9")
+pt9 = Points.point9(c,pt19)
+#
+# #ne fonctionne pas pour l'instant
+# [pt15,pt13] =Points.points15_13(imagerot)
 # pt13 = (1288, 1228)
 # pt15 = (1308, 1098)
 # cv2.circle(imagerot, pt15, 20, (255, 0, 0), -1)
 # cv2.circle(imagerot, pt13, 20, (255, 0, 0), -1)
-# #
+#
 # pt5,pt7 = Points.points5_7(imagerot,pt9)
-# #
+pt5,pt7= Points.points5_7(imagerot,pt9,left)
+#
 # pt11,pt17 = Points.points11_17(imagerot,pt13,pt15)
 # pt11 = (pt11[0],pt11[1])
 # pt17 = (pt17[0],pt17[1])
@@ -681,17 +792,17 @@ class Points():
 # cv2.circle(imagerot, right, 12, (0, 255, 255), -1)
 # cv2.circle(imagerot, top, 12, (255, 50, 0), -1)
 # cv2.circle(imagerot, bottom, 12, (255, 255, 0), -1)
-# cv2.circle(imagerot, pt3, 12, (255, 0, 0), -1)
-# cv2.circle(imagerot, pt19, 12, (255, 0, 0), -1)
-# cv2.circle(imagerot, pt9, 12, (255, 0, 0), -1)
-# cv2.circle(imagerot, pt5, 8, (0, 255, 0), -1)
-# cv2.circle(imagerot, pt7, 8, (0, 255, 0), -1)
+cv2.circle(imagerot, pt3, 4, (255, 0, 0), -1)
+cv2.circle(imagerot, pt19, 4, (255, 0, 0), -1)
+cv2.circle(imagerot, pt9, 8, (255, 0, 0), -1)
+cv2.circle(imagerot, pt5, 8, (0, 255, 0), -1)
+cv2.circle(imagerot, pt7, 8, (0, 255, 0), -1)
 # cv2.circle(imagerot, pt11, 8, (0, 255, 0), -1)
 # cv2.circle(imagerot, pt17, 8, (0, 255, 0), -1)
-#
-# # plt.imshow(imagerot)
-# plt.show()
-#
+# plt.figure()
+plt.imshow(imagerot)
+plt.show()
+#(
 
 
 #

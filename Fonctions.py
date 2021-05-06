@@ -114,6 +114,12 @@ class Externes():
         distances_check = Externes.px10mmListe(distances_check,echelle10mm)
         return distances_check
 
+    def find_nearest(array, value):
+        import numpy as np
+        array = np.asarray(array)
+        idx = (np.abs(array - value)).argmin()
+        return idx
+
     def detect_eye(img):
         import cv2
         import numpy as np
@@ -146,3 +152,11 @@ class Externes():
         texte += "8 <-> 10 : Longueur Corps : "+str(distance[0])+" mm \n"
         texte += " 13 <-> 15 : Largeur corps : "+str(distance[1])+" mm \n"
         return texte
+
+    def projeteOrtho(pente,intercept,xA,yA):
+        import numpy as np
+        matriceA = np.array([[pente,-1],[1,pente]])
+        vecteurB = np.array([[-intercept],[xA+pente*yA]])
+        invMatA = np.linalg.inv(matriceA)
+        projete = np.dot(invMatA,vecteurB)
+        return projete
