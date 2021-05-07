@@ -351,7 +351,7 @@ def importImage():
 
     ''' Resize pour la tête '''
     print("\n### Traitement de la tête 1/3 ### ")
-    PIL_image_big,CV2_image_big,left1 = Placement.Points.ImageTete(ImagePIL)
+    PIL_image_big,CV2_image_big,left1 = Placement.Points.ImageTete(pathok)
     HeadFish(canvas,PIL_image_big,CV2_image_big,(3500,2625))
     canvas.update()
     print("### OK ###")
@@ -366,25 +366,29 @@ def importImage():
 
     ''' Initialisation des points 3 et 19 par détection auto '''
     print("\n### Calcul des points 3 et 19 ###")
-    try:
-        [pt3,pt19]=Placement.Points.points3_19(CV2_image_big)
-        pt3 = [pt3[0],pt3[1]]
-        pt19 = [pt19[0],pt19[1]]
-    except:
-        print("Impossible de déterminer les points 3 et 19")
-        nbPointNonDetectes+=2
+    # try:
+    #     [pt3,pt19]=Placement.Points.points3_19(CV2_image_big)
+    #     pt3 = [pt3[0],pt3[1]]
+    #     pt19 = [pt19[0],pt19[1]]
+    # except:
+    #     print("Impossible de déterminer les points 3 et 19")
+    #     nbPointNonDetectes+=2
+    [pt3,pt19]=Placement.Points.points3_19(CV2_image_big)
+    pt3 = [pt3[0],pt3[1]]
+    pt19 = [pt19[0],pt19[1]]
     print("### OK ###")
 
     '''Initialisation du point 9 par détection auto '''
     print("\n### Calcul du point 9 ###")
     _,c = Placement.Points.contoursCorpsBig(CV2_image_big)
+    print(CV2_image_big.shape)
     try:
         pt9=Placement.Points.point9(c,pt19)
         pt9 = [pt9[0],pt9[1]]
         print("pt9")
         print(pt9)
-        print("left")
-        print(left)
+        # print("left")
+        # print(left)
     except:
         print("Impossible de déterminer le point 9")
         nbPointNonDetectes+=1
@@ -469,6 +473,9 @@ tk.Button(root,text = "Predict",command = affichePrediction,fg='purple').place(x
 tk.Label(root, text = 'ADD THESE VALUES TO MODEL',font=("Purisa",12,"bold"),fg='green').place(x=760,y=70)
 tk.Button(root,text = "Model Update (developpers only)",command = HeadClass.genererAllDistancesHead,fg='green').place(x=850,y=100)
 tk.Label(root,text='Sex for model: ',fg='green').place(x=725,y=105)
+tk.Button(root,text='<--').place(x=550,y=230)
+tk.Button(root,text='-->').place(x=600,y=230)
+
 sexModel = tk.Entry(root,width=3)
 sexModel.place(x=810,y=105)
 

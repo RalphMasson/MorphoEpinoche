@@ -222,26 +222,44 @@ class Points():
     '''
     def points3_19(img):
         img = cv2.resize(img,(3500,2625))
+        print(img[:,:,0][1000][1500])
         pupille = Points.detect_eye(img)
-        # print("toto")
-        # print(pupille)
+        print("toto")
+        print(pupille)
         imgNB = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
         # imgNB = cv2.GaussianBlur(imgNB,(15,15),0)
         imgNB = cv2.addWeighted(imgNB, 4, imgNB, 0, 1)
+        print(imgNB[1000][1500])
+        print(imgNB[1000][1505])
+        print(imgNB[1000][1510])
+        print(imgNB[1000][1511])
+        print(imgNB[1000][1512])
+        print(imgNB[1000][1513])
+        print(imgNB[1000][1514])
+        print(imgNB[1001][1500])
+        print(imgNB[1001][1505])
+        print(imgNB[1001][1510])
+        print(imgNB[1001][1511])
+        print(imgNB[1001][1512])
+        print(imgNB[1001][1513])
+        print(imgNB[1001][1514])
         # plt.figure()
         # plt.imshow(imgNB,cmap="gray")
         # plt.show()
         #95 et minRAdius 30
         # 40 et minRadius 20
         circles = cv2.HoughCircles(imgNB, cv2.HOUGH_GRADIENT, 2.8, 300,minRadius=60,maxRadius=90)
+        print(circles)
+
         # circles = cv2.HoughCircles(imgNB, cv2.HOUGH_GRADIENT, 2.8, 300,minRadius=60,maxRadius=90)
 
         if circles is not None:
             circles = np.round(circles[0, :]).astype("int")
         listPotentiels = [x[0] for x in circles]
-
+        print(circles)
         i = Fonctions.Externes.find_nearest(listPotentiels,pupille[0])
-        print(circles[i][0])
+        print(i)
+        # print(circles[i][0])
         # points 3 et 19
         # cv2.line(out,(circles[0][0],circles[0][1]),(circles[0][0]+circles[0][2],circles[0][1]),(255, 0, 0), 1)
         # cv2.line(out,(circles[0][0],circles[0][1]),(circles[0][0]-circles[0][2],circles[0][1]),(255, 0, 0), 1)
@@ -729,12 +747,15 @@ class Points():
         newPIL_image = Image.fromarray(imagerot)
         return corpsStandard,newPIL_image,left
 
-    def ImageTete(imgPIL):
+    def ImageTete(pathok):
         from PIL import Image
+        import cv2
+        imgPIL = Image.open(pathok)
         PIL_image_big = imgPIL.resize((3500,2625), Image.ANTIALIAS)
         PIL_image_big = np.flip(PIL_image_big,axis=2)
-        CV2_image_big = np.array(PIL_image_big)
-        CV2_image_big = CV2_image_big[:, :, ::-1].copy()
+        CV2_image_big = cv2.imread(pathok)
+        CV2_image_big = cv2.cvtColor(CV2_image_big,cv2.COLOR_BGR2RGB)
+        # CV2_image_big = CV2_image_big[:, :, ::-1].copy()
         out,c = Points.contoursCorpsBig(CV2_image_big)
         [left1,right1,top,bottom] = Points.pointExtremeContours(c)
         CV2_image_big = Points.rotate_image(out,Points.angleRot(left1,right1)[0],Points.angleRot(left1,right1)[1])
@@ -748,7 +769,7 @@ class Points():
 * Main function
 *
 '''
-
+#
 # plt.figure()
 # plt.imshow(img)
 # plt.show()
@@ -756,54 +777,58 @@ class Points():
 # plt.figure()
 # plt.imshow(out)
 # plt.show()
-#
-# # # # #
-out,c = Points.contoursCorpsBig(img)
-[left,right,top,bottom] = Points.pointExtremeContours(c)
-imagerot = Points.rotate_image(out,Points.angleRot(left,right)[0],Points.angleRot(left,right)[1])
+
+# # # #
+# out,c = Points.contoursCorpsBig(img)
+# [left,right,top,bottom] = Points.pointExtremeContours(c)
+# imagerot = Points.rotate_image(out,Points.angleRot(left,right)[0],Points.angleRot(left,right)[1])
+# # #
+# _,c = Points.contoursCorpsBig(imagerot)
+# [left,right,top,bottom] = Points.pointExtremeContours(c)
+# print("left")
+# print(left)
+# # #
+# print("toto")
+# print(imagerot.shape)
+# [pt3,pt19]=Points.points3_19(imagerot)
+# print("pt3")
+# print(pt3)
+# print("pt19")
+# print(pt19)
+# # circles = Points.points3_19(imagerot)
+# print("pt9")
+# pt9 = Points.point9(c,pt19)
 # #
-_,c = Points.contoursCorpsBig(imagerot)
-[left,right,top,bottom] = Points.pointExtremeContours(c)
-print("left")
-print(left)
+# # #ne fonctionne pas pour l'instant
+# # [pt15,pt13] =Points.points15_13(imagerot)
+# # pt13 = (1288, 1228)
+# # pt15 = (1308, 1098)
+# # cv2.circle(imagerot, pt15, 20, (255, 0, 0), -1)
+# # cv2.circle(imagerot, pt13, 20, (255, 0, 0), -1)
 # #
-#
-[pt3,pt19]=Points.points3_19(imagerot)
-print(pt3)
-print(pt19)
-# circles = Points.points3_19(imagerot)
-print("pt9")
-pt9 = Points.point9(c,pt19)
-#
-# #ne fonctionne pas pour l'instant
-# [pt15,pt13] =Points.points15_13(imagerot)
-# pt13 = (1288, 1228)
-# pt15 = (1308, 1098)
-# cv2.circle(imagerot, pt15, 20, (255, 0, 0), -1)
-# cv2.circle(imagerot, pt13, 20, (255, 0, 0), -1)
-#
-# pt5,pt7 = Points.points5_7(imagerot,pt9)
-pt5,pt7= Points.points5_7(imagerot,pt9,left)
-#
-# pt11,pt17 = Points.points11_17(imagerot,pt13,pt15)
-# pt11 = (pt11[0],pt11[1])
-# pt17 = (pt17[0],pt17[1])
-# cv2.circle(imagerot, left, 12, (0, 50, 255), -1)
-# cv2.circle(imagerot, right, 12, (0, 255, 255), -1)
-# cv2.circle(imagerot, top, 12, (255, 50, 0), -1)
-# cv2.circle(imagerot, bottom, 12, (255, 255, 0), -1)
-cv2.circle(imagerot, pt3, 4, (255, 0, 0), -1)
-cv2.circle(imagerot, pt19, 4, (255, 0, 0), -1)
-cv2.circle(imagerot, pt9, 8, (255, 0, 0), -1)
-cv2.circle(imagerot, pt5, 8, (0, 255, 0), -1)
-cv2.circle(imagerot, pt7, 8, (0, 255, 0), -1)
-# cv2.circle(imagerot, pt11, 8, (0, 255, 0), -1)
-# cv2.circle(imagerot, pt17, 8, (0, 255, 0), -1)
-# plt.figure()
-plt.imshow(imagerot)
-plt.show()
-#(
+# # pt5,pt7 = Points.points5_7(imagerot,pt9)
+# pt5,pt7= Points.points5_7(imagerot,pt9,left)
+# #
+# # pt11,pt17 = Points.points11_17(imagerot,pt13,pt15)
+# # pt11 = (pt11[0],pt11[1])
+# # pt17 = (pt17[0],pt17[1])
+# # cv2.circle(imagerot, left, 12, (0, 50, 255), -1)
+# # cv2.circle(imagerot, right, 12, (0, 255, 255), -1)
+# # cv2.circle(imagerot, top, 12, (255, 50, 0), -1)
+# # cv2.circle(imagerot, bottom, 12, (255, 255, 0), -1)
+# cv2.circle(imagerot, pt3, 4, (255, 0, 0), -1)
+# cv2.circle(imagerot, pt19, 4, (255, 0, 0), -1)
+# cv2.circle(imagerot, pt9, 8, (255, 0, 0), -1)
+# cv2.circle(imagerot, pt5, 8, (0, 255, 0), -1)
+# cv2.circle(imagerot, pt7, 8, (0, 255, 0), -1)
+# # cv2.circle(imagerot, pt11, 8, (0, 255, 0), -1)
+# # cv2.circle(imagerot, pt17, 8, (0, 255, 0), -1)
+# # plt.figure()
+# plt.imshow(imagerot)
+# plt.title("Vérification du positionnement des points avant interface")
+# plt.grid(True)
+# plt.show()
 
 
-#
+
 
