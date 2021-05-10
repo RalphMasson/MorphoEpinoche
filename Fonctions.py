@@ -133,7 +133,7 @@ class Externes():
 
     def openfn():
         import tkinter.filedialog,tkinter as tk
-        filepath = tk.filedialog.askopenfilename(title="Ouvrir une image",filetypes=[('jpg files','.jpg'),('jpeg files','.jpeg')])
+        filepath = tk.filedialog.askopenfilenames(title="Ouvrir une image",filetypes=[('jpg files','.jpg'),('jpeg files','.jpeg')])
         return filepath
 
     def Longueur(distance):

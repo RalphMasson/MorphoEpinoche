@@ -36,8 +36,8 @@ class HeadClass():
             self.polygon = canvas.create_polygon(self.points,fill='',outline=outline,smooth=0,width=2,dash=())
             HeadClass.id_polygons.append(self.polygon)
             canvas.tag_bind(self.polygon, '<ButtonPress-1>',   lambda event, tag=self.polygon: self.on_press_tag(event, 0, tag))
-            canvas.tag_bind(self.polygon, '<ButtonRelease-1>', lambda event, tag=self.polygon: self.on_release_tag(event, 0, tag))
-            canvas.tag_bind(self.polygon, '<B1-Motion>', self.on_move_polygon)
+            canvas.tag_bind(self.polygon, '<ButtonRelease-1>', lambda event, tag=self.polygon: self.on_release_tag(event, 0, tag,canvas))
+            canvas.tag_bind(self.polygon, '<B1-Motion>', lambda event = self.polygon : self.on_move_polygon(event,canvas))
             self.nodes = []
             self.nonodes = []
             for number, point in enumerate(self.points):
@@ -47,15 +47,15 @@ class HeadClass():
                 self.nodes.append(node)
                 self.nonodes.append(label)
                 canvas.tag_bind(node, '<ButtonPress-1>',   lambda event, number=number, tag=node: self.on_press_tag(event, number, tag))
-                canvas.tag_bind(node, '<ButtonRelease-1>', lambda event, number=number, tag=node: self.on_release_tag(event, number, tag))
-                canvas.tag_bind(node, '<B1-Motion>', lambda event, number=number: self.on_move_node(event, number))
+                canvas.tag_bind(node, '<ButtonRelease-1>', lambda event, number=number, tag=node: self.on_release_tag(event, number, tag,canvas))
+                canvas.tag_bind(node, '<B1-Motion>', lambda event, number=number: self.on_move_node(event, number,canvas))
 
-        HeadClass.update_points()
+        HeadClass.update_points(canvas)
 
         if(len(HeadClass.pointsEchelle)>0):
-             afficheLongueur()
+             Interface.afficheLongueur()
 
-    def update_points():
+    def update_points(canvas):
         """!
         Methode de mise à jour de la position des points
         """
@@ -76,11 +76,11 @@ class HeadClass():
         self.previous_y = event.y
         print(self.selected,event,tag)
 
-    def on_release_tag(self, event, number, tag):
+    def on_release_tag(self, event, number, tag,canvas):
         self.selected = self.previous_x = self.previous_y = None
-        HeadClass.update_points()
+        HeadClass.update_points(canvas)
 
-    def on_move_node(self, event, number):
+    def on_move_node(self, event, number,canvas):
         '''move single node in polygon'''
         if self.selected:
             dx = event.x - self.previous_x
@@ -122,9 +122,9 @@ class HeadClass():
                 None
 
 
-        HeadClass.update_points()
-        afficheLongueur()
-    def on_move_polygon(self, event):
+        HeadClass.update_points(canvas)
+        Interface.afficheLongueur()
+    def on_move_polygon(self, event,canvas):
         '''move polygon and red rectangles in nodes'''
         if self.selected:
             dx = event.x - self.previous_x
@@ -141,7 +141,7 @@ class HeadClass():
                 item[1] += dy
             self.previous_x = event.x
             self.previous_y = event.y
-        HeadClass.update_points()
+        HeadClass.update_points(canvas)
 
     def genererAllDistancesHead():
         HeadClass.distances_all = Fonctions.Externes.genererAllDistancesHead(HeadClass.pointsEchelle,HeadClass.pointsFish)
@@ -172,9 +172,9 @@ class BodyClass():
             else: outline=''
             self.polygon = canvas1.create_polygon(self.points,fill='',outline=outline,smooth=0,width=3,dash=())
             BodyClass.id_polygons.append(self.polygon)
-            canvas1.tag_bind(self.polygon, '<ButtonPress-3>',   lambda event, tag=self.polygon: self.on_press_tag(event, 0, tag))
-            canvas1.tag_bind(self.polygon, '<ButtonRelease-3>', lambda event, tag=self.polygon: self.on_release_tag(event, 0, tag))
-            canvas1.tag_bind(self.polygon, '<B3-Motion>', self.on_move_polygon)
+            canvas1.tag_bind(self.polygon, '<ButtonPress-3>',   lambda event, tag=self.polygon: self.on_press_tag(event, 0, tag,canvas1))
+            canvas1.tag_bind(self.polygon, '<ButtonRelease-3>', lambda event, tag=self.polygon: self.on_release_tag(event, 0, tag,canvas1))
+            canvas1.tag_bind(self.polygon, '<B3-Motion>',lambda event = self.polygon : self.on_move_polygon(event,canvas1))
             self.nodes = []
             self.nonodes = []
             for number, point in enumerate(self.points):
@@ -183,22 +183,22 @@ class BodyClass():
                 label = canvas1.create_text((x+15, y+6),text=str(node%15),font=("Purisa", 1),fill='green')
                 self.nodes.append(node)
                 self.nonodes.append(label)
-                canvas1.tag_bind(node, '<ButtonPress-3>',   lambda event, number=number, tag=node: self.on_press_tag(event, number, tag))
-                canvas1.tag_bind(node, '<ButtonRelease-3>', lambda event, number=number, tag=node: self.on_release_tag(event, number, tag))
-                canvas1.tag_bind(node, '<B3-Motion>', lambda event, number=number: self.on_move_node(event, number))
+                canvas1.tag_bind(node, '<ButtonPress-3>',   lambda event, number=number, tag=node: self.on_press_tag(event, number, tag,canvas1))
+                canvas1.tag_bind(node, '<ButtonRelease-3>', lambda event, number=number, tag=node: self.on_release_tag(event, number, tag,canvas1))
+                canvas1.tag_bind(node, '<B3-Motion>', lambda event, number=number: self.on_move_node(event, number,canvas1))
 
-        BodyClass.update_points()
+        BodyClass.update_points(canvas1)
 
         if(len(BodyClass.pointsFish)>0):
-            afficheLongueurBody()
+            Interface.afficheLongueurBody()
 
-    def update_points():
+    def update_points(canvas1):
         for id in BodyClass.id_polygons:
             liste = canvas1.coords(id)
             if(len(canvas1.coords(id))==8):BodyClass.pointsFish=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
             if(len(canvas1.coords(id))==4):BodyClass.pointsEchelle=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
 
-    def on_press_tag(self, event, number, tag):
+    def on_press_tag(self, event, number, tag,canvas1):
         """!
         Methode pour determiner l'item selectionné
         @param event event : coordonnees de l'item
@@ -208,15 +208,15 @@ class BodyClass():
         self.selected = tag
         self.previous_x = event.x
         self.previous_y = event.y
-        BodyClass.update_points()
-        afficheLongueurBody()
+        BodyClass.update_points(canvas1)
+        Interface.afficheLongueurBody()
 
-    def on_release_tag(self, event, number, tag):
+    def on_release_tag(self, event, number, tag,canvas1):
         self.selected = self.previous_x = self.previous_y = None
-        BodyClass.update_points()
-        afficheLongueurBody()
+        BodyClass.update_points(canvas1)
+        Interface.afficheLongueurBody()
 
-    def on_move_node(self, event, number):
+    def on_move_node(self, event, number,canvas1):
         '''move single node in polygon'''
         if self.selected:
             dx = event.x - self.previous_x
@@ -231,10 +231,10 @@ class BodyClass():
             self.previous_x = event.x
             self.previous_y = event.y
 
-        BodyClass.update_points()
-        afficheLongueurBody()
+        BodyClass.update_points(canvas1)
+        Interface.afficheLongueurBody()
 
-    def on_move_polygon(self, event):
+    def on_move_polygon(self, event,canvas1):
         '''move polygon and red rectangles in nodes'''
         if self.selected:
             dx = event.x - self.previous_x
@@ -252,8 +252,8 @@ class BodyClass():
             self.previous_x = event.x
             self.previous_y = event.y
 
-        BodyClass.update_points()
-        afficheLongueurBody()
+        BodyClass.update_points(canvas1)
+        Interface.afficheLongueurBody()
 
     def calculDistances():
         BodyClass.distances_check = Fonctions.Externes.calculDistances2(BodyClass.pointsEchelle,BodyClass.pointsFish)
@@ -277,10 +277,10 @@ class HeadFish():
         HeadFish.poisson = canvas.create_image(0, 0, anchor=tk.NW,image=self.img)
         HeadFish.CV2_image_big = CV2_image
         canvas.move(HeadFish.poisson,-(self.circle[0]-300),-(self.circle[1]-250))
-        root.bind("<Left>",self.moveLeft)
-        root.bind("<Right>",self.moveRight)
-        root.bind("<Up>",self.moveUp)
-        root.bind("<Down>",self.moveDown)
+        app.bind("<Left>",self.moveLeft)
+        app.bind("<Right>",self.moveRight)
+        app.bind("<Up>",self.moveUp)
+        app.bind("<Down>",self.moveDown)
     def moveLeft(self,event):
         canvas.move(HeadFish.poisson,-10,0)
     def moveRight(self,event):
@@ -295,10 +295,10 @@ class BodyFish():
     def __init__(self, canvas1,PIL_image,size):
         self.img = ImageTk.PhotoImage(PIL_image.resize(size, Image.ANTIALIAS))
         BodyFish.poisson = canvas1.create_image(0, 0, anchor=tk.NW, image=self.img)
-        root.bind("<Key>",self.move)
-        root.bind("<Key>",self.move)
-        root.bind("<Key>",self.move)
-        root.bind("<Key>",self.move)
+        app.bind("<Key>",self.move)
+        app.bind("<Key>",self.move)
+        app.bind("<Key>",self.move)
+        app.bind("<Key>",self.move)
     def move(self,event):
         if event.char=='q':
             canvas1.move(BodyFish.poisson,-10,0)
@@ -308,215 +308,322 @@ class BodyFish():
             canvas1.move(BodyFish.poisson,0,-10)
 
 
-def afficheLongueur():
-    Longueur.config(text=Fonctions.Externes.Longueur(HeadClass.calculDistances()))
+class Interface(tk.Tk):
+    numImageActuelle = 0
+    listeImages = ""
+    def __init__(self):
+        super().__init__()
 
-def afficheLongueurBody():
-    LongueurBody.config(text=Fonctions.Externes.LongueurBody(BodyClass.calculDistances()))
+        ''' Fenetre et menu'''
+        # root = tk.Tk()
+        self.state('zoomed')
+        self.title("Sex Determination for Three Spined Stickleback")
+        menubar = tk.Menu(self)
+        menuFichier = tk.Menu(menubar,tearoff=0)
+        # menuFichier.add_command(label="Créer", command=None)
+        menuFichier.add_command(label="Importer", command=None)
+        # menuFichier.add_command(label="Editer", command=None)
+        menuFichier.add_separator()
+        menuFichier.add_command(label="Quitter", command=self.destroy)
+        menubar.add_cascade(label="Fichier", menu=menuFichier)
+        menuAide = tk.Menu(menubar, tearoff=0)
+        menuAide.add_command(label="A propos", command=None)
+        menubar.add_cascade(label="Aide", menu=menuAide)
+        self.config(menu=menubar)
 
-def clearAllCanvas():
-    HeadClass.id_polygons=[]
-    HeadClass.pointsFish=[]
-    HeadClass.pointsEchelle=[]
-    HeadClass.distances_check=[0 for _ in range(20)]
-    Longueur.config(text="")
-    BodyClass.id_polygons=[]
-    BodyClass.pointsFish=[]
-    BodyClass.pointsEchelle=[]
-    BodyClass.distances_check=[0 for _ in range(20)]
-    LongueurBody.config(text="")
-    avertissement.config(text="")
-    sexPrediction.config(text="")
-    canvas.delete('all')
-    canvas1.delete('all')
+        CV2_image_big = None
+        ''' Label Intro de presentation'''
+        tk.Label(self,text=" ",font=("Purisa",12,"bold")).grid(ipadx=2)
+        tk.Label(self,text=" \t Sexing procedure of three-spined stickleback \n",font=("Andalus",16,"bold")).place(x=750,y=40,anchor=tk.CENTER)
+        tk.Label(self,text="\n \n \n \n ").grid(column=0,row=1)
 
+        ''' Boutons '''
+        tk.Label(self, text = 'PREDICTION',font=("Purisa",12,"bold"),fg='purple').place(x=460,y=70)
+        tk.Button(self,text = "Import image and autoplace",command = self.importImage,fg='purple').place(x=400,y=100)
+        tk.Button(self,text = "Predict",command = Interface.affichePrediction,fg='purple').place(x=570,y=100)
+        tk.Label(self, text = 'ADD THESE VALUES TO MODEL',font=("Purisa",12,"bold"),fg='green').place(x=760,y=70)
+        tk.Button(self,text = "Model Update (developpers only)",command = HeadClass.genererAllDistancesHead,fg='green').place(x=850,y=100)
+        tk.Label(self,text='Sex for model: ',fg='green').place(x=725,y=105)
+        tk.Button(self,text='<--',command = None).place(x=550,y=230)
+        tk.Button(self,text='-->',command = self.nextImage).place(x=600,y=230)
 
-def importImage():
-    nbPointNonDetectes = 0
+        self.sexModel = tk.Entry(self,width=3)
+        self.sexModel.place(x=810,y=105)
 
-    print("### Initialisation ###")
-    tete,echelle10mm,echelle3mm = Placement.Points.randomPointsBis()
-    pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19 = tete
-    clearAllCanvas()
-    pathok = Fonctions.Externes.openfn()
-    ImagePIL = Image.open(pathok)
+        self.sexPrediction = tk.Label(self,text="")
+        self.sexPrediction.place(x=650,y=190)
 
-    ''' Resize pour le corps '''
-    print("\n### Traitement du corps ###")
-    corpsStandard,newPIL_image,left = Placement.Points.ImageCorps(ImagePIL)
-    BodyFish(canvas1,newPIL_image,(1300,975))
-    canvas1.move(BodyFish.poisson,-(left[0]-50),-(left[1]-280))
-    canvas1.update()
-    print("### OK ###")
+        self.avertissement = tk.Label(self,text="")
+        self.avertissement.place(x=650,y=160)
 
-    ''' Resize pour la tête '''
-    print("\n### Traitement de la tête 1/3 ### ")
-    PIL_image_big,CV2_image_big,left1 = Placement.Points.ImageTete(pathok)
-    HeadFish(canvas,PIL_image_big,CV2_image_big,(3500,2625))
-    canvas.update()
-    print("### OK ###")
+        self.explanation = tk.Label(self,text="\n ")
+        self.explanation.grid(column=0,row=3)
 
-    print("\n### Alignement des points sur le corps'  ###")
-    corpsStandard = [[x[0]-(left[0]-50),x[1]-(left[1]-280)] for x in corpsStandard]
-    echelle10mm = [[x[0]-(left[0]-250),x[1]-(left[1]-350)] for x in echelle10mm]
-    BodyClass(canvas1, echelle10mm,'red')
-    BodyClass(canvas1,corpsStandard,'cyan')
-    canvas1.update()
-    print("### OK ###")
+        ''' Labels pour les longueurs de la tête '''
+        tk.Label(self,text="Longueurs caractéristiques de la tête : \n",justify=tk.LEFT,font=("Purisa",8,"bold","underline")).grid(column=0,row=4)
+        self.Longueur = tk.Label(self,text="",justify=tk.LEFT)
+        self.Longueur.grid(column=0,row=5)
 
-    ''' Initialisation des points 3 et 19 par détection auto '''
-    print("\n### Calcul des points 3 et 19 ###")
-    # try:
-    #     [pt3,pt19]=Placement.Points.points3_19(CV2_image_big)
-    #     pt3 = [pt3[0],pt3[1]]
-    #     pt19 = [pt19[0],pt19[1]]
-    # except:
-    #     print("Impossible de déterminer les points 3 et 19")
-    #     nbPointNonDetectes+=2
-    [pt3,pt19]=Placement.Points.points3_19(CV2_image_big)
-    pt3 = [pt3[0],pt3[1]]
-    pt19 = [pt19[0],pt19[1]]
-    print("### OK ###")
+        ''' Labels pour les longueurs du corps '''
+        tk.Label(self,text="Longueurs caractéristiques du corps : \n",justify=tk.LEFT,font=("Purisa",8,"bold","underline")).grid(column=1,row=4)
+        self.LongueurBody = tk.Label(self,text="",justify=tk.LEFT)
+        self.LongueurBody.grid(column=1,row=5)
 
-    '''Initialisation du point 9 par détection auto '''
-    print("\n### Calcul du point 9 ###")
-    _,c = Placement.Points.contoursCorpsBig(CV2_image_big)
-    print(CV2_image_big.shape)
-    try:
-        pt9=Placement.Points.point9(c,pt19)
-        pt9 = [pt9[0],pt9[1]]
-        print("pt9")
-        print(pt9)
-        # print("left")
-        # print(left)
-    except:
-        print("Impossible de déterminer le point 9")
-        nbPointNonDetectes+=1
-    print("### OK ###")
+        ''' Canvas pour la tête '''
+        self.canvas = tk.Canvas(self,bg='#f0f0f0',bd=0,highlightthickness=1, highlightbackground="black")
+        self.canvas.config(width=600, height=500)
+        self.canvas.grid(column=0,row=8)
 
-    '''Initialisation du point 15 et 13 par détection auto '''
-    print("\n### Calcul des points 9 ###")
-    try:
-        pt15,pt13=Placement_Points.points15_13(CV2_image_big)
-        pt15 = [pt15[0],pt15[1]]
-        pt13 = [pt13[0],pt13[1]]
-    except:
-        print("Impossible de déterminer les points 15 et 13")
-        pt13 = [1288, 1228]
-        pt15 = [1308, 1098]
-        nbPointNonDetectes+=2
-    print("### OK ###")
+        ''' Canvas pour le corps '''
+        self.canvas1 = tk.Canvas(self,bg='#f0f0f0',highlightthickness=1, highlightbackground="black")
+        self.canvas1.config(width=960, height=500)
+        self.canvas1.grid(column=1,row=8)
 
+        """Canvas pour logo"""
+        self.canvas2 = tk.Canvas(self,bg='#f0f0f0')
+        self.canvas2.config(width=157,height=84)
+        self.canvas2.place(x=0,y=0)
+        self.logoPIL = ImageTk.PhotoImage(Image.open("C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho/images/logo2.png").resize((157,84)))
+        self.canvas2.create_image(0, 0, anchor=tk.NW,image=self.logoPIL)
 
-    '''Initialisation des points 5 et 7 par détection auto '''
-    print("\n### Calcul des points 5 et 7  ###")
-    try:
-        pt7,pt5 = Placement.Points.points5_7(CV2_image_big,pt9,left1)
-        pt5 = [pt5[0],pt5[1]]
-        pt7 = [pt7[0],pt7[1]]
-    except:
-         print("Impossible de détecter les points 5 et 7")
-         nbPointNonDetectes+=2
+    def afficheLongueur():
+        app.Longueur.config(text=Fonctions.Externes.Longueur(HeadClass.calculDistances()))
 
-    """Initialisation des points 11 et 17 par détection auto """
-    try:
-        pt17,pt11 = Placement.Points.points11_17(CV2_image_big,pt13,pt15)
-    except:
-        print("Impossible de détecter les points 11 et 17")
-        nbPointNonDetectes+=2
+    def afficheLongueurBody():
+        app.LongueurBody.config(text=Fonctions.Externes.LongueurBody(BodyClass.calculDistances()))
 
-    tete = Placement.Points.centerPoints([pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19],HeadFish.centreOeil)
-
-    print("\n### Placement des points de la tête ###")
-    HeadClass(canvas, tete,'#ff00f2')
-    HeadClass(canvas,echelle3mm,'red')
-    print("### OK ###")
-    avertissement.config(text=str(13-nbPointNonDetectes)+" points détectés / 13 ")
+    def clearAllCanvas(self):
+        HeadClass.id_polygons=[]
+        HeadClass.pointsFish=[]
+        HeadClass.pointsEchelle=[]
+        HeadClass.distances_check=[0 for _ in range(20)]
+        self.Longueur.config(text="")
+        BodyClass.id_polygons=[]
+        BodyClass.pointsFish=[]
+        BodyClass.pointsEchelle=[]
+        BodyClass.distances_check=[0 for _ in range(20)]
+        self.LongueurBody.config(text="")
+        self.avertissement.config(text="")
+        self.sexPrediction.config(text="")
+        self.canvas.delete('all')
+        self.canvas1.delete('all')
 
 
-def affichePrediction():
-    choix,couleur = Classification.Prediction.predict()
-    sexPrediction.config(text="")
-    sexPrediction.config(text=choix,font=("Purisa",16),fg=couleur)
+    def importImage(self):
+        nbPointNonDetectes = 0
+
+        print("### Initialisation ###")
+        tete,echelle10mm,echelle3mm = Placement.Points.randomPointsBis()
+        pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19 = tete
+        self.clearAllCanvas()
+        pathok = Fonctions.Externes.openfn()
+        Interface.listeImages = pathok
+        print(pathok)
+        ImagePIL = Image.open(pathok[app.numImageActuelle])
+
+        ''' Resize pour le corps '''
+        print("\n### Traitement du corps ###")
+        corpsStandard,newPIL_image,left = Placement.Points.ImageCorps(ImagePIL)
+        BodyFish(self.canvas1,newPIL_image,(1300,975))
+        self.canvas1.move(BodyFish.poisson,-(left[0]-50),-(left[1]-280))
+        self.canvas1.update()
+        print("### OK ###")
+
+        ''' Resize pour la tête '''
+        print("\n### Traitement de la tête 1/3 ### ")
+        PIL_image_big,CV2_image_big,left1 = Placement.Points.ImageTete(pathok,app.numImageActuelle)
+        HeadFish(self.canvas,PIL_image_big,CV2_image_big,(3500,2625))
+        self.canvas.update()
+        print("### OK ###")
+
+        print("\n### Alignement des points sur le corps'  ###")
+        corpsStandard = [[x[0]-(left[0]-50),x[1]-(left[1]-280)] for x in corpsStandard]
+        echelle10mm = [[x[0]-(left[0]-250),x[1]-(left[1]-350)] for x in echelle10mm]
+        BodyClass(self.canvas1, echelle10mm,'red')
+        BodyClass(self.canvas1,corpsStandard,'cyan')
+        self.canvas1.update()
+        print("### OK ###")
+
+        ''' Initialisation des points 3 et 19 par détection auto '''
+        print("\n### Calcul des points 3 et 19 ###")
+        # try:
+        #     [pt3,pt19]=Placement.Points.points3_19(CV2_image_big)
+        #     pt3 = [pt3[0],pt3[1]]
+        #     pt19 = [pt19[0],pt19[1]]
+        # except:
+        #     print("Impossible de déterminer les points 3 et 19")
+        #     nbPointNonDetectes+=2
+        [pt3,pt19]=Placement.Points.points3_19(CV2_image_big)
+        pt3 = [pt3[0],pt3[1]]
+        pt19 = [pt19[0],pt19[1]]
+        print("### OK ###")
+
+        '''Initialisation du point 9 par détection auto '''
+        print("\n### Calcul du point 9 ###")
+        _,c = Placement.Points.contoursCorpsBig(CV2_image_big)
+        print(CV2_image_big.shape)
+        try:
+            pt9=Placement.Points.point9(c,pt19)
+            pt9 = [pt9[0],pt9[1]]
+            print("pt9")
+            print(pt9)
+            # print("left")
+            # print(left)
+        except:
+            print("Impossible de déterminer le point 9")
+            nbPointNonDetectes+=1
+        print("### OK ###")
+
+        '''Initialisation du point 15 et 13 par détection auto '''
+        print("\n### Calcul des points 9 ###")
+        try:
+            pt15,pt13=Placement_Points.points15_13(CV2_image_big)
+            pt15 = [pt15[0],pt15[1]]
+            pt13 = [pt13[0],pt13[1]]
+        except:
+            print("Impossible de déterminer les points 15 et 13")
+            pt13 = [1288, 1228]
+            pt15 = [1308, 1098]
+            nbPointNonDetectes+=2
+        print("### OK ###")
 
 
+        '''Initialisation des points 5 et 7 par détection auto '''
+        print("\n### Calcul des points 5 et 7  ###")
+        try:
+            pt7,pt5 = Placement.Points.points5_7(CV2_image_big,pt9,left1)
+            pt5 = [pt5[0],pt5[1]]
+            pt7 = [pt7[0],pt7[1]]
+        except:
+            print("Impossible de détecter les points 5 et 7")
+            nbPointNonDetectes+=2
 
-## Main
+        """Initialisation des points 11 et 17 par détection auto """
+        try:
+            pt17,pt11 = Placement.Points.points11_17(CV2_image_big,pt13,pt15)
+        except:
+            print("Impossible de détecter les points 11 et 17")
+            nbPointNonDetectes+=2
 
-''' Fenetre et menu'''
-root = tk.Tk()
-root.state('zoomed')
-root.title("Sex Determination for Three Spined Stickleback")
-menubar = tk.Menu(root)
-menuFichier = tk.Menu(menubar,tearoff=0)
-# menuFichier.add_command(label="Créer", command=None)
-menuFichier.add_command(label="Importer", command=None)
-# menuFichier.add_command(label="Editer", command=None)
-menuFichier.add_separator()
-menuFichier.add_command(label="Quitter", command=root.destroy)
-menubar.add_cascade(label="Fichier", menu=menuFichier)
-menuAide = tk.Menu(menubar, tearoff=0)
-menuAide.add_command(label="A propos", command=None)
-menubar.add_cascade(label="Aide", menu=menuAide)
-root.config(menu=menubar)
+        tete = Placement.Points.centerPoints([pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19],HeadFish.centreOeil)
 
-CV2_image_big = None
-''' Label Intro de presentation'''
-tk.Label(root,text=" ",font=("Purisa",12,"bold")).grid(ipadx=2)
-tk.Label(root,text=" \t Sexing procedure of three-spined stickleback \n",font=("Andalus",16,"bold")).place(x=750,y=40,anchor=tk.CENTER)
-tk.Label(root,text="\n \n \n \n ").grid(column=0,row=1)
-
-''' Boutons '''
-tk.Label(root, text = 'PREDICTION',font=("Purisa",12,"bold"),fg='purple').place(x=460,y=70)
-tk.Button(root,text = "Import image and autoplace",command = importImage,fg='purple').place(x=400,y=100)
-tk.Button(root,text = "Predict",command = affichePrediction,fg='purple').place(x=570,y=100)
-tk.Label(root, text = 'ADD THESE VALUES TO MODEL',font=("Purisa",12,"bold"),fg='green').place(x=760,y=70)
-tk.Button(root,text = "Model Update (developpers only)",command = HeadClass.genererAllDistancesHead,fg='green').place(x=850,y=100)
-tk.Label(root,text='Sex for model: ',fg='green').place(x=725,y=105)
-tk.Button(root,text='<--').place(x=550,y=230)
-tk.Button(root,text='-->').place(x=600,y=230)
-
-sexModel = tk.Entry(root,width=3)
-sexModel.place(x=810,y=105)
-
-sexPrediction = tk.Label(root,text="")
-sexPrediction.place(x=650,y=190)
-
-avertissement = tk.Label(root,text="")
-avertissement.place(x=650,y=160)
-
-explanation = tk.Label(root,text="\n ")
-explanation.grid(column=0,row=3)
-
-''' Labels pour les longueurs de la tête '''
-tk.Label(root,text="Longueurs caractéristiques de la tête : \n",justify=tk.LEFT,font=("Purisa",8,"bold","underline")).grid(column=0,row=4)
-Longueur = tk.Label(root,text="",justify=tk.LEFT)
-Longueur.grid(column=0,row=5)
-
-''' Labels pour les longueurs du corps '''
-tk.Label(root,text="Longueurs caractéristiques du corps : \n",justify=tk.LEFT,font=("Purisa",8,"bold","underline")).grid(column=1,row=4)
-LongueurBody = tk.Label(root,text="",justify=tk.LEFT)
-LongueurBody.grid(column=1,row=5)
-
-''' Canvas pour la tête '''
-canvas = tk.Canvas(root,bg='#f0f0f0',bd=0,highlightthickness=1, highlightbackground="black")
-canvas.config(width=600, height=500)
-canvas.grid(column=0,row=8)
-
-''' Canvas pour le corps '''
-canvas1 = tk.Canvas(root,bg='#f0f0f0',highlightthickness=1, highlightbackground="black")
-canvas1.config(width=960, height=500)
-canvas1.grid(column=1,row=8)
-
-"""Canvas pour logo"""
-canvas2 = tk.Canvas(root,bg='#f0f0f0')
-canvas2.config(width=157,height=84)
-canvas2.place(x=0,y=0)
-logoPIL = ImageTk.PhotoImage(Image.open("C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho/images/logo2.png").resize((157,84)))
-canvas2.create_image(0, 0, anchor=tk.NW,image=logoPIL)
+        print("\n### Placement des points de la tête ###")
+        HeadClass(self.canvas, tete,'#ff00f2')
+        HeadClass(self.canvas,echelle3mm,'red')
+        print("### OK ###")
+        app.avertissement.config(text=str(13-nbPointNonDetectes)+" points détectés / 13 ")
 
 
-root.mainloop()
+    def affichePrediction():
+        choix,couleur = Classification.Prediction.predict()
+        app.sexPrediction.config(text="")
+        app.sexPrediction.config(text=choix+" avec p=0.5",font=("Purisa",16),fg=couleur)
+
+    def nextImage(self):
+        nbPointNonDetectes = 0
+        app.numImageActuelle+=1
+        self.clearAllCanvas()
+        tete,echelle10mm,echelle3mm = Placement.Points.randomPointsBis()
+        ImagePIL = Image.open(Interface.listeImages[app.numImageActuelle])
+
+        ''' Resize pour le corps '''
+        print("\n### Traitement du corps ###")
+        corpsStandard,newPIL_image,left = Placement.Points.ImageCorps(ImagePIL)
+        BodyFish(self.canvas1,newPIL_image,(1300,975))
+        self.canvas1.move(BodyFish.poisson,-(left[0]-50),-(left[1]-280))
+        self.canvas1.update()
+        print("### OK ###")
+
+        ''' Resize pour la tête '''
+        print("\n### Traitement de la tête 1/3 ### ")
+        PIL_image_big,CV2_image_big,left1 = Placement.Points.ImageTete(Interface.listeImages,app.numImageActuelle)
+        HeadFish(self.canvas,PIL_image_big,CV2_image_big,(3500,2625))
+        self.canvas.update()
+        print("### OK ###")
+
+        print("\n### Alignement des points sur le corps'  ###")
+        corpsStandard = [[x[0]-(left[0]-50),x[1]-(left[1]-280)] for x in corpsStandard]
+        echelle10mm = [[x[0]-(left[0]-250),x[1]-(left[1]-350)] for x in echelle10mm]
+        BodyClass(self.canvas1, echelle10mm,'red')
+        BodyClass(self.canvas1,corpsStandard,'cyan')
+        self.canvas1.update()
+        print("### OK ###")
+
+        ''' Initialisation des points 3 et 19 par détection auto '''
+        print("\n### Calcul des points 3 et 19 ###")
+        # try:
+        #     [pt3,pt19]=Placement.Points.points3_19(CV2_image_big)
+        #     pt3 = [pt3[0],pt3[1]]
+        #     pt19 = [pt19[0],pt19[1]]
+        # except:
+        #     print("Impossible de déterminer les points 3 et 19")
+        #     nbPointNonDetectes+=2
+        [pt3,pt19]=Placement.Points.points3_19(CV2_image_big)
+        pt3 = [pt3[0],pt3[1]]
+        pt19 = [pt19[0],pt19[1]]
+        print("### OK ###")
+
+        '''Initialisation du point 9 par détection auto '''
+        print("\n### Calcul du point 9 ###")
+        _,c = Placement.Points.contoursCorpsBig(CV2_image_big)
+        print(CV2_image_big.shape)
+        try:
+            pt9=Placement.Points.point9(c,pt19)
+            pt9 = [pt9[0],pt9[1]]
+            print("pt9")
+            print(pt9)
+            # print("left")
+            # print(left)
+        except:
+            print("Impossible de déterminer le point 9")
+            nbPointNonDetectes+=1
+        print("### OK ###")
+
+        '''Initialisation du point 15 et 13 par détection auto '''
+        print("\n### Calcul des points 9 ###")
+        try:
+            pt15,pt13=Placement_Points.points15_13(CV2_image_big)
+            pt15 = [pt15[0],pt15[1]]
+            pt13 = [pt13[0],pt13[1]]
+        except:
+            print("Impossible de déterminer les points 15 et 13")
+            pt13 = [1288, 1228]
+            pt15 = [1308, 1098]
+            nbPointNonDetectes+=2
+        print("### OK ###")
+
+
+        '''Initialisation des points 5 et 7 par détection auto '''
+        print("\n### Calcul des points 5 et 7  ###")
+        try:
+            pt7,pt5 = Placement.Points.points5_7(CV2_image_big,pt9,left1)
+            pt5 = [pt5[0],pt5[1]]
+            pt7 = [pt7[0],pt7[1]]
+        except:
+            print("Impossible de détecter les points 5 et 7")
+            nbPointNonDetectes+=2
+
+        """Initialisation des points 11 et 17 par détection auto """
+        try:
+            pt17,pt11 = Placement.Points.points11_17(CV2_image_big,pt13,pt15)
+        except:
+            print("Impossible de détecter les points 11 et 17")
+            nbPointNonDetectes+=2
+
+        tete = Placement.Points.centerPoints([pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19],HeadFish.centreOeil)
+
+        print("\n### Placement des points de la tête ###")
+        HeadClass(self.canvas, tete,'#ff00f2')
+        HeadClass(self.canvas,echelle3mm,'red')
+        print("### OK ###")
+        app.avertissement.config(text=str(13-nbPointNonDetectes)+" points détectés / 13 ")
+
+
+    # Main
+
+
+app = Interface()
+app.mainloop()
 #
 # import inspect
 # src_file_path = inspect.getfile(lambda: None)

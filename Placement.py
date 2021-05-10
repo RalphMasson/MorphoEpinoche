@@ -407,7 +407,7 @@ class Points():
         from scipy.signal import argrelextrema
 
         _,c = Points.contoursCorpsBig(img)
-        approxBouche = cv2.approxPolyDP(c,0.1e-10,closed=False)
+        approxBouche = cv2.approxPolyDP(c,1e-16,closed=False)
 
         approxBouche2 = []
 
@@ -505,7 +505,7 @@ class Points():
         # print(intercept)
         # plt.figure()
         # plt.plot(xx,yy,'r')
-        # plt.plot(xx,ordonnees,'b')
+        # plt.plot(abscisses,ordonnees,'b')
         projete = [np.round(Fonctions.Externes.projeteOrtho(pente,intercept,xx[i],ordonnees[i])) for i in range(len(xx))]
         projete = [x.flatten().tolist() for x in projete]
         xxx=np.array(projete).T[0]
@@ -747,13 +747,13 @@ class Points():
         newPIL_image = Image.fromarray(imagerot)
         return corpsStandard,newPIL_image,left
 
-    def ImageTete(pathok):
+    def ImageTete(pathok,numImage):
         from PIL import Image
         import cv2
-        imgPIL = Image.open(pathok)
+        imgPIL = Image.open(pathok[numImage])
         PIL_image_big = imgPIL.resize((3500,2625), Image.ANTIALIAS)
         PIL_image_big = np.flip(PIL_image_big,axis=2)
-        CV2_image_big = cv2.imread(pathok)
+        CV2_image_big = cv2.imread(pathok[numImage])
         CV2_image_big = cv2.cvtColor(CV2_image_big,cv2.COLOR_BGR2RGB)
         # CV2_image_big = CV2_image_big[:, :, ::-1].copy()
         out,c = Points.contoursCorpsBig(CV2_image_big)
@@ -824,9 +824,9 @@ class Points():
 # # cv2.circle(imagerot, pt11, 8, (0, 255, 0), -1)
 # # cv2.circle(imagerot, pt17, 8, (0, 255, 0), -1)
 # # plt.figure()
-# plt.imshow(imagerot)
-# plt.title("Vérification du positionnement des points avant interface")
-# plt.grid(True)
+# # plt.imshow(imagerot)
+# # plt.title("Vérification du positionnement des points avant interface")
+# # plt.grid(True)
 # plt.show()
 
 
