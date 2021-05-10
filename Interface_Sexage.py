@@ -1,6 +1,11 @@
 # Pour assurer le bon fonctionnement
-import sys
-sys.path.insert(0, 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho')
+import sys,inspect
+# sys.path.insert(0, 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho')
+pypath = inspect.stack()[0][1]
+pypath = pypath.split('\\')
+pypath = '/'.join(pypath[:-1])
+sys.path.insert(0,pypath)
+
 
 # Import des bibliothèques (s'assurer qu'elles soient installées)
 import tkinter as tk
@@ -344,8 +349,8 @@ class Interface(tk.Tk):
         tk.Label(self, text = 'ADD THESE VALUES TO MODEL',font=("Purisa",12,"bold"),fg='green').place(x=760,y=70)
         tk.Button(self,text = "Model Update (developpers only)",command = HeadClass.genererAllDistancesHead,fg='green').place(x=850,y=100)
         tk.Label(self,text='Sex for model: ',fg='green').place(x=725,y=105)
-        tk.Button(self,text='<--',command = None).place(x=550,y=230)
-        tk.Button(self,text='-->',command = self.nextImage).place(x=600,y=230)
+        tk.Button(self,text='<--',command = self.previousImage).place(x=570,y=780)
+        tk.Button(self,text='-->',command = self.nextImage).place(x=610,y=780)
 
         self.sexModel = tk.Entry(self,width=3)
         self.sexModel.place(x=810,y=105)
@@ -358,6 +363,11 @@ class Interface(tk.Tk):
 
         self.explanation = tk.Label(self,text="\n ")
         self.explanation.grid(column=0,row=3)
+
+        self.LabelnomImage = tk.Label(self,text="Image :",font=("Purisa",11),fg='gray')
+        self.LabelnomImage.place(x=650,y=780)
+        self.nomImage = tk.Label(self,text="",font=("Purisa",11),fg='gray')
+        self.nomImage.place(x=760,y=780)
 
         ''' Labels pour les longueurs de la tête '''
         tk.Label(self,text="Longueurs caractéristiques de la tête : \n",justify=tk.LEFT,font=("Purisa",8,"bold","underline")).grid(column=0,row=4)
@@ -383,14 +393,14 @@ class Interface(tk.Tk):
         self.canvas2 = tk.Canvas(self,bg='#f0f0f0')
         self.canvas2.config(width=157,height=84)
         self.canvas2.place(x=0,y=0)
-        self.logoPIL = ImageTk.PhotoImage(Image.open("C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho/images/logo2.png").resize((157,84)))
+        self.logoPIL = ImageTk.PhotoImage(Image.open(pypath+"/images/logo2.png").resize((157,84)))
         self.canvas2.create_image(0, 0, anchor=tk.NW,image=self.logoPIL)
 
 
         self.canvas3 = tk.Canvas(self,bg='#f0f0f0')
         self.canvas3.config(width = 288,height=192)
         self.canvas3.place(x=1250,y=0)
-        self.schema = ImageTk.PhotoImage(Image.open("C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho/images/schema.png").resize((288,192)))
+        self.schema = ImageTk.PhotoImage(Image.open(pypath+"/images/schema.png").resize((288,192)))
         self.canvas3.create_image(0,0,anchor=tk.NW,image=self.schema)
 
     def afficheLongueur():
@@ -414,6 +424,8 @@ class Interface(tk.Tk):
         self.sexPrediction.config(text="")
         self.canvas.delete('all')
         self.canvas1.delete('all')
+        self.nomImage.config(text="")
+
 
 
     def importImage(self):
@@ -427,6 +439,8 @@ class Interface(tk.Tk):
         Interface.listeImages = pathok
         print(pathok)
         ImagePIL = Image.open(pathok[app.numImageActuelle])
+        app.nomImage.config(text=Interface.listeImages[app.numImageActuelle])
+        app.LabelnomImage.config(text=str(app.numImageActuelle+1)+"/"+str(len(Interface.listeImages)))
 
         ''' Resize pour le corps '''
         print("\n### Traitement du corps ###")
@@ -528,103 +542,219 @@ class Interface(tk.Tk):
 
     def nextImage(self):
         nbPointNonDetectes = 0
-        app.numImageActuelle+=1
+
         self.clearAllCanvas()
-        tete,echelle10mm,echelle3mm = Placement.Points.randomPointsBis()
-        ImagePIL = Image.open(Interface.listeImages[app.numImageActuelle])
-
-        ''' Resize pour le corps '''
-        print("\n### Traitement du corps ###")
-        corpsStandard,newPIL_image,left = Placement.Points.ImageCorps(ImagePIL)
-        BodyFish(self.canvas1,newPIL_image,(1300,975))
-        self.canvas1.move(BodyFish.poisson,-(left[0]-50),-(left[1]-280))
-        self.canvas1.update()
-        print("### OK ###")
-
-        ''' Resize pour la tête '''
-        print("\n### Traitement de la tête 1/3 ### ")
-        PIL_image_big,CV2_image_big,left1 = Placement.Points.ImageTete(Interface.listeImages,app.numImageActuelle)
-        HeadFish(self.canvas,PIL_image_big,CV2_image_big,(3500,2625))
-        self.canvas.update()
-        print("### OK ###")
-
-        print("\n### Alignement des points sur le corps'  ###")
-        corpsStandard = [[x[0]-(left[0]-50),x[1]-(left[1]-280)] for x in corpsStandard]
-        echelle10mm = [[x[0]-(left[0]-250),x[1]-(left[1]-350)] for x in echelle10mm]
-        BodyClass(self.canvas1, echelle10mm,'red')
-        BodyClass(self.canvas1,corpsStandard,'cyan')
-        self.canvas1.update()
-        print("### OK ###")
-
-        ''' Initialisation des points 3 et 19 par détection auto '''
-        print("\n### Calcul des points 3 et 19 ###")
-        # try:
-        #     [pt3,pt19]=Placement.Points.points3_19(CV2_image_big)
-        #     pt3 = [pt3[0],pt3[1]]
-        #     pt19 = [pt19[0],pt19[1]]
-        # except:
-        #     print("Impossible de déterminer les points 3 et 19")
-        #     nbPointNonDetectes+=2
-        [pt3,pt19]=Placement.Points.points3_19(CV2_image_big)
-        pt3 = [pt3[0],pt3[1]]
-        pt19 = [pt19[0],pt19[1]]
-        print("### OK ###")
-
-        '''Initialisation du point 9 par détection auto '''
-        print("\n### Calcul du point 9 ###")
-        _,c = Placement.Points.contoursCorpsBig(CV2_image_big)
-        print(CV2_image_big.shape)
         try:
-            pt9=Placement.Points.point9(c,pt19)
-            pt9 = [pt9[0],pt9[1]]
-            print("pt9")
-            print(pt9)
-            # print("left")
-            # print(left)
-        except:
-            print("Impossible de déterminer le point 9")
-            nbPointNonDetectes+=1
-        print("### OK ###")
+            if(app.numImageActuelle<len(Interface.listeImages)):
+                app.numImageActuelle+=1
 
-        '''Initialisation du point 15 et 13 par détection auto '''
-        print("\n### Calcul des points 9 ###")
+                tete,echelle10mm,echelle3mm = Placement.Points.randomPointsBis()
+                ImagePIL = Image.open(Interface.listeImages[app.numImageActuelle])
+                print(app.numImageActuelle)
+                app.nomImage.config(text=Interface.listeImages[app.numImageActuelle])
+                app.LabelnomImage.config(text=str(app.numImageActuelle+1)+"/"+str(len(Interface.listeImages)))
+
+                ''' Resize pour le corps '''
+                print("\n### Traitement du corps ###")
+                corpsStandard,newPIL_image,left = Placement.Points.ImageCorps(ImagePIL)
+                BodyFish(self.canvas1,newPIL_image,(1300,975))
+                self.canvas1.move(BodyFish.poisson,-(left[0]-50),-(left[1]-280))
+                self.canvas1.update()
+                print("### OK ###")
+
+                ''' Resize pour la tête '''
+                print("\n### Traitement de la tête 1/3 ### ")
+                PIL_image_big,CV2_image_big,left1 = Placement.Points.ImageTete(Interface.listeImages,app.numImageActuelle)
+                HeadFish(self.canvas,PIL_image_big,CV2_image_big,(3500,2625))
+                self.canvas.update()
+                print("### OK ###")
+
+                print("\n### Alignement des points sur le corps'  ###")
+                corpsStandard = [[x[0]-(left[0]-50),x[1]-(left[1]-280)] for x in corpsStandard]
+                echelle10mm = [[x[0]-(left[0]-250),x[1]-(left[1]-350)] for x in echelle10mm]
+                BodyClass(self.canvas1, echelle10mm,'red')
+                BodyClass(self.canvas1,corpsStandard,'cyan')
+                self.canvas1.update()
+                print("### OK ###")
+
+                ''' Initialisation des points 3 et 19 par détection auto '''
+                print("\n### Calcul des points 3 et 19 ###")
+                # try:
+                #     [pt3,pt19]=Placement.Points.points3_19(CV2_image_big)
+                #     pt3 = [pt3[0],pt3[1]]
+                #     pt19 = [pt19[0],pt19[1]]
+                # except:
+                #     print("Impossible de déterminer les points 3 et 19")
+                #     nbPointNonDetectes+=2
+                [pt3,pt19]=Placement.Points.points3_19(CV2_image_big)
+                pt3 = [pt3[0],pt3[1]]
+                pt19 = [pt19[0],pt19[1]]
+                print("### OK ###")
+
+                '''Initialisation du point 9 par détection auto '''
+                print("\n### Calcul du point 9 ###")
+                _,c = Placement.Points.contoursCorpsBig(CV2_image_big)
+                print(CV2_image_big.shape)
+                try:
+                    pt9=Placement.Points.point9(c,pt19)
+                    pt9 = [pt9[0],pt9[1]]
+                    print("pt9")
+                    print(pt9)
+                    # print("left")
+                    # print(left)
+                except:
+                    print("Impossible de déterminer le point 9")
+                    nbPointNonDetectes+=1
+                print("### OK ###")
+
+                '''Initialisation du point 15 et 13 par détection auto '''
+                print("\n### Calcul des points 9 ###")
+                try:
+                    pt15,pt13=Placement_Points.points15_13(CV2_image_big)
+                    pt15 = [pt15[0],pt15[1]]
+                    pt13 = [pt13[0],pt13[1]]
+                except:
+                    print("Impossible de déterminer les points 15 et 13")
+                    pt13 = [1288, 1228]
+                    pt15 = [1308, 1098]
+                    nbPointNonDetectes+=2
+                print("### OK ###")
+
+
+                '''Initialisation des points 5 et 7 par détection auto '''
+                print("\n### Calcul des points 5 et 7  ###")
+                try:
+                    pt7,pt5 = Placement.Points.points5_7(CV2_image_big,pt9,left1)
+                    pt5 = [pt5[0],pt5[1]]
+                    pt7 = [pt7[0],pt7[1]]
+                except:
+                    print("Impossible de détecter les points 5 et 7")
+                    nbPointNonDetectes+=2
+
+                """Initialisation des points 11 et 17 par détection auto """
+                try:
+                    pt17,pt11 = Placement.Points.points11_17(CV2_image_big,pt13,pt15)
+                except:
+                    print("Impossible de détecter les points 11 et 17")
+                    nbPointNonDetectes+=2
+
+                tete = Placement.Points.centerPoints([pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19],HeadFish.centreOeil)
+
+                print("\n### Placement des points de la tête ###")
+                HeadClass(self.canvas, tete,'#ff00f2')
+                HeadClass(self.canvas,echelle3mm,'red')
+                print("### OK ###")
+                app.avertissement.config(text=str(13-nbPointNonDetectes)+" points détectés / 13 ")
+        except:
+            app.nomImage.config(text="")
+
+    def previousImage(self):
+        nbPointNonDetectes = 0
+        self.clearAllCanvas()
         try:
-            pt15,pt13=Placement_Points.points15_13(CV2_image_big)
-            pt15 = [pt15[0],pt15[1]]
-            pt13 = [pt13[0],pt13[1]]
+            if(app.numImageActuelle>0):
+                app.numImageActuelle-=1
+                print("tata")
+                print(app.numImageActuelle)
+
+                tete,echelle10mm,echelle3mm = Placement.Points.randomPointsBis()
+                ImagePIL = Image.open(Interface.listeImages[app.numImageActuelle])
+                app.LabelnomImage.config(text=str(app.numImageActuelle+1)+"/"+str(len(Interface.listeImages)))
+                app.nomImage.config(text=Interface.listeImages[app.numImageActuelle])
+
+                ''' Resize pour le corps '''
+                print("\n### Traitement du corps ###")
+                corpsStandard,newPIL_image,left = Placement.Points.ImageCorps(ImagePIL)
+                BodyFish(self.canvas1,newPIL_image,(1300,975))
+                self.canvas1.move(BodyFish.poisson,-(left[0]-50),-(left[1]-280))
+                self.canvas1.update()
+                print("### OK ###")
+
+                ''' Resize pour la tête '''
+                print("\n### Traitement de la tête 1/3 ### ")
+                PIL_image_big,CV2_image_big,left1 = Placement.Points.ImageTete(Interface.listeImages,app.numImageActuelle)
+                HeadFish(self.canvas,PIL_image_big,CV2_image_big,(3500,2625))
+                self.canvas.update()
+                print("### OK ###")
+
+                print("\n### Alignement des points sur le corps'  ###")
+                corpsStandard = [[x[0]-(left[0]-50),x[1]-(left[1]-280)] for x in corpsStandard]
+                echelle10mm = [[x[0]-(left[0]-250),x[1]-(left[1]-350)] for x in echelle10mm]
+                BodyClass(self.canvas1, echelle10mm,'red')
+                BodyClass(self.canvas1,corpsStandard,'cyan')
+                self.canvas1.update()
+                print("### OK ###")
+
+                ''' Initialisation des points 3 et 19 par détection auto '''
+                print("\n### Calcul des points 3 et 19 ###")
+                # try:
+                #     [pt3,pt19]=Placement.Points.points3_19(CV2_image_big)
+                #     pt3 = [pt3[0],pt3[1]]
+                #     pt19 = [pt19[0],pt19[1]]
+                # except:
+                #     print("Impossible de déterminer les points 3 et 19")
+                #     nbPointNonDetectes+=2
+                [pt3,pt19]=Placement.Points.points3_19(CV2_image_big)
+                pt3 = [pt3[0],pt3[1]]
+                pt19 = [pt19[0],pt19[1]]
+                print("### OK ###")
+
+                '''Initialisation du point 9 par détection auto '''
+                print("\n### Calcul du point 9 ###")
+                _,c = Placement.Points.contoursCorpsBig(CV2_image_big)
+                print(CV2_image_big.shape)
+                try:
+                    pt9=Placement.Points.point9(c,pt19)
+                    pt9 = [pt9[0],pt9[1]]
+                    print("pt9")
+                    print(pt9)
+                    # print("left")
+                    # print(left)
+                except:
+                    print("Impossible de déterminer le point 9")
+                    nbPointNonDetectes+=1
+                print("### OK ###")
+
+                '''Initialisation du point 15 et 13 par détection auto '''
+                print("\n### Calcul des points 9 ###")
+                try:
+                    pt15,pt13=Placement_Points.points15_13(CV2_image_big)
+                    pt15 = [pt15[0],pt15[1]]
+                    pt13 = [pt13[0],pt13[1]]
+                except:
+                    print("Impossible de déterminer les points 15 et 13")
+                    pt13 = [1288, 1228]
+                    pt15 = [1308, 1098]
+                    nbPointNonDetectes+=2
+                print("### OK ###")
+
+
+                '''Initialisation des points 5 et 7 par détection auto '''
+                print("\n### Calcul des points 5 et 7  ###")
+                try:
+                    pt7,pt5 = Placement.Points.points5_7(CV2_image_big,pt9,left1)
+                    pt5 = [pt5[0],pt5[1]]
+                    pt7 = [pt7[0],pt7[1]]
+                except:
+                    print("Impossible de détecter les points 5 et 7")
+                    nbPointNonDetectes+=2
+
+                """Initialisation des points 11 et 17 par détection auto """
+                try:
+                    pt17,pt11 = Placement.Points.points11_17(CV2_image_big,pt13,pt15)
+                except:
+                    print("Impossible de détecter les points 11 et 17")
+                    nbPointNonDetectes+=2
+
+                tete = Placement.Points.centerPoints([pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19],HeadFish.centreOeil)
+
+                print("\n### Placement des points de la tête ###")
+                HeadClass(self.canvas, tete,'#ff00f2')
+                HeadClass(self.canvas,echelle3mm,'red')
+                print("### OK ###")
+                app.avertissement.config(text=str(13-nbPointNonDetectes)+" points détectés / 13 ")
         except:
-            print("Impossible de déterminer les points 15 et 13")
-            pt13 = [1288, 1228]
-            pt15 = [1308, 1098]
-            nbPointNonDetectes+=2
-        print("### OK ###")
-
-
-        '''Initialisation des points 5 et 7 par détection auto '''
-        print("\n### Calcul des points 5 et 7  ###")
-        try:
-            pt7,pt5 = Placement.Points.points5_7(CV2_image_big,pt9,left1)
-            pt5 = [pt5[0],pt5[1]]
-            pt7 = [pt7[0],pt7[1]]
-        except:
-            print("Impossible de détecter les points 5 et 7")
-            nbPointNonDetectes+=2
-
-        """Initialisation des points 11 et 17 par détection auto """
-        try:
-            pt17,pt11 = Placement.Points.points11_17(CV2_image_big,pt13,pt15)
-        except:
-            print("Impossible de détecter les points 11 et 17")
-            nbPointNonDetectes+=2
-
-        tete = Placement.Points.centerPoints([pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19],HeadFish.centreOeil)
-
-        print("\n### Placement des points de la tête ###")
-        HeadClass(self.canvas, tete,'#ff00f2')
-        HeadClass(self.canvas,echelle3mm,'red')
-        print("### OK ###")
-        app.avertissement.config(text=str(13-nbPointNonDetectes)+" points détectés / 13 ")
-
+            app.nomImage.config(text="")
 
     # Main
 
@@ -632,11 +762,20 @@ class Interface(tk.Tk):
 app = Interface()
 app.mainloop()
 #
-# import inspect
+import inspect
 # src_file_path = inspect.getfile(lambda: None)
-# print(inspect.stack()[0][1])
+# src_file = inspect.getsourcelines(lambda:None)
+# print(src_file)
 
+# print(src_file_path)
+print(inspect.stack()[0][1])
+# from pathlib import Path
+# source_path = Path('Interface_Sexage.py').resolve()
+# source_dir = source_path.parent
+# print(source_path)
 
+# for _ in range(200):
+    # print(os.path.dirname(os.path.abspath(__Interface_Sexage__)))
 
 ''' Documentation
 
