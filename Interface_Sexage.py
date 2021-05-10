@@ -1,6 +1,5 @@
 # Pour assurer le bon fonctionnement
 import sys,inspect
-# sys.path.insert(0, 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho')
 pypath = inspect.stack()[0][1]
 pypath = pypath.split('\\')
 pypath = '/'.join(pypath[:-1])
@@ -537,9 +536,9 @@ class Interface(tk.Tk):
 
 
     def affichePrediction():
-        choix,couleur = Classification.Prediction.predict()
+        choix,couleur,p = Classification.Prediction.predict()
         app.sexPrediction.config(text="")
-        app.sexPrediction.config(text=choix+" avec p=0.5",font=("Purisa",16),fg=couleur)
+        app.sexPrediction.config(text=choix+" avec p="+str(round(p,2)),font=("Purisa",16),fg=couleur)
 
     def nextImage(self):
         nbPointNonDetectes = 0

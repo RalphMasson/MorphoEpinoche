@@ -9,11 +9,14 @@ img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\images_all\\gimp_cut\\ma
 # img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/3-3.JPG'
 
 img = cv2.imread(img_path)
-
 img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
-import sys
-sys.path.insert(0, 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho')
-import Fonctions
+
+import sys,inspect,Fonctions
+pypath = inspect.stack()[0][1]
+pypath = pypath.split('\\')
+pypath = '/'.join(pypath[:-1])
+sys.path.insert(0,pypath)
+
 
 
 class Points():
@@ -204,8 +207,6 @@ class Points():
 
 
     def detect_eye(img):
-        import cv2
-        import numpy as np
         img_couleur = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
         img_gray=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
         img_gray = cv2.medianBlur(img_gray,21)
@@ -278,7 +279,6 @@ class Points():
 
     ''' Méthode calculant la distance euclidienne entre deux points '''
     def euclideDist(a,b):
-        import numpy as np
         x1 = a[0]
         y1 = a[1]
         x2 = b[0]
@@ -400,11 +400,6 @@ class Points():
 
 
     def points5_7(img,pt9,left):
-        import scipy.signal
-        from scipy.signal import savgol_filter
-        from scipy import interpolate
-        from scipy.interpolate import InterpolatedUnivariateSpline
-        from scipy.signal import argrelextrema
 
         _,c = Points.contoursCorpsBig(img)
         approxBouche = cv2.approxPolyDP(c,1e-16,closed=False)
@@ -441,19 +436,19 @@ class Points():
         # plt.plot(-ordonnees,-1*abscisses,'r',label='Contour bouche')
 
         #smoothing the contours of the mouth
-        tck,u = interpolate.splprep([ordonnees,-1*abscisses],k=3,s=16)
+        '''tck,u = interpolate.splprep([ordonnees,-1*abscisses],k=3,s=16)
         u=np.linspace(0,1,num=len(ordonnees),endpoint=True)
-        outBouche = interpolate.splev(u,tck)
+        outBouche = interpolate.splev(u,tck)'''
         # plt.plot(- outBouche[0], outBouche[1], 'b',label='Contour bouche lissé' )
         # plt.legend()
         # print(len(outBouche[0]))
         # print(outBouche[1])
 
         ''' zscore '''
-        zscore=scipy.stats.zscore(outBouche[1])
+        '''zscore=scipy.stats.zscore(outBouche[1])
         # print(len(outBouche[1]))
         input = zscore
-        signal = (input > np.roll(input,1)) & (input > np.roll(input,-1))
+        signal = (input > np.roll(input,1)) & (input > np.roll(input,-1))'''
         # plt.plot(input)
         # print(signal)
         # plt.plot(signal.nonzero()[0], input[signal], 'ro')
@@ -476,20 +471,20 @@ class Points():
         # # plt.figure()
 
         '''find peak cwt'''
-        peakind = scipy.signal.find_peaks(-1*abscisses,prominence=0.)
+        '''peakind = scipy.signal.find_peaks(-1*abscisses,prominence=0.)'''
         # print(ordonnees)
         # print(peakind[0])
         # plt.figure()
         # plt.plot(ordonnees,-1*abscisses, 'b')
         # plt.plot(ordonnees[peakind[0]],-1*abscisses[peakind[0]],'ro')
         # compute the 1st derivative
-        f_prime = np.gradient (outBouche[1])
+        '''f_prime = np.gradient (outBouche[1])'''
         # plt.figure()
         # plt.plot(outBouche[0],f_prime,label='dérivée première')
         # smoothing the 1st derivative
-        tck,u = interpolate.splprep([outBouche[0],f_prime],k=3,s=5)
+        '''tck,u = interpolate.splprep([outBouche[0],f_prime],k=3,s=5)
         u=np.linspace(0,1,num=len(f_prime),endpoint=True)
-        out = interpolate.splev(u,tck)
+        out = interpolate.splev(u,tck)'''
         # print(len(out[0]))
 
         # plt.figure()
@@ -535,28 +530,28 @@ class Points():
 
 
         # compute the 2nd derivative
-        f_second = np.gradient(out[1])
+        '''f_second = np.gradient(out[1])'''
         # plt.figure()
         # plt.plot(out[0],f_second,label='dérivée 2nd lissée')
 
         # indices = np.where (np.diff (np.sign (f_prime))) [0] # Find the inflection point.
-        infls = np.where(np.diff(np.sign(f_second)))[0]
+        '''infls = np.where(np.diff(np.sign(f_second)))[0]'''
         # print(len(infls))
         # print(infls)
         # plt.figure()
         # plt.plot(outBouche[0],outBouche[1],'r.',label='Contour bouche')
 
-        local_maxima = argrelextrema(outBouche[1], np.less, order = 10, mode = 'wrap')
+        '''local_maxima = argrelextrema(outBouche[1], np.less, order = 10, mode = 'wrap')
         # print(list(local_maxima))
         mini = np.argmin(abscisses)
         # for i, infl in enumerate(list(local_maxima[0]), 1):
             # plt.axvline(x=ordonnees[infl], color='k', label=f'Inflection Point {i}')
-        local_maxima = list(local_maxima[0])[0]
+        local_maxima = list(local_maxima[0])[0]'''
         # print(local_maxima)
 
         # av erifier
-        pt5 = (abscisses[mini],ordonnees[mini])
-        pt7 = (abscisses[local_maxima],ordonnees[local_maxima])
+        '''pt5 = (abscisses[mini],ordonnees[mini])
+        pt7 = (abscisses[local_maxima],ordonnees[local_maxima])'''
         pt5 = (left[0],left[1])
         pt7 = (int(xx[indx]),int(ordonnees[indx]))
         print("pt5")
@@ -625,8 +620,8 @@ class Points():
         img_hsv = cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
         # img_hsv = cv2.bilateralFilter(img_hsv,15,75,75)
 
-        plt.figure()
-        plt.imshow(img_hsv)
+        # plt.figure()
+        # plt.imshow(img_hsv)
 
 
 
@@ -695,9 +690,9 @@ class Points():
         # plt.imshow(img)
         # plt.figure()
         # plt.imshow(img_hsv)
-        plt.figure()
-        plt.imshow(res)
-        plt.show()
+        # plt.figure()
+        # plt.imshow(res)
+        # plt.show()
     def points11_17(img,pt13,pt15):
         _,c = Points.contoursCorpsBig(img)
         approxCorps = cv2.approxPolyDP(c,0.0000001,closed=False)
