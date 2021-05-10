@@ -386,6 +386,13 @@ class Interface(tk.Tk):
         self.logoPIL = ImageTk.PhotoImage(Image.open("C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho/images/logo2.png").resize((157,84)))
         self.canvas2.create_image(0, 0, anchor=tk.NW,image=self.logoPIL)
 
+
+        self.canvas3 = tk.Canvas(self,bg='#f0f0f0')
+        self.canvas3.config(width = 288,height=192)
+        self.canvas3.place(x=1250,y=0)
+        self.schema = ImageTk.PhotoImage(Image.open("C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho/images/schema.png").resize((288,192)))
+        self.canvas3.create_image(0,0,anchor=tk.NW,image=self.schema)
+
     def afficheLongueur():
         app.Longueur.config(text=Fonctions.Externes.Longueur(HeadClass.calculDistances()))
 
