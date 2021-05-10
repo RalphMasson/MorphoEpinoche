@@ -314,8 +314,8 @@ class BodyFish():
 
 
 class Interface(tk.Tk):
-    numImageActuelle = 0
-    listeImages = ""
+
+
     def __init__(self):
         super().__init__()
 
@@ -335,7 +335,7 @@ class Interface(tk.Tk):
         menuAide.add_command(label="A propos", command=None)
         menubar.add_cascade(label="Aide", menu=menuAide)
         self.config(menu=menubar)
-
+        self.listeImages = ""
         CV2_image_big = None
         ''' Label Intro de presentation'''
         tk.Label(self,text=" ",font=("Purisa",12,"bold")).grid(ipadx=2)
@@ -373,6 +373,7 @@ class Interface(tk.Tk):
         tk.Label(self,text="Longueurs caractéristiques de la tête : \n",justify=tk.LEFT,font=("Purisa",8,"bold","underline")).grid(column=0,row=4)
         self.Longueur = tk.Label(self,text="",justify=tk.LEFT)
         self.Longueur.grid(column=0,row=5)
+        self.numImageActuelle = 0
 
         ''' Labels pour les longueurs du corps '''
         tk.Label(self,text="Longueurs caractéristiques du corps : \n",justify=tk.LEFT,font=("Purisa",8,"bold","underline")).grid(column=1,row=4)
@@ -436,11 +437,11 @@ class Interface(tk.Tk):
         pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19 = tete
         self.clearAllCanvas()
         pathok = Fonctions.Externes.openfn()
-        Interface.listeImages = pathok
+        self.listeImages = pathok
         print(pathok)
-        ImagePIL = Image.open(pathok[app.numImageActuelle])
-        app.nomImage.config(text=Interface.listeImages[app.numImageActuelle])
-        app.LabelnomImage.config(text=str(app.numImageActuelle+1)+"/"+str(len(Interface.listeImages)))
+        ImagePIL = Image.open(pathok[self.numImageActuelle])
+        app.nomImage.config(text=self.listeImages[self.numImageActuelle])
+        app.LabelnomImage.config(text=str(self.numImageActuelle+1)+"/"+str(len(self.listeImages)))
 
         ''' Resize pour le corps '''
         print("\n### Traitement du corps ###")
@@ -452,7 +453,7 @@ class Interface(tk.Tk):
 
         ''' Resize pour la tête '''
         print("\n### Traitement de la tête 1/3 ### ")
-        PIL_image_big,CV2_image_big,left1 = Placement.Points.ImageTete(pathok,app.numImageActuelle)
+        PIL_image_big,CV2_image_big,left1 = Placement.Points.ImageTete(pathok,self.numImageActuelle)
         HeadFish(self.canvas,PIL_image_big,CV2_image_big,(3500,2625))
         self.canvas.update()
         print("### OK ###")
@@ -545,14 +546,14 @@ class Interface(tk.Tk):
 
         self.clearAllCanvas()
         try:
-            if(app.numImageActuelle<len(Interface.listeImages)):
-                app.numImageActuelle+=1
+            if(self.numImageActuelle<len(self.listeImages)):
+                self.numImageActuelle+=1
 
                 tete,echelle10mm,echelle3mm = Placement.Points.randomPointsBis()
-                ImagePIL = Image.open(Interface.listeImages[app.numImageActuelle])
-                print(app.numImageActuelle)
-                app.nomImage.config(text=Interface.listeImages[app.numImageActuelle])
-                app.LabelnomImage.config(text=str(app.numImageActuelle+1)+"/"+str(len(Interface.listeImages)))
+                ImagePIL = Image.open(self.listeImages[self.numImageActuelle])
+                # print(self.numImageActuelle)
+                app.nomImage.config(text=self.listeImages[self.numImageActuelle])
+                app.LabelnomImage.config(text=str(self.numImageActuelle+1)+"/"+str(len(self.listeImages)))
 
                 ''' Resize pour le corps '''
                 print("\n### Traitement du corps ###")
@@ -564,7 +565,7 @@ class Interface(tk.Tk):
 
                 ''' Resize pour la tête '''
                 print("\n### Traitement de la tête 1/3 ### ")
-                PIL_image_big,CV2_image_big,left1 = Placement.Points.ImageTete(Interface.listeImages,app.numImageActuelle)
+                PIL_image_big,CV2_image_big,left1 = Placement.Points.ImageTete(self.listeImages,self.numImageActuelle)
                 HeadFish(self.canvas,PIL_image_big,CV2_image_big,(3500,2625))
                 self.canvas.update()
                 print("### OK ###")
@@ -652,15 +653,15 @@ class Interface(tk.Tk):
         nbPointNonDetectes = 0
         self.clearAllCanvas()
         try:
-            if(app.numImageActuelle>0):
-                app.numImageActuelle-=1
+            if(self.numImageActuelle>0):
+                self.numImageActuelle-=1
                 print("tata")
-                print(app.numImageActuelle)
+                print(self.numImageActuelle)
 
                 tete,echelle10mm,echelle3mm = Placement.Points.randomPointsBis()
-                ImagePIL = Image.open(Interface.listeImages[app.numImageActuelle])
-                app.LabelnomImage.config(text=str(app.numImageActuelle+1)+"/"+str(len(Interface.listeImages)))
-                app.nomImage.config(text=Interface.listeImages[app.numImageActuelle])
+                ImagePIL = Image.open(self.listeImages[self.numImageActuelle])
+                app.LabelnomImage.config(text=str(self.numImageActuelle+1)+"/"+str(len(self.listeImages)))
+                app.nomImage.config(text=self.listeImages[self.numImageActuelle])
 
                 ''' Resize pour le corps '''
                 print("\n### Traitement du corps ###")
@@ -672,7 +673,7 @@ class Interface(tk.Tk):
 
                 ''' Resize pour la tête '''
                 print("\n### Traitement de la tête 1/3 ### ")
-                PIL_image_big,CV2_image_big,left1 = Placement.Points.ImageTete(Interface.listeImages,app.numImageActuelle)
+                PIL_image_big,CV2_image_big,left1 = Placement.Points.ImageTete(self.listeImages,self.numImageActuelle)
                 HeadFish(self.canvas,PIL_image_big,CV2_image_big,(3500,2625))
                 self.canvas.update()
                 print("### OK ###")
@@ -762,13 +763,13 @@ class Interface(tk.Tk):
 app = Interface()
 app.mainloop()
 #
-import inspect
+# import inspects
 # src_file_path = inspect.getfile(lambda: None)
 # src_file = inspect.getsourcelines(lambda:None)
 # print(src_file)
 
 # print(src_file_path)
-print(inspect.stack()[0][1])
+# print(inspect.stack()[0][1])
 # from pathlib import Path
 # source_path = Path('Interface_Sexage.py').resolve()
 # source_dir = source_path.parent
