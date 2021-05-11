@@ -254,7 +254,7 @@ class Points():
             circles = np.round(circles[0, :]).astype("int")
         listPotentiels = [x[0] for x in circles]
         # # print(circles)
-        i = Fonctions.Externes.find_nearest(listPotentiels,pupille[0])
+        i = Fonctions.Externes.findNearestValueFromArray(listPotentiels,pupille[0])
         # # print(i)
         # print(circles[i][0])
         # points 3 et 19
@@ -268,43 +268,6 @@ class Points():
         # # print(pt19)
         return [pt3,pt19]
         # return circles
-
-
-
-
-
-    ''' Méthode calculant la distance euclidienne entre deux points '''
-    def euclideDist(a,b):
-        x1 = a[0]
-        y1 = a[1]
-        x2 = b[0]
-        y2 = b[1]
-        norme = np.sqrt((x2-x1)**2+(y2-y1)**2)
-        return norme
-
-
-
-
-
-
-    ''' Méthode calculant l'angle par la loi des cosinus '''
-    def calculAngle(pt1,pt2,pt3):
-        #calcul par alkashi des angles en degres du triangle reliant les 3 points
-        #        pt2
-        #     b /     \ a
-        #  pt1 ----- pt3
-        #         c
-        #angle au niveau du pt2
-        b = euclideDist(pt1,pt2)
-        a = euclideDist(pt2,pt3)
-        c = euclideDist(pt1,pt3)
-        from math import acos,pi
-        Apt2 = acos((b**2+a**2-c**2)/(2*b*a))*180/pi
-        return Apt2
-
-
-
-
 
 
 
@@ -456,7 +419,7 @@ class Points():
         ''' choix du pic le plus proche de la lèvre inférieure '''
         if(len(peaks)>1):
             pointsPotentiels = [[xx[peaks[i]],ordonnees[peaks[i]]] for i in range(len(peaks))]
-            indxx,_,_ = Fonctions.Externes.findNearestPointFromList(left,pointsPotentiels)
+            indxx,_,_ = Fonctions.Externes.findNearestPointFromListOfPoints(left,pointsPotentiels)
             indxx = peaks[indxx]
         else:
             indxx = peaks
@@ -464,7 +427,7 @@ class Points():
 
         pt5 = (left[0],left[1])
         pt7 = (int(xx[indxx]),int(ordonnees[indxx]))
-        _,pointB,_ = Fonctions.Externes.findNearestPointFromList(pt7,cList)
+        _,pointB,_ = Fonctions.Externes.findNearestPointFromListOfPoints(pt7,cList)
         pt7 = (pointB[0],pointB[1])
         print("pt5")
         print(pt5)
@@ -706,7 +669,3 @@ class Points():
 # # # plt.title("Vérification du positionnement des points avant interface")
 # # # plt.grid(True)
 # # # plt.show()
-
-
-
-

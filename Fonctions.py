@@ -1,6 +1,7 @@
 ''' Bibliothèque de fonctions externes '''
 
 class Externes():
+    nbClic = 0
 
     def euclideDist(a,b):
         import numpy as np
@@ -68,7 +69,7 @@ class Externes():
             distances.append(Externes.px10mm(x,echelle))
         return distances
 
-    def genererAllDistancesHead(ptsEchelle,ptsFish):
+    def genererAllDistancesHead(ptsEchelle,ptsFish,chemin):
         import numpy as np
         distances_all = []
         listeCombinaisonsDistance,listeCombinaisonsAngle = Externes.allPointsAngles()
@@ -84,12 +85,13 @@ class Externes():
             thetas = np.around(thetas[0],4)
             distances_all.append(thetas)
 
-        f = open("C:/Users/MASSON/Desktop/STAGE_EPINOCHE/DistancesPourModele.csv", "a")
+        f = open(chemin+"/DistancesPourModele.csv", "a")
         header = listeCombinaisonsDistance+listeCombinaisonsAngle
         header = "; ".join(str(i) for i in header)
         distances_all = "; ".join(str(i) for i in distances_all)
-        f.write(str(header)+"\n")
-        f.write(str(distances_all))
+        if(Externes.nbClic==0):
+            f.write(str(header)+"\n")
+        f.write(str(distances_all)+"\n")
         f.close()
         return distances_all
 
@@ -114,22 +116,11 @@ class Externes():
         distances_check = Externes.px10mmListe(distances_check,echelle10mm)
         return distances_check
 
-    def find_nearest(array, value):
+    def findNearestValueFromArray(array, value):
         import numpy as np
         array = np.asarray(array)
         idx = (np.abs(array - value)).argmin()
         return idx
-
-    def detect_eye(img):
-        import cv2
-        import numpy as np
-        img_couleur = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
-        img_gray=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-        img_gray = cv2.medianBlur(img_gray,21)
-        circles1 = cv2.HoughCircles(image=img_gray, method=cv2.HOUGH_GRADIENT, dp=2,param1=70,param2=65, minDist=100, minRadius=25,maxRadius=45)
-        circles = cv2.HoughCircles(image=img_gray, method=cv2.HOUGH_GRADIENT, dp=2,param1=100,param2=30, minDist=120, minRadius=80,maxRadius=95)
-        circles = np.round(circles[0, :]).astype("int32")
-        return circles1[0][0]
 
     def openfn():
         import tkinter.filedialog,tkinter as tk
@@ -173,7 +164,7 @@ class Externes():
         projete = np.dot(invMatA,vecteurB)
         return projete
 
-    def findNearestPointFromList(pointA,listeOfPoints):
+    def findNearestPointFromListOfPoints(pointA,listeOfPoints):
         import numpy as np
         #liste = [[x,y],[x,y]...]
         #point = [x,y]
