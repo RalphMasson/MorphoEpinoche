@@ -439,7 +439,9 @@ class Interface(tk.Tk):
         self.canvas1.delete('all')
         self.nomImage.config(text="")
 
-
+    def resetListeImages(self):
+        self.listeImages = []
+        self.numImageActuelle = 0
 
     def importImage(self):
         nbPointNonDetectes = 0
@@ -448,6 +450,7 @@ class Interface(tk.Tk):
         tete,echelle10mm,echelle3mm = Placement.Points.randomPointsBis()
         pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19 = tete
         self.clearAllCanvas()
+        self.resetListeImages()
         pathok = Fonctions.Externes.openfn()
         self.listeImages = pathok
         print(pathok)
@@ -539,7 +542,7 @@ class Interface(tk.Tk):
             print("Impossible de détecter les points 11 et 17")
             nbPointNonDetectes+=2
 
-        tete = Placement.Points.centerPoints([pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19],HeadFish.centreOeil)
+        tete = Fonctions.Externes.centerPoints([pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19],HeadFish.centreOeil)
 
         print("\n### Placement des points de la tête ###")
         HeadClass(self.canvas, tete,'#ff00f2')
@@ -651,7 +654,7 @@ class Interface(tk.Tk):
                     print("Impossible de détecter les points 11 et 17")
                     nbPointNonDetectes+=2
 
-                tete = Placement.Points.centerPoints([pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19],HeadFish.centreOeil)
+                tete = Fonctions.Externes.centerPoints([pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19],HeadFish.centreOeil)
 
                 print("\n### Placement des points de la tête ###")
                 HeadClass(self.canvas, tete,'#ff00f2')
@@ -759,7 +762,7 @@ class Interface(tk.Tk):
                     print("Impossible de détecter les points 11 et 17")
                     nbPointNonDetectes+=2
 
-                tete = Placement.Points.centerPoints([pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19],HeadFish.centreOeil)
+                tete = Fonctions.Externes.centerPoints([pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19],HeadFish.centreOeil)
 
                 print("\n### Placement des points de la tête ###")
                 HeadClass(self.canvas, tete,'#ff00f2')

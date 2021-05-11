@@ -1,9 +1,9 @@
 import cv2
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 import numpy as np
 import math
 
-img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\images_all\\gimp_cut\\male\\IMGP1107M.JPG"
+img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\images_all\\gimp_cut\\male\\IMGP1086M.JPG"
 # img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/1-1.JPG'
 # img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/2.JPG'
 # img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/3-3.JPG'
@@ -11,13 +11,9 @@ img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\images_all\\gimp_cut\\ma
 img = cv2.imread(img_path)
 img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
 
-import sys,inspect,Fonctions
-pypath = inspect.stack()[0][1]
-pypath = pypath.split('\\')
-pypath = '/'.join(pypath[:-1])
-sys.path.insert(0,pypath)
-
-
+import sys,inspect
+sys.path.insert(0,'/'.join(inspect.stack()[0][1].split('\\')[:-1]))
+import Fonctions
 
 class Points():
     '''
@@ -399,176 +395,83 @@ class Points():
         return pt15,pt13
 
 
+    '''
+    * Routine pour détecter les points 5 et 7 (lèvres)
+    * input : img,pt9,left
+    * return : pt5,pt7 (type tuple of tuple)
+    '''
+
     def points5_7(img,pt9,left):
+        from scipy.signal import find_peaks
+        import statistics
 
+        ''' contours du corps '''
         _,c = Points.contoursCorpsBig(img)
+        cX = c.T[0][0]
+        cY = c.T[1][0]
+        cList = [[cX[i],cY[i]] for i in range(len(cX))]
+
+        ''' contours de la bouche '''
         approxBouche = cv2.approxPolyDP(c,1e-16,closed=False)
-
         approxBouche2 = []
-
-        i=0
         for x in approxBouche:
             if (x[0][0]<pt9[0] and x[0][1]<left[1]):
                 approxBouche2.append(x)
-                i+=1
         approxBouche2 = np.asarray(approxBouche2)
-        pt5 = [0,0]
-        pt7 = [0,0]
-
-        blank = np.ones_like(img)*255
-        # cv2.polylines(blank, [approxBouche2], False, (255,0,0), 3)
         approxBouche2 = approxBouche2[:,0,:]
-        # cv2.drawContours(img, [approxBouche2], -1, (0, 255, 0), 3)
-        # plt.imshow(img)
-        # print("toto")
-        # print(approxBouche2)
-        # plt.figure()
-        # plt.plot(approxBouche2.T[0],-approxBouche2.T[1])
-        # approxBouche2 = approxBouche[::2]
         approxBouche2 = np.array([list(approxBouche2[::2][i]) for i in range(len(approxBouche2)//2)])
-        # print("toto")
-        # print(approxBouche2)
-        # cv2.drawContours(img, [approxBouche2], -1, (0, 0, 255), 1)
-        # plt.imshow(img)
         abscisses = approxBouche2.T[0]
         ordonnees = approxBouche2.T[1]
-        # plt.figure()
-        # plt.plot(-ordonnees,-1*abscisses,'r',label='Contour bouche')
-
-        #smoothing the contours of the mouth
-        '''tck,u = interpolate.splprep([ordonnees,-1*abscisses],k=3,s=16)
-        u=np.linspace(0,1,num=len(ordonnees),endpoint=True)
-        outBouche = interpolate.splev(u,tck)'''
-        # plt.plot(- outBouche[0], outBouche[1], 'b',label='Contour bouche lissé' )
-        # plt.legend()
-        # print(len(outBouche[0]))
-        # print(outBouche[1])
-
-        ''' zscore '''
-        '''zscore=scipy.stats.zscore(outBouche[1])
-        # print(len(outBouche[1]))
-        input = zscore
-        signal = (input > np.roll(input,1)) & (input > np.roll(input,-1))'''
-        # plt.plot(input)
-        # print(signal)
-        # plt.plot(signal.nonzero()[0], input[signal], 'ro')
-        # plt.plot(X2,F2)
-
-        ''' wavelet transform and zerocrossing '''
-        # import pywt
-        # swt = pywt.swt(outBouche[1][:-1], 'rbio3.1')
-        # cA = [x for x in swt[0][0]]
-        # cD = [x for x in swt[0][1]]
-        # # plt.figure()
-        # # plt.plot(cD)
-        # zc = np.where(np.diff(np.sign(cD)))[0]
-        # # plt.figure()
-        # # plt.plot(ordonnees,abscisses, 'b')
-        # # plt.plot(ordonnees[zc+1],abscisses[zc+1],'ro')
-        # print(zc)
-        # # plt.figure()
-        # # plt.plot(outBouche[0],zscore)
-        # # plt.figure()
-
-        '''find peak cwt'''
-        '''peakind = scipy.signal.find_peaks(-1*abscisses,prominence=0.)'''
-        # print(ordonnees)
-        # print(peakind[0])
-        # plt.figure()
-        # plt.plot(ordonnees,-1*abscisses, 'b')
-        # plt.plot(ordonnees[peakind[0]],-1*abscisses[peakind[0]],'ro')
-        # compute the 1st derivative
-        '''f_prime = np.gradient (outBouche[1])'''
-        # plt.figure()
-        # plt.plot(outBouche[0],f_prime,label='dérivée première')
-        # smoothing the 1st derivative
-        '''tck,u = interpolate.splprep([outBouche[0],f_prime],k=3,s=5)
-        u=np.linspace(0,1,num=len(f_prime),endpoint=True)
-        out = interpolate.splev(u,tck)'''
-        # print(len(out[0]))
-
-        # plt.figure()
-        # plt.plot(out[0],out[1],label='dérivée première lissée')
-        # plt.legend()
 
         ''' distance to line'''
         pente =(approxBouche2[0][1]-left[1])/(approxBouche2[0][0]-left[0])
         intercept = approxBouche2[0][1]-pente*approxBouche2[0][0]
         xx = np.linspace(max(approxBouche2[0][0],left[0]),min(approxBouche2[0][0],left[0]),len(abscisses))
         yy = np.round(pente*xx+intercept)
-        # print(pente)
-        # print(intercept)
-        # plt.figure()
-        # plt.plot(xx,yy,'r')
-        # plt.plot(abscisses,ordonnees,'b')
+
+        ''' calcul du projete '''
         projete = [np.round(Fonctions.Externes.projeteOrtho(pente,intercept,xx[i],ordonnees[i])) for i in range(len(xx))]
         projete = [x.flatten().tolist() for x in projete]
         xxx=np.array(projete).T[0]
         yyy = np.array(projete).T[1]
-        # plt.plot(xx[10],ordonnees[10],'go')
-        # plt.plot(projete[0],projete[1],'ko')
-        # plt.plot(xxx,yyy,'g')
-        # print("droite")
-        # print(yy)
-        # print("points")
-        # # print(ordonnees)
-        # print("projetés")
-        # print(yyy)
-        # erreur = [(yy[i]-ordonnees[i])**2 for i in range(len(yy))]
-        erreur2 = [(yy[i]-yyy[i])**2 for i in range(len(yyy))]
-        # print("erreur")
-        # print(erreur2)
+
+        ''' affichage controle '''
+        # # plt.figure()
+        # # plt.plot(-ordonnees,-1*abscisses,'r',label='Contour bouche')
+        # # plt.figure()
+        # # plt.imshow(img)
+        # # # plt.plot(xx,yy,'r')
+        # # plt.plot(abscisses,ordonnees,'b')
+        # # plt.plot(xxx,yyy,'g')
+
+        ''' calcul de la distance '''
+        erreur3 = [Fonctions.Externes.euclideDist([xx[i],yy[i]],[xxx[i],yyy[i]]) for i in range(len(yyy))]
+        erreur3 = [erreur3[i]-statistics.mean(erreur3) for i in range(len(erreur3))]
+        peaks,_=find_peaks(erreur3,height=(0, None),distance=5,prominence=1)
+
+        ''' affichage distance '''
         # plt.figure()
-        # plt.plot(xx,erreur)
-        # plt.plot(xx,erreur2)
+        # plt.plot(xx,erreur3)
 
-        print(np.max(erreur2))
-        indx = np.argmax(erreur2)
-        # plt.plot(xx[indx],ordonnees[indx],'yo')
+        ''' choix du pic le plus proche de la lèvre inférieure '''
+        if(len(peaks)>1):
+            pointsPotentiels = [[xx[peaks[i]],ordonnees[peaks[i]]] for i in range(len(peaks))]
+            indxx,_,_ = Fonctions.Externes.findNearestPointFromList(left,pointsPotentiels)
+            indxx = peaks[indxx]
+        else:
+            indxx = peaks
 
 
-
-
-        # compute the 2nd derivative
-        '''f_second = np.gradient(out[1])'''
-        # plt.figure()
-        # plt.plot(out[0],f_second,label='dérivée 2nd lissée')
-
-        # indices = np.where (np.diff (np.sign (f_prime))) [0] # Find the inflection point.
-        '''infls = np.where(np.diff(np.sign(f_second)))[0]'''
-        # print(len(infls))
-        # print(infls)
-        # plt.figure()
-        # plt.plot(outBouche[0],outBouche[1],'r.',label='Contour bouche')
-
-        '''local_maxima = argrelextrema(outBouche[1], np.less, order = 10, mode = 'wrap')
-        # print(list(local_maxima))
-        mini = np.argmin(abscisses)
-        # for i, infl in enumerate(list(local_maxima[0]), 1):
-            # plt.axvline(x=ordonnees[infl], color='k', label=f'Inflection Point {i}')
-        local_maxima = list(local_maxima[0])[0]'''
-        # print(local_maxima)
-
-        # av erifier
-        '''pt5 = (abscisses[mini],ordonnees[mini])
-        pt7 = (abscisses[local_maxima],ordonnees[local_maxima])'''
         pt5 = (left[0],left[1])
-        pt7 = (int(xx[indx]),int(ordonnees[indx]))
+        pt7 = (int(xx[indxx]),int(ordonnees[indxx]))
+        _,pointB,_ = Fonctions.Externes.findNearestPointFromList(pt7,cList)
+        pt7 = (pointB[0],pointB[1])
         print("pt5")
         print(pt5)
         print("pt7")
         print(pt7)
-        # plt.axvline(x=ordonnees[mini],color='k')
-        # print(local_maxima)
-        # plt.plot(yhat)'
-        # plt.figure()
-        # plt.imshow(img)
-        # plt.legend()
 
-        # plt.show()
         return pt5,pt7
-        # return swt
-
 
     def randomPoints():
         pt3 = [249.0, 250.0]
@@ -600,30 +503,13 @@ class Points():
         echelle3mm = [[67,74],[199,74]]
         return corps,echelle10mm,echelle3mm
 
-    def randomPointsContours(c):
-        pt3 = [1086.0, 1131.0]
-        pt5 = [422.0, 509.0]
-        pt7 = [405.0, 562.0]
-        pt9 = [507.0, 643.0]
-        pt11 = [396.0, 415.0]
-        pt13 = [414.0, 343.0]
-        pt15 = [438.0, 239.0]
-        pt17 = [473.0, 119.0]
-        pt19 = [679.0, 498.0]
-        corps= [pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19]
-        echelle10mm = [[112,181],[300,186]]
-        echelle3mm = [[67,74],[199,74]]
-        return corps,echelle10mm,echelle3mm
 
-
-    def contoursCorpsNew(img):
+    def contoursCorpsFondBlanc(img):
         img_hsv = cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
         # img_hsv = cv2.bilateralFilter(img_hsv,15,75,75)
 
         # plt.figure()
         # plt.imshow(img_hsv)
-
-
 
         low_tail = np.array([90, 30, 160])
         high_tail = np.array([110, 138, 220])
@@ -641,8 +527,6 @@ class Points():
         res[:,:,2]= res_r
         res = cv2.medianBlur(res,11)
         res_hsv = cv2.cvtColor(res,cv2.COLOR_BGR2HSV)
-
-
 
         low_shadow = np.array([107,6,65])
         high_shadow = np.array([125,30,125])
@@ -693,6 +577,15 @@ class Points():
         # plt.figure()
         # plt.imshow(res)
         # plt.show()
+
+
+
+    '''
+    * Routine pour détecter les points 11 et 17 (ouverture bronchiale)
+    * input : img (type numpy.array)
+    * return : pt11,pt17 (type tuple of tuple)
+    '''
+
     def points11_17(img,pt13,pt15):
         _,c = Points.contoursCorpsBig(img)
         approxCorps = cv2.approxPolyDP(c,0.0000001,closed=False)
@@ -717,17 +610,7 @@ class Points():
         print(pt17)
         return pt11,pt17
 
-    def centerPoint(pt,eye):
-        return [pt[0]-(eye[0]-300),pt[1]-(eye[1]-250)]
 
-    def decenterPoint(A,eye):
-        return [A[0]+eye[0]-300,A[1]+eye[1]-250]
-
-    def centerPoints(lstpt,eye):
-        new_lstpt = []
-        for x in lstpt:
-            new_lstpt.append(Points.centerPoint(x,eye))
-        return new_lstpt
 
     def ImageCorps(imgPIL):
         from PIL import Image
@@ -768,61 +651,61 @@ class Points():
 # plt.figure()
 # plt.imshow(img)
 # plt.show()
-# Points.contoursCorpsNew(img)
+# Points.contoursCorpsFondBlanc(img)
 # plt.figure()
 # plt.imshow(out)
 # plt.show()
 
+# # # # # #
+# # # out,c = Points.contoursCorpsBig(img)
+# # # [left,right,top,bottom] = Points.pointExtremeContours(c)
+# # # imagerot = Points.rotate_image(out,Points.angleRot(left,right)[0],Points.angleRot(left,right)[1])
+# # # # #
+# # # _,c = Points.contoursCorpsBig(imagerot)
+# # # [left,right,top,bottom] = Points.pointExtremeContours(c)
+# # # print("left")
+# # # print(left)
+# # # # #
+# # # print("toto")
+# # # print(imagerot.shape)
+# # # [pt3,pt19]=Points.points3_19(imagerot)
+# # # print("pt3")
+# # # print(pt3)
+# # # print("pt19")
+# # # print(pt19)
+# # # # circles = Points.points3_19(imagerot)
+# # # print("pt9")
+# # # pt9 = Points.point9(c,pt19)
 # # # #
-# out,c = Points.contoursCorpsBig(img)
-# [left,right,top,bottom] = Points.pointExtremeContours(c)
-# imagerot = Points.rotate_image(out,Points.angleRot(left,right)[0],Points.angleRot(left,right)[1])
-# # #
-# _,c = Points.contoursCorpsBig(imagerot)
-# [left,right,top,bottom] = Points.pointExtremeContours(c)
-# print("left")
-# print(left)
-# # #
-# print("toto")
-# print(imagerot.shape)
-# [pt3,pt19]=Points.points3_19(imagerot)
-# print("pt3")
-# print(pt3)
-# print("pt19")
-# print(pt19)
-# # circles = Points.points3_19(imagerot)
-# print("pt9")
-# pt9 = Points.point9(c,pt19)
-# #
-# # #ne fonctionne pas pour l'instant
-# # [pt15,pt13] =Points.points15_13(imagerot)
-# # pt13 = (1288, 1228)
-# # pt15 = (1308, 1098)
-# # cv2.circle(imagerot, pt15, 20, (255, 0, 0), -1)
-# # cv2.circle(imagerot, pt13, 20, (255, 0, 0), -1)
-# #
-# # pt5,pt7 = Points.points5_7(imagerot,pt9)
-# pt5,pt7= Points.points5_7(imagerot,pt9,left)
-# #
-# # pt11,pt17 = Points.points11_17(imagerot,pt13,pt15)
-# # pt11 = (pt11[0],pt11[1])
-# # pt17 = (pt17[0],pt17[1])
-# # cv2.circle(imagerot, left, 12, (0, 50, 255), -1)
-# # cv2.circle(imagerot, right, 12, (0, 255, 255), -1)
-# # cv2.circle(imagerot, top, 12, (255, 50, 0), -1)
-# # cv2.circle(imagerot, bottom, 12, (255, 255, 0), -1)
-# cv2.circle(imagerot, pt3, 4, (255, 0, 0), -1)
-# cv2.circle(imagerot, pt19, 4, (255, 0, 0), -1)
-# cv2.circle(imagerot, pt9, 8, (255, 0, 0), -1)
-# cv2.circle(imagerot, pt5, 8, (0, 255, 0), -1)
-# cv2.circle(imagerot, pt7, 8, (0, 255, 0), -1)
-# # cv2.circle(imagerot, pt11, 8, (0, 255, 0), -1)
-# # cv2.circle(imagerot, pt17, 8, (0, 255, 0), -1)
-# # plt.figure()
-# # plt.imshow(imagerot)
-# # plt.title("Vérification du positionnement des points avant interface")
-# # plt.grid(True)
-# plt.show()
+# # # # #ne fonctionne pas pour l'instant
+# # # # [pt15,pt13] =Points.points15_13(imagerot)
+# # # # pt13 = (1288, 1228)
+# # # # pt15 = (1308, 1098)
+# # # # cv2.circle(imagerot, pt15, 20, (255, 0, 0), -1)
+# # # # cv2.circle(imagerot, pt13, 20, (255, 0, 0), -1)
+# # # #
+# # # # pt5,pt7 = Points.points5_7(imagerot,pt9)
+# # # pt5,pt7= Points.points5_7(imagerot,pt9,left)
+# # # #
+# # # # pt11,pt17 = Points.points11_17(imagerot,pt13,pt15)
+# # # # pt11 = (pt11[0],pt11[1])
+# # # # pt17 = (pt17[0],pt17[1])
+# # # # cv2.circle(imagerot, left, 12, (0, 50, 255), -1)
+# # # # cv2.circle(imagerot, right, 12, (0, 255, 255), -1)
+# # # # cv2.circle(imagerot, top, 12, (255, 50, 0), -1)
+# # # # cv2.circle(imagerot, bottom, 12, (255, 255, 0), -1)
+# # # cv2.circle(imagerot, pt3, 4, (255, 0, 0), -1)
+# # # cv2.circle(imagerot, pt19, 4, (255, 0, 0), -1)
+# # # cv2.circle(imagerot, pt9, 8, (255, 0, 0), -1)
+# # # cv2.circle(imagerot, pt5, 8, (0, 255, 0), -1)
+# # # cv2.circle(imagerot, pt7, 8, (0, 255, 0), -1)
+# # # # cv2.circle(imagerot, pt11, 8, (0, 255, 0), -1)
+# # # # cv2.circle(imagerot, pt17, 8, (0, 255, 0), -1)
+# # # plt.figure()
+# # # plt.imshow(imagerot)
+# # # plt.title("Vérification du positionnement des points avant interface")
+# # # plt.grid(True)
+# # # plt.show()
 
 
 

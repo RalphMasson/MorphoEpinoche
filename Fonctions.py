@@ -153,6 +153,18 @@ class Externes():
         texte += " 13 <-> 15 : Largeur corps : "+str(distance[1])+" mm \n"
         return texte
 
+    def centerPoint(pt,eye):
+        return [pt[0]-(eye[0]-300),pt[1]-(eye[1]-250)]
+
+    def decenterPoint(A,eye):
+        return [A[0]+eye[0]-300,A[1]+eye[1]-250]
+
+    def centerPoints(lstpt,eye):
+        new_lstpt = []
+        for x in lstpt:
+            new_lstpt.append(Externes.centerPoint(x,eye))
+        return new_lstpt
+
     def projeteOrtho(pente,intercept,xA,yA):
         import numpy as np
         matriceA = np.array([[pente,-1],[1,pente]])
@@ -160,3 +172,13 @@ class Externes():
         invMatA = np.linalg.inv(matriceA)
         projete = np.dot(invMatA,vecteurB)
         return projete
+
+    def findNearestPointFromList(pointA,listeOfPoints):
+        import numpy as np
+        #liste = [[x,y],[x,y]...]
+        #point = [x,y]
+        listeDistances = [Externes.euclideDist(pointA,x) for x in listeOfPoints]
+        indexMin = np.argmin(listeDistances)
+        pointB = listeOfPoints[indexMin]
+        distance = listeDistances[indexMin]
+        return indexMin,pointB,distance
