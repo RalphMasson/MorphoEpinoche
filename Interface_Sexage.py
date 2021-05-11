@@ -148,7 +148,7 @@ class HeadClass():
         HeadClass.update_points(canvas)
 
     def genererAllDistancesHead():
-        HeadClass.distances_all = Fonctions.Externes.genererAllDistancesHead(HeadClass.pointsEchelle,HeadClass.pointsFish,pypath)
+        HeadClass.distances_all = Fonctions.Externes.genererAllDistancesHead(HeadClass.pointsEchelle,HeadClass.pointsFish,Interface.sexModele.get(),pypath)
         Fonctions.Externes.nbClic +=1
 
     def calculDistances():
@@ -314,7 +314,7 @@ class BodyFish():
 
 
 class Interface(tk.Tk):
-
+    sexModele = None
 
     def __init__(self):
         super().__init__()
@@ -347,12 +347,14 @@ class Interface(tk.Tk):
         tk.Button(self,text = "Import image and autoplace",command = self.importImage,fg='purple').place(x=400,y=100)
         tk.Button(self,text = "Predict",command = Interface.affichePrediction,fg='purple').place(x=570,y=100)
         tk.Label(self, text = 'ADD THESE VALUES TO MODEL',font=("Purisa",12,"bold"),fg='green').place(x=760,y=70)
-        tk.Button(self,text = "Model Update (developpers only)",command = HeadClass.genererAllDistancesHead,fg='green').place(x=850,y=100)
+        tk.Button(self,text = "Model Update (close Excel before)",command = HeadClass.genererAllDistancesHead,fg='green').place(x=850,y=100)
         tk.Label(self,text='Sex for model: ',fg='green').place(x=725,y=105)
         tk.Button(self,text='<--',command = self.previousImage).place(x=570,y=780)
         tk.Button(self,text='-->',command = self.nextImage).place(x=610,y=780)
 
-        self.sexModel = tk.Entry(self,width=3)
+
+        Interface.sexModele = tk.StringVar(self)
+        self.sexModel = tk.Entry(self,width=3,textvariable=Interface.sexModele)
         self.sexModel.place(x=810,y=105)
 
         self.labelSex = tk.Label(self,text="")
