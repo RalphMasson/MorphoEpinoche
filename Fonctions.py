@@ -115,7 +115,9 @@ class Externes():
                     excel.DisplayAlerts = False
                     excel.ActiveWorkbook.Save()
                     excel.Quit()
-                    time.sleep(0.7)
+                    os.system('taskkill /f /im excel.exe')
+                    time.sleep(0.5)
+                    f = open(chemin+"\DistancesPourModele.csv","a+")
             if(len(chemin2)>len(chemin)):
                 try:
                     f = open(chemin2+"\DistancesPourModele.csv","a+")
@@ -126,8 +128,9 @@ class Externes():
                     excel.DisplayAlerts = False
                     excel.ActiveWorkbook.Save()
                     excel.Quit()
-                    time.sleep(0.8)
-            # f = open(chemin+"/DistancesPourModele.csv", "a+")
+                    os.system('taskkill /f /im excel.exe')
+                    time.sleep(0.5)
+                    f = open(chemin2+"\DistancesPourModele.csv","a+")
 
             header = ['Sexe (0:F, 1:M)']+listeCombinaisonsDistance+listeCombinaisonsAngle
             header = "; ".join(str(i) for i in header)

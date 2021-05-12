@@ -386,15 +386,16 @@ class Interface(tk.Tk):
         self.boutonImport.bind('<Control-o>',self.importImage)
         tk.Button(self,text = "Predict",command = Interface.affichePrediction,fg='purple').place(x=570,y=100)
         tk.Label(self, text = 'ADD THESE VALUES TO MODEL',font=("Purisa",12,"bold"),fg='green').place(x=760,y=70)
+        Interface.sexModele = tk.StringVar(self)
+        self.sexModel = tk.Entry(self,width=3,textvariable=Interface.sexModele)
+        self.sexModel.place(x=810,y=105)
         tk.Button(self,text = "Model Update (close Excel before)",command = HeadClass.genererAllDistancesHead,fg='green').place(x=850,y=100)
         tk.Label(self,text='Sex for model: ',fg='green').place(x=725,y=105)
         tk.Button(self,text='<--',command = self.previousImage).place(x=570,y=780)
         tk.Button(self,text='-->',command = self.nextImage).place(x=610,y=780)
 
 
-        Interface.sexModele = tk.StringVar(self)
-        self.sexModel = tk.Entry(self,width=3,textvariable=Interface.sexModele)
-        self.sexModel.place(x=810,y=105)
+
 
         self.labelSex = tk.Label(self,text="")
         self.labelSex.place(x=650,y=190)
