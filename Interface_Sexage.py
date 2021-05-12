@@ -616,13 +616,14 @@ class Interface(tk.Tk):
     def openDataBase(self):
         pypath = inspect.getfile(lambda: None)
         pypath = '/'.join(pypath.split('\\')[:-1])
-
+        import subprocess
         if(os.path.exists(pypath+"/DistancesPourModele.csv")):
 
             commande = "start EXCEL.EXE "
             commande += pypath+"/DistancesPourModele.csv"
             try:
-                os.system(commande)
+                # os.system(commande)
+                subprocess.Popen([pypath+"/DistancesPourModele.csv"])
             except:
                 commande = "start scalc.EXE "
                 commande += pypath+"/DistancesPourModele.csv"
@@ -637,7 +638,9 @@ class Interface(tk.Tk):
             commande = "start EXCEL.EXE "
             commande += os.getcwd()+"\DistancesPourModele.csv"
             try:
-                os.system(commande)
+                # os.system(commande)
+                subprocess.Popen([os.getcwd()+"\DistancesPourModele.csv"])
+
             except:
                 commande = "start scalc.EXE "
                 commande += os.getcwd()+"\DistancesPourModele.csv"

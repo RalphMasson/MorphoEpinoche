@@ -109,26 +109,54 @@ class Externes():
                 try:
                     f = open(chemin+"/DistancesPourModele.csv", "a+")
                 except PermissionError:
-                    excel = Dispatch("Excel.Application")
-                    excel.Visible=False
-                    workbook = excel.Workbooks.Open(chemin+"/DistancesPourModele.csv")
-                    excel.DisplayAlerts = False
-                    excel.ActiveWorkbook.Save()
-                    excel.Quit()
-                    os.system('taskkill /f /im excel.exe')
+                    print(Externes.checkIfProcessRunning("excel"))
+                    print(Externes.checkIfProcessRunning("scalc"))
+                    print(Externes.checkIfProcessRunning("soffice"))
+                    print(Externes.checkIfProcessRunning("notepad"))
+
+                    if(Externes.checkIfProcessRunning("excel")):
+                        excel = Dispatch("Excel.Application")
+                        excel.Visible=False
+                        workbook = excel.Workbooks.Open(chemin+"/DistancesPourModele.csv")
+                        excel.DisplayAlerts = False
+                        excel.ActiveWorkbook.Save()
+                        excel.Quit()
+                        os.system('taskkill /f /im excel.exe')
+                    if(Externes.checkIfProcessRunning("scalc")):
+                        os.system('taskkill /f /im scalc.exe')
+
+                    if(Externes.checkIfProcessRunning("soffice")):
+                        os.system('taskkill /f /im soffice.exe')
+                        os.system('taskkill /f /im soffice.bin')
+                    if(Externes.checkIfProcessRunning("notepad")):
+                        os.system('taskkill /f /im notepad.exe')
                     time.sleep(0.5)
                     f = open(chemin+"\DistancesPourModele.csv","a+")
             if(len(chemin2)>len(chemin)):
                 try:
                     f = open(chemin2+"\DistancesPourModele.csv","a+")
                 except PermissionError:
-                    excel = Dispatch("Excel.Application")
-                    excel.Visible=False
-                    workbook = excel.Workbooks.Open(chemin2+"/DistancesPourModele.csv")
-                    excel.DisplayAlerts = False
-                    excel.ActiveWorkbook.Save()
-                    excel.Quit()
-                    os.system('taskkill /f /im excel.exe')
+                    print(Externes.checkIfProcessRunning("excel"))
+                    print(Externes.checkIfProcessRunning("scalc"))
+                    print(Externes.checkIfProcessRunning("soffice"))
+                    print(Externes.checkIfProcessRunning("notepad"))
+
+                    if(Externes.checkIfProcessRunning("excel")):
+                        excel = Dispatch("Excel.Application")
+                        excel.Visible=False
+                        workbook = excel.Workbooks.Open(chemin2+"\DistancesPourModele.csv")
+                        excel.DisplayAlerts = False
+                        excel.ActiveWorkbook.Save()
+                        excel.Quit()
+                        os.system('taskkill /f /im excel.exe')
+                    if(Externes.checkIfProcessRunning("scalc")):
+                        os.system('taskkill /f /im scalc.exe')
+
+                    if(Externes.checkIfProcessRunning("soffice")):
+                        os.system('taskkill /f /im soffice.exe')
+                        os.system('taskkill /f /im soffice.bin')
+                    if(Externes.checkIfProcessRunning("notepad")):
+                        os.system('taskkill /f /im notepad.exe')
                     time.sleep(0.5)
                     f = open(chemin2+"\DistancesPourModele.csv","a+")
 
@@ -226,3 +254,16 @@ class Externes():
         pointB = listeOfPoints[indexMin]
         distance = listeDistances[indexMin]
         return indexMin,pointB,distance
+
+
+    def checkIfProcessRunning(processName):
+        import psutil
+        #Iterate over the all the running process
+        for proc in psutil.process_iter():
+            try:
+                # Check if process name contains the given name string.
+                if processName.lower() in proc.name().lower():
+                    return True
+            except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+                pass
+        return False
