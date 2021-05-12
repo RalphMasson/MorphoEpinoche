@@ -73,47 +73,65 @@ class Externes():
         import numpy as np
         import time
         from win32com.client import Dispatch
-        distances_all = []
-        listeCombinaisonsDistance,listeCombinaisonsAngle = Externes.allPointsAngles()
-        pt22 = ptsEchelle[0]
-        pt24 = ptsEchelle[1]
-        if(sex=='F'):sex=0
-        if(sex=='M'):sex=1
-        distances_all.append(sex)
-        echelle3mm_px = Externes.euclideDist(pt22,pt24)
-        for x in listeCombinaisonsDistance:
-            distpx = Externes.euclideDist(ptsFish[x[0]],ptsFish[x[1]])
-            distmm = round(3*distpx/echelle3mm_px,4)
-            distances_all.append(distmm)
-        for x in listeCombinaisonsAngle:
-            thetas = Externes.calculAngle(ptsFish[x[0]],ptsFish[x[1]],ptsFish[x[2]])
-            thetas = np.around(thetas[0],4)
-            distances_all.append(thetas)
+        from tkinter import messagebox
+        import tkinter as tk
 
-        # chemin = "C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho/"
 
-        try:
-            f = open(chemin+"/DistancesPourModele.csv", "a")
-        except:
-            excel = Dispatch("Excel.Application")
-            excel.Visible=False
-            workbook = excel.Workbooks.Open(chemin+"/DistancesPourModele.csv")
-            excel.DisplayAlerts = False
-            excel.ActiveWorkbook.Save()
-            excel.Quit()
-            time.sleep(0.5)
-        f = open(chemin+"/DistancesPourModele.csv", "a+")
+        if(len(ptsEchelle)==0 or len(ptsFish)==0):
+            tk.messagebox.showwarning(title="Attention",message="Importer une image")
 
-        header = ['Sexe (0:F, 1:M)']+listeCombinaisonsDistance+listeCombinaisonsAngle
-        header = "; ".join(str(i) for i in header)
-        distances_all = "; ".join(str(i) for i in distances_all)
-        f.seek(0)
-        if(Externes.nbClic==0 and f.read(1)!="S"):
-            f.write(str(header)+"\n")
-        f.read()
-        f.write(str(distances_all)+"\n")
-        f.close()
-        return distances_all
+        elif(sex==''):
+            tk.messagebox.showwarning(title="Attention",message="Renseigner un sexe avant de mettre à jour le modèle")
+
+
+        elif(sex=='F' or sex=='M'):
+            distances_all = []
+            listeCombinaisonsDistance,listeCombinaisonsAngle = Externes.allPointsAngles()
+            pt22 = ptsEchelle[0]
+            pt24 = ptsEchelle[1]
+            if(sex=='F'):sex=0
+            if(sex=='M'):sex=1
+
+            distances_all.append(sex)
+            echelle3mm_px = Externes.euclideDist(pt22,pt24)
+            for x in listeCombinaisonsDistance:
+                distpx = Externes.euclideDist(ptsFish[x[0]],ptsFish[x[1]])
+                distmm = round(3*distpx/echelle3mm_px,4)
+                distances_all.append(distmm)
+            for x in listeCombinaisonsAngle:
+                thetas = Externes.calculAngle(ptsFish[x[0]],ptsFish[x[1]],ptsFish[x[2]])
+                thetas = np.around(thetas[0],4)
+                distances_all.append(thetas)
+
+            # chemin = "C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho/"
+
+            try:
+                f = open(chemin+"/DistancesPourModele.csv", "a")
+            except:
+                excel = Dispatch("Excel.Application")
+                excel.Visible=False
+                workbook = excel.Workbooks.Open(chemin+"/DistancesPourModele.csv")
+                excel.DisplayAlerts = False
+                excel.ActiveWorkbook.Save()
+                excel.Quit()
+                time.sleep(0.5)
+            f = open(chemin+"/DistancesPourModele.csv", "a+")
+
+            header = ['Sexe (0:F, 1:M)']+listeCombinaisonsDistance+listeCombinaisonsAngle
+            header = "; ".join(str(i) for i in header)
+            distances_all = "; ".join(str(i) for i in distances_all)
+            f.seek(0)
+            if(Externes.nbClic==0 and f.read(1)!="S"):
+                f.write(str(header)+"\n")
+            f.read()
+            f.write(str(distances_all)+"\n")
+            f.close()
+
+        else:
+            tk.messagebox.showwarning(title="Attention",message="Le sexe doit être F ou M")
+
+
+        # return distances_all
 
     def calculDistances(ptsEchelle,ptsFish):
         echelle3mm = Externes.euclideDist(ptsEchelle[0],ptsEchelle[1])

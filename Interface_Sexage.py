@@ -5,9 +5,27 @@ pypath = pypath.split('\\')
 pypath = '/'.join(pypath[:-1])
 sys.path.insert(0,pypath)
 
+# Documentation
+
+"""generate diagramm class : script.ps1"""
+"""use ml-morph : ..."""
+"""articles :
+* file:///C:/Users/MASSON/Downloads/Admixture_mapping_of_male_nuptial_color_and_body_s.pdf
+* https://condor.depaul.edu/~waguirre/Aguirre_et_al_08_RS.pdf
+* https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3183875/
+* file:///C:/Users/MASSON/Downloads/KitanoetalCopeia.pdf
+* https://jeb.biologists.org/content/216/5/835
+* file:///C:/Users/MASSON/Downloads/Environ.Biol.Fish.2005.pdf
+* file:///C:/Users/MASSON/Downloads/_journals_njz_28_3-4_article-p524_5-preview.pdf
+* https://www.researchgate.net/figure/Morphological-characters-measured-from-the-left-side-of-each-fish-1-fork-length-2-jaw_fig2_233726301
+* https://www.researchgate.net/figure/Morphometric-analysis-of-body-shape-and-its-association-with-colour-a-The-20-numbered_fig3_225288970
+* https://journals.plos.org/plosone/article/figure?id=10.1371/journal.pone.0021060.g001
+* https://docs.google.com/presentation/d/1HZcpJerbqx9Z-llRNlb6E30YXBvOnMuJ/edit#slide=id.p12
+"""
 
 # Import des bibliothèques (s'assurer qu'elles soient installées)
 import tkinter as tk
+from tkinter import messagebox
 from PIL import Image, ImageTk
 import math,functools,itertools,os,cv2
 import Placement,Fonctions,Classification
@@ -148,7 +166,9 @@ class HeadClass():
         HeadClass.update_points(canvas)
 
     def genererAllDistancesHead():
-        HeadClass.distances_all = Fonctions.Externes.genererAllDistancesHead(HeadClass.pointsEchelle,HeadClass.pointsFish,Interface.sexModele.get(),pypath)
+        # HeadClass.distances_all = Fonctions.Externes.genererAllDistancesHead(HeadClass.pointsEchelle,HeadClass.pointsFish,Interface.sexModele.get(),pypath)
+        Fonctions.Externes.genererAllDistancesHead(HeadClass.pointsEchelle,HeadClass.pointsFish,Interface.sexModele.get(),pypath)
+
         Fonctions.Externes.nbClic +=1
 
     def calculDistances():
@@ -325,26 +345,45 @@ class Interface(tk.Tk):
         self.title("Sex Determination for Three Spined Stickleback")
         menubar = tk.Menu(self)
         menuFichier = tk.Menu(menubar,tearoff=0)
-        # menuFichier.add_command(label="Créer", command=None)
-        menuFichier.add_command(label="Importer", command=None)
-        # menuFichier.add_command(label="Editer", command=None)
+        menuFichier.add_command(label="Importer", command=self.importImage,accelerator="(Ctrl+O)")
+        self.bind_all("<Control-o>",lambda e : self.importImage())
         menuFichier.add_separator()
-        menuFichier.add_command(label="Quitter", command=self.destroy)
+        menuFichier.add_command(label="Quitter", command=self.destroy,accelerator="(Ctrl+Q)")
+        self.bind_all("<Control-q>",lambda e : self.destroy())
         menubar.add_cascade(label="Fichier", menu=menuFichier)
+
+        menuOutils = tk.Menu(menubar,tearoff=0)
+        menuOutils.add_command(label="Prédire le sexe",command=Interface.affichePrediction,accelerator="(Ctrl+P)")
+        self.bind_all("<Control-p>",lambda e : Interface.affichePrediction())
+        menuOutils.add_command(label="Image suivante",command=self.nextImage,accelerator="(Ctrl+Entrée)")
+        self.bind_all("<Control-Return>",lambda e : self.nextImage())
+        menuOutils.add_command(label="Image précédente",command=self.previousImage,accelerator="(Ctrl+Backspace)")
+        self.bind_all("<Control-BackSpace>",lambda e : self.previousImage())
+        menuOutils.add_separator()
+        menuOutils.add_command(label="Ouvrir base de données",command=self.openDataBase,accelerator="(Ctrl+H)")
+        self.bind_all("<Control-h>",lambda e : self.openDataBase())
+        menubar.add_cascade(label="Outils",menu=menuOutils)
+
+
         menuAide = tk.Menu(menubar, tearoff=0)
-        menuAide.add_command(label="A propos", command=None)
+        menuAide.add_command(label="A propos", command=self.help,accelerator="(Ctrl+I)")
+        self.bind_all("<Control-i>",lambda e : self.help())
         menubar.add_cascade(label="Aide", menu=menuAide)
+
+
         self.config(menu=menubar)
         self.listeImages = []
         CV2_image_big = None
         ''' Label Intro de presentation'''
         tk.Label(self,text=" ",font=("Purisa",12,"bold")).grid(ipadx=2)
-        tk.Label(self,text=" \t Sexing procedure of three-spined stickleback \n",font=("Andalus",16,"bold")).place(x=750,y=40,anchor=tk.CENTER)
+        tk.Label(self,text=" Sexing procedure of three-spined stickleback \n",font=("Andalus",16,"bold")).place(x=750,y=40,anchor=tk.CENTER)
         tk.Label(self,text="\n \n \n \n ").grid(column=0,row=1)
 
         ''' Boutons '''
         tk.Label(self, text = 'PREDICTION',font=("Purisa",12,"bold"),fg='purple').place(x=460,y=70)
-        tk.Button(self,text = "Import image and autoplace",command = self.importImage,fg='purple').place(x=400,y=100)
+        self.boutonImport = tk.Button(self,text = "Import image and autoplace",command = self.importImage,fg='purple')
+        self.boutonImport.place(x=400,y=100)
+        self.boutonImport.bind('<Control-o>',self.importImage)
         tk.Button(self,text = "Predict",command = Interface.affichePrediction,fg='purple').place(x=570,y=100)
         tk.Label(self, text = 'ADD THESE VALUES TO MODEL',font=("Purisa",12,"bold"),fg='green').place(x=760,y=70)
         tk.Button(self,text = "Model Update (close Excel before)",command = HeadClass.genererAllDistancesHead,fg='green').place(x=850,y=100)
@@ -444,7 +483,7 @@ class Interface(tk.Tk):
         self.listeImages = []
         self.numImageActuelle = 0
 
-    def importImage(self):
+    def importImage(self,event=' '):
         self.choice = 0
         self.resetListeImages()
         self.listeImages = Fonctions.Externes.openfn()
@@ -574,28 +613,31 @@ class Interface(tk.Tk):
             nbPointNonDetectes = 0
             self.calculPoints()
 
+    def openDataBase(self):
+
+        commande = "start EXCEL.EXE "
+        commande += pypath+"/DistancesPourModele.csv"
+        if(os.path.exists(pypath+"/DistancesPourModele.csv")):
+            try:
+                os.system(commande)
+            except:
+                tk.messagebox.showwarning(title="Attention", message="La base de données n'a pas été trouvée")
+        else:
+            message = "La base de données n'a pas été trouvée"
+            message += "\n\n1) Vérifier qu'elle est située ici : "
+            message += "\n"+pypath+"/DistancesPourModele.csv"
+            message += "\n\n2) Commencer par créer une base de données"
+            tk.messagebox.showwarning(title="Attention", message=message)
+
+    def help(self):
+        message = "PROCEDURE DE SEXAGE DE L'EPINOCHE v1.2"
+        message += "\n\n- Modèle de placement de points par traitement d'image et par Machine Learning (learning : 150 individus)"
+        message += "\n\n- Modèle de classification Male/Femelle par Machine Learning (learning : 300 individus)"
+        message += "\n\n\n Interface développée par R. Masson pour l'INERIS"
+        tk.messagebox.showinfo(title="Informations",message=message)
 
 app = Interface()
 app.mainloop()
 
 
-''' Documentation
-
-generate diagramm class
-
-in powershell : Pyreverse -o dot Interface_Sexage.py
-in pyzo : render('dot','png','C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\classes.dot')
-
-file:///C:/Users/MASSON/Downloads/Admixture_mapping_of_male_nuptial_color_and_body_s.pdf
-https://condor.depaul.edu/~waguirre/Aguirre_et_al_08_RS.pdf
-https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3183875/
-file:///C:/Users/MASSON/Downloads/KitanoetalCopeia.pdf
-https://jeb.biologists.org/content/216/5/835
-file:///C:/Users/MASSON/Downloads/Environ.Biol.Fish.2005.pdf
-file:///C:/Users/MASSON/Downloads/_journals_njz_28_3-4_article-p524_5-preview.pdf
-https://www.researchgate.net/figure/Morphological-characters-measured-from-the-left-side-of-each-fish-1-fork-length-2-jaw_fig2_233726301
-https://www.researchgate.net/figure/Morphometric-analysis-of-body-shape-and-its-association-with-colour-a-The-20-numbered_fig3_225288970
-https://journals.plos.org/plosone/article/figure?id=10.1371/journal.pone.0021060.g001
-https://docs.google.com/presentation/d/1HZcpJerbqx9Z-llRNlb6E30YXBvOnMuJ/edit#slide=id.p12
-'''
 
