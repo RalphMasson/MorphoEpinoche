@@ -3,13 +3,13 @@ import cv2
 import numpy as np
 import math
 
-img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\images_all\\gimp_cut\\male\\IMGP1086M.JPG"
+# img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\images_all\\gimp_cut\\male\\IMGP1086M.JPG"
 # img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/1-1.JPG'
 # img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/2.JPG'
 # img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/3-3.JPG'
 
-img = cv2.imread(img_path)
-img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
+# img = cv2.imread(img_path)
+# img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
 
 import sys,inspect
 sys.path.insert(0,'/'.join(inspect.stack()[0][1].split('\\')[:-1]))
