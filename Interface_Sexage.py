@@ -595,7 +595,6 @@ class Interface(tk.Tk):
         print("### OK ###")
         app.labelInfoPoints.config(text=str(13-nbPointNonDetectes)+" points détectés / 13 ")
 
-
     def affichePrediction():
         choix,couleur,p = Classification.Prediction.predict()
         app.labelSex.config(text="")
@@ -614,18 +613,49 @@ class Interface(tk.Tk):
             self.calculPoints()
 
     def openDataBase(self):
+        pypath = inspect.getfile(lambda: None)
+        pypath = '/'.join(pypath.split('\\')[:-1])
 
-        commande = "start EXCEL.EXE "
-        commande += pypath+"/DistancesPourModele.csv"
         if(os.path.exists(pypath+"/DistancesPourModele.csv")):
+
+            commande = "start EXCEL.EXE "
+            commande += pypath+"/DistancesPourModele.csv"
             try:
                 os.system(commande)
             except:
-                tk.messagebox.showwarning(title="Attention", message="La base de données n'a pas été trouvée")
+                commande = "start scalc.EXE "
+                commande += pypath+"/DistancesPourModele.csv"
+                try:
+                    os.system(commande)
+                except:
+                    commande = "start notepad.EXE "
+                    commande += pypath+"/DistancesPourModele.csv"
+                    os.system(commande)
+
+        elif(os.path.exists(os.getcwd()+"\DistancesPourModele.csv")):
+            commande = "start EXCEL.EXE "
+            commande += os.getcwd()+"\DistancesPourModele.csv"
+            try:
+                os.system(commande)
+            except:
+                commande = "start scalc.EXE "
+                commande += os.getcwd()+"\DistancesPourModele.csv"
+                try:
+                    os.system(commande)
+                except:
+                    commande = "start notepad.EXE "
+                    commande += os.getcwd()+"\DistancesPourModele.csv"
+                    os.system(commande)
+
+
         else:
             message = "La base de données n'a pas été trouvée"
             message += "\n\n1) Vérifier qu'elle est située ici : "
             message += "\n"+pypath+"/DistancesPourModele.csv"
+            test = os.getcwd()
+            test2 = inspect.getfile(lambda: None)
+            message += "\n"+test
+            message += "\n"+'/'.join(test2.split('\\')[:-1])+"/DistancesPourModele.csv"
             message += "\n\n2) Commencer par créer une base de données"
             tk.messagebox.showwarning(title="Attention", message=message)
 
@@ -637,7 +667,7 @@ class Interface(tk.Tk):
         tk.messagebox.showinfo(title="Informations",message=message)
 
 app = Interface()
+# app.iconphoto(False,tk.PhotoImage(file=Interface.resource_path("icon.png")))
 app.mainloop()
-
 
 

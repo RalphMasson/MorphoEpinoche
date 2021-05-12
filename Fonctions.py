@@ -71,7 +71,7 @@ class Externes():
 
     def genererAllDistancesHead(ptsEchelle,ptsFish,sex,chemin):
         import numpy as np
-        import time
+        import time,os
         from win32com.client import Dispatch
         from tkinter import messagebox
         import tkinter as tk
@@ -106,8 +106,8 @@ class Externes():
             # chemin = "C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho/"
 
             try:
-                f = open(chemin+"/DistancesPourModele.csv", "a")
-            except:
+                f = open(chemin+"/DistancesPourModele.csv", "a+")
+            except PermissionError:
                 excel = Dispatch("Excel.Application")
                 excel.Visible=False
                 workbook = excel.Workbooks.Open(chemin+"/DistancesPourModele.csv")
@@ -115,13 +115,18 @@ class Externes():
                 excel.ActiveWorkbook.Save()
                 excel.Quit()
                 time.sleep(0.5)
-            f = open(chemin+"/DistancesPourModele.csv", "a+")
+            except:
+                try:
+                    f = open(os.getcwd()+"\DistancesPourModele.csv","a+")
+                except PermissionError:
+                    tk.messagebox.showwarning(title="Attention",message="Fermer le logiciel")
+            # f = open(chemin+"/DistancesPourModele.csv", "a+")
 
             header = ['Sexe (0:F, 1:M)']+listeCombinaisonsDistance+listeCombinaisonsAngle
             header = "; ".join(str(i) for i in header)
             distances_all = "; ".join(str(i) for i in distances_all)
             f.seek(0)
-            if(Externes.nbClic==0 and f.read(1)!="S"):
+            if(f.read(1)!="S"):
                 f.write(str(header)+"\n")
             f.read()
             f.write(str(distances_all)+"\n")
