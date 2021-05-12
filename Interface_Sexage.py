@@ -657,6 +657,8 @@ class Interface(tk.Tk):
             message += "\n"+test
             message += "\n"+'/'.join(test2.split('\\')[:-1])+"/DistancesPourModele.csv"
             message += "\n\n2) Commencer par créer une base de données"
+            # message += "\n"+str(len(test))
+            # message += "\n"+str(len('/'.join(test2.split('\\')[:-1])))
             tk.messagebox.showwarning(title="Attention", message=message)
 
     def help(self):

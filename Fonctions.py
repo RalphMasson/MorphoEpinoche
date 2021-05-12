@@ -104,22 +104,29 @@ class Externes():
                 distances_all.append(thetas)
 
             # chemin = "C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho/"
-
-            try:
-                f = open(chemin+"/DistancesPourModele.csv", "a+")
-            except PermissionError:
-                excel = Dispatch("Excel.Application")
-                excel.Visible=False
-                workbook = excel.Workbooks.Open(chemin+"/DistancesPourModele.csv")
-                excel.DisplayAlerts = False
-                excel.ActiveWorkbook.Save()
-                excel.Quit()
-                time.sleep(0.5)
-            except:
+            chemin2 = os.getcwd()
+            if(len(chemin)>len(chemin2)):
                 try:
-                    f = open(os.getcwd()+"\DistancesPourModele.csv","a+")
+                    f = open(chemin+"/DistancesPourModele.csv", "a+")
                 except PermissionError:
-                    tk.messagebox.showwarning(title="Attention",message="Fermer le logiciel")
+                    excel = Dispatch("Excel.Application")
+                    excel.Visible=False
+                    workbook = excel.Workbooks.Open(chemin+"/DistancesPourModele.csv")
+                    excel.DisplayAlerts = False
+                    excel.ActiveWorkbook.Save()
+                    excel.Quit()
+                    time.sleep(0.7)
+            if(len(chemin2)>len(chemin)):
+                try:
+                    f = open(chemin2+"\DistancesPourModele.csv","a+")
+                except PermissionError:
+                    excel = Dispatch("Excel.Application")
+                    excel.Visible=False
+                    workbook = excel.Workbooks.Open(chemin2+"/DistancesPourModele.csv")
+                    excel.DisplayAlerts = False
+                    excel.ActiveWorkbook.Save()
+                    excel.Quit()
+                    time.sleep(0.8)
             # f = open(chemin+"/DistancesPourModele.csv", "a+")
 
             header = ['Sexe (0:F, 1:M)']+listeCombinaisonsDistance+listeCombinaisonsAngle
