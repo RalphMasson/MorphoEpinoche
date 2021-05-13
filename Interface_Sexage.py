@@ -618,38 +618,20 @@ class Interface(tk.Tk):
         pypath = '/'.join(pypath.split('\\')[:-1])
         import subprocess
         if(os.path.exists(pypath+"/DistancesPourModele.csv")):
-
-            commande = "start EXCEL.EXE "
-            commande += pypath+"/DistancesPourModele.csv"
             try:
-                # os.system(commande)
                 subprocess.Popen([pypath+"/DistancesPourModele.csv"])
             except:
-                commande = "start scalc.EXE "
+                commande = "start notepad.EXE "
                 commande += pypath+"/DistancesPourModele.csv"
-                try:
-                    os.system(commande)
-                except:
-                    commande = "start notepad.EXE "
-                    commande += pypath+"/DistancesPourModele.csv"
-                    os.system(commande)
+                os.system(commande)
 
         elif(os.path.exists(os.getcwd()+"\DistancesPourModele.csv")):
-            commande = "start EXCEL.EXE "
-            commande += os.getcwd()+"\DistancesPourModele.csv"
             try:
-                # os.system(commande)
                 subprocess.Popen([os.getcwd()+"\DistancesPourModele.csv"])
-
             except:
-                commande = "start scalc.EXE "
+                commande = "start notepad.EXE "
                 commande += os.getcwd()+"\DistancesPourModele.csv"
-                try:
-                    os.system(commande)
-                except:
-                    commande = "start notepad.EXE "
-                    commande += os.getcwd()+"\DistancesPourModele.csv"
-                    os.system(commande)
+                os.system(commande)
 
 
         else:
