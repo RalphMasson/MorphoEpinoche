@@ -5,7 +5,7 @@ block_cipher = None
 added_files = [('C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\images\\logo2.png', '.'),('C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\images\\schema.png', '.')]
 
 a = Analysis(['Interface_Sexage.py'],
-             pathex=['C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\Interface_Sexage.py'],
+             pathex=['C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\code\\Interface_Sexage.py'],
              binaries=[],
              datas=added_files,
              hiddenimports=[],
@@ -26,7 +26,7 @@ exe = EXE(pyz,
           a.zipfiles,
           a.datas,
           [],
-          name='Morphométrie Ineris',
+          name='Morphométrie_Ineris',
           debug=False,
           bootloader_ignore_signals=False,
           strip=False,
