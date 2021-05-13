@@ -27,7 +27,7 @@ sys.path.insert(0,pypath)
 import tkinter as tk
 from tkinter import messagebox
 from PIL import Image, ImageTk
-import math,functools,itertools,os,cv2
+import math,functools,itertools,os,cv2,webbrowser
 import Placement,Fonctions,Classification
 import numpy as np
 
@@ -368,6 +368,7 @@ class Interface(tk.Tk):
         menuAide = tk.Menu(menubar, tearoff=0)
         menuAide.add_command(label="A propos", command=self.help,accelerator="(Ctrl+I)")
         self.bind_all("<Control-i>",lambda e : self.help())
+        menuAide.add_command(label="Télécharger la dernière version",command=Interface.updateVersion)
         menubar.add_cascade(label="Aide", menu=menuAide)
 
 
@@ -483,6 +484,10 @@ class Interface(tk.Tk):
     def resetListeImages(self):
         self.listeImages = []
         self.numImageActuelle = 0
+
+    def updateVersion():
+        webbrowser.open('https://github.com/RalphMasson/MorphoEpinoche/releases/')
+
 
     def importImage(self,event=' '):
         self.choice = 0
