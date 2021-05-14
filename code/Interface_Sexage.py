@@ -4,8 +4,9 @@
 import sys,inspect
 pypath = inspect.stack()[0][1]
 pypath = pypath.split('\\')
-pypath = '/'.join(pypath[:-1])
-sys.path.insert(0,pypath)
+pypath1 = '/'.join(pypath[:-1])
+pypath2 = '/'.join(pypath[:-2])
+sys.path.insert(0,pypath1)
 
 # Documentation
 
@@ -552,7 +553,7 @@ class Interface(tk.Tk):
             base_path = sys._MEIPASS
             print(base_path)
         except Exception:
-            base_path = pypath+"/images/"
+            base_path = pypath2+"/images/"
 
         return os.path.join(base_path, relative_path)
 
