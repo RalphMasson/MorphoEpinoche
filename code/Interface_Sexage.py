@@ -1,3 +1,5 @@
+''' Module pour l'interface GUI '''
+
 # Pour assurer le bon fonctionnement
 import sys,inspect
 pypath = inspect.stack()[0][1]
@@ -22,6 +24,7 @@ sys.path.insert(0,pypath)
 * https://journals.plos.org/plosone/article/figure?id=10.1371/journal.pone.0021060.g001
 * https://docs.google.com/presentation/d/1HZcpJerbqx9Z-llRNlb6E30YXBvOnMuJ/edit#slide=id.p12
 """
+
 
 # Import des bibliothèques (s'assurer qu'elles soient installées)
 import tkinter as tk

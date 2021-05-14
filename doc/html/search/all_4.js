@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['headclass_5',['HeadClass',['../class_interface___sexage_1_1_head_class.html',1,'Interface_Sexage']]],
-  ['headfish_6',['HeadFish',['../class_interface___sexage_1_1_head_fish.html',1,'Interface_Sexage']]]
+  ['euclidedist_10',['euclideDist',['../class_fonctions_1_1_externes.html#a0cd3e2302dd679cd8130d49cdc45cf42',1,'Fonctions::Externes']]],
+  ['externes_11',['Externes',['../class_fonctions_1_1_externes.html',1,'Fonctions']]]
 ];
