@@ -35,4 +35,7 @@ def supprimer_pycache():
     for x in all_folders:
         if("__pycache__" in x):
             shutil.rmtree(x)
-    os.rmdir(chemin+"dist\\")
+    try:
+        os.rmdir(chemin+"dist\\")
+    except:
+        None

@@ -4,11 +4,24 @@ class Externes():
     nbClic = 0
 
     def euclideDist(a,b):
+        """!
+        Methode pour calculer la distance euclidienne entre deux points
+        @param a tuple : coordonnees du point a : [x1,y1]
+        @param b tuple : coordonnees du point b : [x2,y2]
+        @return norme float : distance entre a et b
+        """
         import numpy as np
         norme = np.sqrt((b[0]-a[0])**2+(b[1]-a[1])**2)
         return norme
 
     def calculAngle(pt1,pt2,pt3):
+        """!
+        Methode pour calculer les 3 angles du triangle crée par 3 points
+        @param pt1 tuple : coordonnees du point1 : [x1,y1]
+        @param pt2 tuple : coordonnees du point2 : [x2,y2]
+        @param pt3 tuple : coordonnees du point3 : [x3,y3]
+        @return listeAngle list of float : liste des 3 angles
+        """
         from math import acos,pi
         b = Externes.euclideDist(pt1,pt2)
         a = Externes.euclideDist(pt2,pt3)

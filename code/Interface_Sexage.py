@@ -80,6 +80,7 @@ class HeadClass():
     def update_points(canvas):
         """!
         Methode de mise à jour de la position des points
+        @param canvas tk.Canvas : cadre de l'image
         """
         for id in HeadClass.id_polygons:
             liste = canvas.coords(id)
@@ -88,7 +89,7 @@ class HeadClass():
 
     def on_press_tag(self, event, number, tag):
         """!
-        Methode pour determiner l'item selectionné
+        Methode pour determiner l'item relaché
         @param event event : coordonnees de l'item
         @param number int : numero de l'id
         @param tag int : numero de l'id
@@ -99,11 +100,22 @@ class HeadClass():
         print(self.selected,event,tag)
 
     def on_release_tag(self, event, number, tag,canvas):
+        """!
+        Methode pour determiner l'item selectionné
+        @param event event : coordonnees de l'item
+        @param number int : numero de l'id
+        @param tag int : numero de l'id
+        """
         self.selected = self.previous_x = self.previous_y = None
         HeadClass.update_points(canvas)
 
     def on_move_node(self, event, number,canvas):
-        '''move single node in polygon'''
+        """!
+        Methode pour deplacer un noeud du graphe
+        @param event event : coordonnees de l'item
+        @param number int : numero de l'id
+        @param tag int : numero de l'id
+        """
         if self.selected:
             dx = event.x - self.previous_x
             dy = event.y - self.previous_y
@@ -147,7 +159,12 @@ class HeadClass():
         HeadClass.update_points(canvas)
         Interface.afficheLongueur()
     def on_move_polygon(self, event,canvas):
-        '''move polygon and red rectangles in nodes'''
+        """!
+        Methode pour deplacer le polygone entier
+        @param event event : coordonnees de l'item
+        @param number int : numero de l'id
+        @param tag int : numero de l'id
+        """
         if self.selected:
             dx = event.x - self.previous_x
             dy = event.y - self.previous_y
@@ -166,12 +183,19 @@ class HeadClass():
         HeadClass.update_points(canvas)
 
     def genererAllDistancesHead():
+        """!
+        Methode pour calculer toutes les distances de la tete
+
+        """
         # HeadClass.distances_all = Fonctions.Externes.genererAllDistancesHead(HeadClass.pointsEchelle,HeadClass.pointsFish,Interface.sexModele.get(),pypath)
         Fonctions.Externes.genererAllDistancesHead(HeadClass.pointsEchelle,HeadClass.pointsFish,Interface.sexModele.get(),pypath)
 
         Fonctions.Externes.nbClic +=1
 
     def calculDistances():
+        """!
+        Methode pour calculer certaines distances caractéristiques
+        """
         HeadClass.distances_check = Fonctions.Externes.calculDistances(HeadClass.pointsEchelle,HeadClass.pointsFish)
         return HeadClass.distances_check
 
@@ -188,7 +212,12 @@ class BodyClass():
     id_polygons = pointsFish = pointsEchelle = distances_all = distances_check = []
 
     def __init__(self, canvas1, points,color):
-
+        """!
+        Constructeur du polygone du corps
+        @param canvas tk.Canvas : cadre de l'image
+        @param points list : liste des points du polygone
+        @param color String : couleur du polygone
+        """
         self.previous_x = self.previous_y = self.selected = self.x = None
         self.points = points
 
@@ -218,6 +247,10 @@ class BodyClass():
             Interface.afficheLongueurBody()
 
     def update_points(canvas1):
+        """!
+        Methode de mise à jour de la position des points
+        @param canvas tk.Canvas : cadre de l'image
+        """
         for id in BodyClass.id_polygons:
             liste = canvas1.coords(id)
             if(len(canvas1.coords(id))==8):BodyClass.pointsFish=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
@@ -237,12 +270,23 @@ class BodyClass():
         Interface.afficheLongueurBody()
 
     def on_release_tag(self, event, number, tag,canvas1):
+        """!
+        Methode pour determiner l'item selectionné
+        @param event event : coordonnees de l'item
+        @param number int : numero de l'id
+        @param tag int : numero de l'id
+        """
         self.selected = self.previous_x = self.previous_y = None
         BodyClass.update_points(canvas1)
         Interface.afficheLongueurBody()
 
     def on_move_node(self, event, number,canvas1):
-        '''move single node in polygon'''
+        """!
+        Methode pour deplacer un noeud du graphe
+        @param event event : coordonnees de l'item
+        @param number int : numero de l'id
+        @param tag int : numero de l'id
+        """
         if self.selected:
             dx = event.x - self.previous_x
             dy = event.y - self.previous_y
@@ -260,7 +304,12 @@ class BodyClass():
         Interface.afficheLongueurBody()
 
     def on_move_polygon(self, event,canvas1):
-        '''move polygon and red rectangles in nodes'''
+        """!
+        Methode pour deplacer le polygone entier
+        @param event event : coordonnees de l'item
+        @param number int : numero de l'id
+        @param tag int : numero de l'id
+        """
         if self.selected:
             dx = event.x - self.previous_x
             dy = event.y - self.previous_y
@@ -281,6 +330,9 @@ class BodyClass():
         Interface.afficheLongueurBody()
 
     def calculDistances():
+        """!
+        Methode pour calculer certaines distances caractéristiques
+        """
         BodyClass.distances_check = Fonctions.Externes.calculDistances2(BodyClass.pointsEchelle,BodyClass.pointsFish)
         return BodyClass.distances_check
 
@@ -296,6 +348,13 @@ class HeadFish():
     centreOeil=None
     CV2_image_big = None
     def __init__(self, canvas,PIL_image,CV2_image,size):
+        """!
+        Constructeur de l'image de la tete
+        @param canvas tk.Canvas : cadre de l'image
+        @param PIL_image list : matrice de l'image format PIL
+        @param cv2_image list : matrice de l'image format cv2
+        @param size list : dimension souhaitée de l'image
+        """
         self.img = ImageTk.PhotoImage(PIL_image.resize(size, Image.ANTIALIAS))
         self.circle = Placement.Points.detect_eye(cv2.resize(CV2_image,size,Image.ANTIALIAS))
         HeadFish.centreOeil = [self.circle[0],self.circle[1]]
@@ -307,17 +366,40 @@ class HeadFish():
         app.bind("<Up>",self.moveUp)
         app.bind("<Down>",self.moveDown)
     def moveLeft(self,event):
+        """!
+        Méthode pour déplacer l'image à gauche
+        @param event : event
+        """
         canvas.move(HeadFish.poisson,-10,0)
     def moveRight(self,event):
+        """!
+        Méthode pour déplacer l'image à droite
+        @param event : event
+        """
         canvas.move(HeadFish.poisson,10,0)
     def moveUp(self,event):
+        """!
+        Méthode pour déplacer l'image en haut
+        @param event : event
+        """
         canvas.move(HeadFish.poisson,0,-10)
     def moveDown(self,event):
+        """!
+        Méthode pour déplacer l'image en bas
+        @param event : event
+        """
         canvas.move(HeadFish.poisson,0,10)
 
 class BodyFish():
     poisson = None
     def __init__(self, canvas1,PIL_image,size):
+        """!
+        Constructeur de l'image du corps
+        @param canvas tk.Canvas : cadre de l'image
+        @param PIL_image list : matrice de l'image format PIL
+        @param cv2_image list : matrice de l'image format cv2
+        @param size list : dimension souhaitée de l'image
+        """
         self.img = ImageTk.PhotoImage(PIL_image.resize(size, Image.ANTIALIAS))
         BodyFish.poisson = canvas1.create_image(0, 0, anchor=tk.NW, image=self.img)
         app.bind("<Key>",self.move)
@@ -325,6 +407,10 @@ class BodyFish():
         app.bind("<Key>",self.move)
         app.bind("<Key>",self.move)
     def move(self,event):
+        """!
+        Méthode pour déplacer l'image
+        @param event : touche pressée
+        """
         if event.char=='q':
             canvas1.move(BodyFish.poisson,-10,0)
         if event.char=='s':
@@ -337,6 +423,10 @@ class Interface(tk.Tk):
     sexModele = None
 
     def __init__(self):
+        """!
+        Constructeur de l'interface
+        """
+
         super().__init__()
 
         ''' Fenetre et menu'''
@@ -450,6 +540,11 @@ class Interface(tk.Tk):
         self.canvasSchema.create_image(0,0,anchor=tk.NW,image=self.imgSchema)
 
     def resource_path(relative_path):
+        """!
+        Méthode permettant d'avoir le chemin absolu temporaire (pour l'exe) ou normal
+        @param relative_path String : chemin du fichier dans le pc
+        @return resource_path : chemin temporaire
+        """
         try:
             base_path = sys._MEIPASS
             print(base_path)
@@ -459,12 +554,21 @@ class Interface(tk.Tk):
         return os.path.join(base_path, relative_path)
 
     def afficheLongueur():
+        """!
+        Méthode permettant de mettre à jour l'affichage des longueurs dans l'interface
+        """
         app.labelLongueur.config(text=Fonctions.Externes.Longueur(HeadClass.calculDistances()))
 
     def afficheLongueurBody():
+        """!
+        Méthode permettant de mettre à jour l'affichage des longueurs du corps dans l'interface
+        """
         app.labelLongueurBody.config(text=Fonctions.Externes.LongueurBody(BodyClass.calculDistances()))
 
     def clearAllCanvas(self):
+        """!
+        Méthode permettant de remettre à zero l'interface
+        """
         HeadClass.id_polygons=[]
         HeadClass.pointsFish=[]
         HeadClass.pointsEchelle=[]
@@ -482,14 +586,23 @@ class Interface(tk.Tk):
         self.labelNomImage.config(text="")
 
     def resetListeImages(self):
+        """!
+        Méthode permettant de remettre à zero les images chargées
+        """
         self.listeImages = []
         self.numImageActuelle = 0
 
     def updateVersion():
+        """!
+        Méthode permettant d'ouvrir le lien github du projet
+        """
         webbrowser.open('https://github.com/RalphMasson/MorphoEpinoche/releases/')
 
 
     def importImage(self,event=' '):
+        """!
+        Méthode permettant de charger 1 ou plusieurs images
+        """
         self.choice = 0
         self.resetListeImages()
         self.listeImages = Fonctions.Externes.openfn()
@@ -497,6 +610,9 @@ class Interface(tk.Tk):
 
 
     def calculPoints(self):
+        """!
+        Méthode permettant de calculer les points et de les disposer sur l'image
+        """
         nbPointNonDetectes = 0
         print("### Initialisation ###")
         tete,echelle10mm,echelle3mm = Placement.Points.randomPointsBis()
@@ -602,23 +718,35 @@ class Interface(tk.Tk):
         app.labelInfoPoints.config(text=str(13-nbPointNonDetectes)+" points détectés / 13 ")
 
     def affichePrediction():
+        """!
+        Méthode permettant d'afficher la prédiction du sexe
+        """
         choix,couleur,p = Classification.Prediction.predict()
         app.labelSex.config(text="")
         app.labelSex.config(text=choix+" avec p="+str(round(p,2)),font=("Purisa",16),fg=couleur)
 
     def nextImage(self):
+        """!
+        Méthode permettant de passer à l'image d'après
+        """
         if(self.numImageActuelle<len(self.listeImages)):
             self.numImageActuelle+=1
             nbPointNonDetectes = 0
             self.calculPoints()
 
     def previousImage(self):
+        """!
+        Méthode permettant de revenir a l'image précédente
+        """
         if(self.numImageActuelle>0):
             self.numImageActuelle-=1
             nbPointNonDetectes = 0
             self.calculPoints()
 
     def openDataBase(self):
+        """!
+        Méthode permettant d'ouvrir le fichier csv s'il existe
+        """
         pypath = inspect.getfile(lambda: None)
         pypath = '/'.join(pypath.split('\\')[:-1])
         import subprocess
@@ -653,6 +781,9 @@ class Interface(tk.Tk):
             tk.messagebox.showwarning(title="Attention", message=message)
 
     def help(self):
+        """!
+        Méthode permettant d'afficher des informations
+        """
         message = "PROCEDURE DE SEXAGE DE L'EPINOCHE v1.2"
         message += "\n\n- Modèle de placement de points par traitement d'image et par Machine Learning (learning : 150 individus)"
         message += "\n\n- Modèle de classification Male/Femelle par Machine Learning (learning : 300 individus)"
