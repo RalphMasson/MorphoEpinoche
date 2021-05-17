@@ -28,7 +28,10 @@ def deplacer_exe():
         os.replace(chemin3+file,chemin0+"executable\\"+file)
 
 def supprimer_dist():
-    os.rmdir(chemin2+"dist\\")
+    try:
+        os.rmdir(chemin2+"dist\\")
+    except:
+        None
 
 def supprimer_pycache():
     all_folders = [x[0] for x in list(os.walk(chemin0))]

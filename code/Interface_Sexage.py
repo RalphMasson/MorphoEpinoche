@@ -5,6 +5,7 @@ import sys,inspect
 pypath = inspect.stack()[0][1]
 pypath = pypath.split('\\')
 pypath1 = '/'.join(pypath[:-1])
+pypath3 = '/'.join(pypath[:-2])+"/executable"
 pypath2 = '/'.join(pypath[:-2])
 sys.path.insert(0,pypath1)
 
@@ -192,7 +193,7 @@ class HeadClass():
 
         """
         # HeadClass.distances_all = Fonctions.Externes.genererAllDistancesHead(HeadClass.pointsEchelle,HeadClass.pointsFish,Interface.sexModele.get(),pypath)
-        Fonctions.Externes.genererAllDistancesHead(HeadClass.pointsEchelle,HeadClass.pointsFish,Interface.sexModele.get(),pypath)
+        Fonctions.Externes.genererAllDistancesHead(HeadClass.pointsEchelle,HeadClass.pointsFish,Interface.sexModele.get(),pypath3)
 
         Fonctions.Externes.nbClic +=1
 
@@ -453,6 +454,7 @@ class Interface(tk.Tk):
         self.bind_all("<Control-Return>",lambda e : self.nextImage())
         menuOutils.add_command(label="Image précédente",command=self.previousImage,accelerator="(Ctrl+Backspace)")
         self.bind_all("<Control-BackSpace>",lambda e : self.previousImage())
+
         menuOutils.add_separator()
         menuOutils.add_command(label="Ouvrir base de données",command=self.openDataBase,accelerator="(Ctrl+H)")
         self.bind_all("<Control-h>",lambda e : self.openDataBase())
@@ -486,8 +488,10 @@ class Interface(tk.Tk):
         self.sexModel.place(x=810,y=105)
         tk.Button(self,text = "Model Update (close Excel before)",command = HeadClass.genererAllDistancesHead,fg='green').place(x=850,y=100)
         tk.Label(self,text='Sex for model: ',fg='green').place(x=725,y=105)
-        tk.Button(self,text='<--',command = self.previousImage).place(x=570,y=780)
-        tk.Button(self,text='-->',command = self.nextImage).place(x=610,y=780)
+        self.boutonPrevious = tk.Button(self,text='<--',command = self.previousImage)
+        self.boutonPrevious.place(x=570,y=780)
+        self.boutonNext = tk.Button(self,text='-->',command = self.nextImage)
+        self.boutonNext.place(x=610,y=780)
 
 
 
@@ -639,7 +643,7 @@ class Interface(tk.Tk):
 
         ''' Resize pour la tête '''
         print("\n### Traitement de la tête 1/3 ### ")
-        PIL_image_big,CV2_image_big,left1 = Placement.Points.ImageTete(self.listeImages,self.numImageActuelle)
+        PIL_image_big,CV2_image_big,left1,right1 = Placement.Points.ImageTete(self.listeImages,self.numImageActuelle)
         HeadFish(self.canvasTete,PIL_image_big,CV2_image_big,(3500,2625))
         self.canvasTete.update()
         print("### OK ###")
@@ -683,9 +687,10 @@ class Interface(tk.Tk):
         print("### OK ###")
 
         '''Initialisation du point 15 et 13 par détection auto '''
-        print("\n### Calcul des points 9 ###")
+        print("\n### Calcul des points 15 et 13 ###")
+        # pt15,pt13=Placement.Points.points15_13(CV2_image_big,pt19,left1,right1)
         try:
-            pt15,pt13=Placement_Points.points15_13(CV2_image_big)
+            pt15,pt13=Placement.Points.points15_13(CV2_image_big,pt19,left1,right1)
             pt15 = [pt15[0],pt15[1]]
             pt13 = [pt13[0],pt13[1]]
         except:
@@ -707,11 +712,12 @@ class Interface(tk.Tk):
             nbPointNonDetectes+=2
 
         """Initialisation des points 11 et 17 par détection auto """
-        try:
-            pt17,pt11 = Placement.Points.points11_17(CV2_image_big,pt13,pt15)
-        except:
-            print("Impossible de détecter les points 11 et 17")
-            nbPointNonDetectes+=2
+        pt17,pt11 = Placement.Points.points11_17(CV2_image_big,pt13,pt15)
+        # try:
+        #     pt17,pt11 = Placement.Points.points11_17(CV2_image_big,pt13,pt15)
+        # except:
+        #     print("Impossible de détecter les points 11 et 17")
+        #     nbPointNonDetectes+=2
 
         tete = Fonctions.Externes.centerPoints([pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19],HeadFish.centreOeil)
 
@@ -733,19 +739,43 @@ class Interface(tk.Tk):
         """!
         Méthode permettant de passer à l'image d'après
         """
+        import time
         if(self.numImageActuelle<len(self.listeImages)):
+            self.unbind_all("<Control-Return>")
+            self.unbind_all("<Control-BackSpace>")
             self.numImageActuelle+=1
             nbPointNonDetectes = 0
+            time.sleep(0.3)
+            self.boutonNext.configure(state=tk.DISABLED)
+            self.boutonPrevious.configure(state=tk.DISABLED)
             self.calculPoints()
+            time.sleep(0.3)
+            self.boutonNext.configure(state=tk.ACTIVE)
+            self.boutonPrevious.configure(state=tk.ACTIVE)
+            self.bind_all("<Control-Return>",lambda e : self.nextImage())
+            self.bind_all("<Control-BackSpace>",lambda e : self.previousImage())
+
 
     def previousImage(self):
         """!
         Méthode permettant de revenir a l'image précédente
         """
+        import time
         if(self.numImageActuelle>0):
+            self.unbind_all("<Control-Return>")
+            self.unbind_all("<Control-BackSpace>")
             self.numImageActuelle-=1
             nbPointNonDetectes = 0
+            time.sleep(0.3)
+            self.boutonPrevious.configure(state=tk.DISABLED)
+            self.boutonNext.configure(state=tk.DISABLED)
             self.calculPoints()
+            time.sleep(0.3)
+            self.boutonPrevious.configure(state=tk.ACTIVE)
+            self.boutonNext.configure(state=tk.ACTIVE)
+            self.bind_all("<Control-Return>",lambda e : self.nextImage())
+            self.bind_all("<Control-BackSpace>",lambda e : self.previousImage())
+
 
     def openDataBase(self):
         """!
@@ -754,27 +784,26 @@ class Interface(tk.Tk):
         pypath = inspect.getfile(lambda: None)
         pypath = '/'.join(pypath.split('\\')[:-1])
         import subprocess
-        if(os.path.exists(pypath+"/DistancesPourModele.csv")):
+        if(os.path.exists(pypath3+"/DistancesPourModele.csv")):
             try:
-                subprocess.Popen([pypath+"/DistancesPourModele.csv"])
+                subprocess.Popen(pypath3+"/DistancesPourModele.csv",shell=True)
             except:
                 commande = "start notepad.EXE "
-                commande += pypath+"/DistancesPourModele.csv"
+                commande += pypath3+"/DistancesPourModele.csv"
                 os.system(commande)
 
         elif(os.path.exists(os.getcwd()+"\DistancesPourModele.csv")):
             try:
-                subprocess.Popen([os.getcwd()+"\DistancesPourModele.csv"])
+                subprocess.Popen(os.getcwd()+"\DistancesPourModele.csv",shell=True)
             except:
                 commande = "start notepad.EXE "
                 commande += os.getcwd()+"\DistancesPourModele.csv"
                 os.system(commande)
 
-
         else:
             message = "La base de données n'a pas été trouvée"
             message += "\n\n1) Vérifier qu'elle est située ici : "
-            message += "\n"+pypath+"/DistancesPourModele.csv"
+            message += "\n"+pypath3+"/DistancesPourModele.csv"
             test = os.getcwd()
             test2 = inspect.getfile(lambda: None)
             message += "\n"+test

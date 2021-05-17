@@ -280,3 +280,45 @@ class Externes():
             except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
                 pass
         return False
+
+    def penteIntercept(a,b):
+        if(b[0]-a[0]==0):
+            pente =  (b[1]-a[1])/0.001
+        else:
+            pente = (b[1]-a[1])/(b[0]-a[0])
+        intercept = b[1]-pente*b[0]
+        return (pente,intercept)
+
+    def isContoursLineLike(c):
+        import numpy as np
+        #[[ [x1,y1]
+        top = tuple(c[c[:, :, 1].argmin()][0])
+        bottom = tuple(c[c[:, :, 1].argmax()][0])
+        pente,intercept = Externes.penteIntercept(top,bottom)
+
+        # plt.plot(top[0],top[1],'ro')
+        # plt.plot(bottom[0],bottom[1],'go')
+
+        listPointDroite = []
+        x = c.T[0][0]
+        y = c.T[1][0]
+
+        abscisse = x
+        ordonnee = np.round(pente*abscisse+intercept,1)
+
+        # print(abscisse)
+        # print(ordonnee)
+        # plt.figure()
+        # plt.plot(abscisse,ordonnee)
+        distanceTotale = 0
+        for i in range(len(ordonnee)):
+            distanceTotale += (y[i]-ordonnee[i])**2
+
+        # plt.plot(x,y)
+
+        # plt.show()
+
+
+
+
+        return pente,distanceTotale

@@ -1,12 +1,11 @@
 ''' Bibliothèque de fonctions de placement '''
 
-
 import cv2
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 import numpy as np
 import math
 
-# img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\images_all\\gimp_cut\\male\\IMGP1086M.JPG"
+# img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\images_all\\gimp_cut\\male\\IMGP1152M.JPG"
 # img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/1-1.JPG'
 # img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/2.JPG'
 # img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/3-3.JPG'
@@ -315,49 +314,119 @@ class Points():
     * return : pt15,pt13 (type tuple of tuple)
     '''
 
-    def points15_13(img):
+    def points15_13(img,pt19,left,right):
+
+        imgcopy = img.copy()
+
+        ''' Noir et blanc '''
+        img = cv2.cvtColor(img,cv2.COLOR_RGB2GRAY)
+        imax,jmax = img.shape
+
+
+        '''Rognage'''
+        img[:,:int(pt19[0])]=255
+        milieu = [(left[0]+right[0])/2,(left[1]+right[1])/2]
+        tiers = [(left[0]+right[0])/3,(left[1]+right[1])/3]
+        # img[:,int(milieu[0]):int(right[0])]=255
+        img[:,int(tiers[0]):int(right[0])]=255
+
+
+
         # img = cv2.medianBlur(img,7)
         img = cv2.GaussianBlur(img,(7,7),0)
         img = cv2.addWeighted(img, 2, img, 0, -2)
 
         # plt.figure()
-        # plt.imshow(img)
+        # plt.imshow(img,cmap="gray")
         img = cv2.threshold(img,40,255,cv2.THRESH_TOZERO)[1]
-
+        # print(img.shape)
         # img = cv2.GaussianBlur(img,(11,11),0)
 
         # plt.figure()
         # plt.imshow(img)
 
 
-        '''valeurs du filtre canny : 30,40'''
-        edges = cv2.Canny(img,10,30)
-        edgecopy = edges.copy()
+        '''valeurs du filtre canny : 30,40   10 30'''
+        edges = cv2.Canny(img,120,130)
+        edges = cv2.blur(edges,(1,1))
+        distances = []
+        contours,hierarchy = cv2.findContours(edges,cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+        i=0
+        pente = []
+        for x in contours:
+            # print(cv2.arcLength(x,True))
+            if(cv2.arcLength(x,True)>100 and cv2.arcLength(x,True)<800):
+                pente = abs(Fonctions.Externes.isContoursLineLike(x)[0])
+                if (pente > 5):
+                    try:
+                        print(len(x))
+                        # cv2.drawContours(imgcopy,x,-1,(255,0,0),2,lineType=-1)
+                        # print("contours")
+                        # print(c)
+                        c=x
+                        left = tuple(c[c[:, :, 0].argmin()][0])
+                        right = tuple(c[c[:, :, 0].argmax()][0])
+                        top = tuple(c[c[:, :, 1].argmin()][0])
+                        bottom = tuple(c[c[:, :, 1].argmax()][0])
+                        # print(Fonctions.Externes.euclideDist(top,bottom))
+                        # print(left)
+                        # print(right)
+                        # print(top)
+                        # print(bottom)
+                        # cv2.circle(imgcopy, left, 4, (0, 255, 0), -1)
+
+                        # cv2.circle(imgcopy, right, 4, (0, 0, 255), -1)
+                        # cv2.circle(imgcopy, top, 4, (255, 255, 0), -1)
+                        # cv2.circle(imgcopy, bottom, 4, (0, 255, 255), -1)
+                        # print(Fonctions.Externes.isContoursLineLike(c))
+                        # pente.append([Fonctions.Externes.isContoursLineLike(c)[0],i])
+                        print(abs(Fonctions.Externes.isContoursLineLike(c)[0]))
+                        distances.append([Fonctions.Externes.isContoursLineLike(c)[0],Fonctions.Externes.isContoursLineLike(c)[1],i])
+                    except:
+                        None
+            i+=1
+        distances.sort(key=lambda x:x[1])
+        print(distances)
+        print(pente)
+        print(np.argmin(distances))
+        # cv2.drawContours(imgcopy,[contours[distances[0][2]]],-1,(255,0,0),5,lineType=-1)
+        # edges = cv2.dilate(edges,(1,1),iterations=4)
+        # edges = cv2.fastNlMeansDenoising(edges,h=40,searchWindowSize =25)
+        # print(contours[0].T[0][0])
         # plt.figure()
-        # plt.imshow(edges,cmap="gray")
+        # plt.imshow(imgcopy)
+        contoursValide = contours[distances[0][2]]
+        top = tuple(contoursValide[contoursValide[:, :, 1].argmin()][0])
+        bottom = tuple(contoursValide[contoursValide[:, :, 1].argmax()][0])
+        pt15 = top
+        pt13 = bottom
+
         # img = cv2.cvtColor(img,cv2.COLOR_RGB2GRAY)
-        lines = cv2.HoughLinesP(edges, rho=1, theta=np.pi/180, threshold=15, minLineLength=35, maxLineGap=30)
-        # lines = cv2.HoughLinesP(grad, rho=1, theta=np.pi/180, threshold=40, minLineLength=100, maxLineGap=45)
-
-        pointsbronchie = []
-
-        for line in lines:
-            for x1, y1, x2, y2 in line:
-                slope = abs((y2-y1)/(x2-x1))
-                # print(slope)
-                if(slope > 3):
-                    # print(slope)
-                    # cv2.line(out, (x1, y1), (x2, y2), (255, 0, 0), 3)
-                    pointsbronchie.append(x1)
-                    pointsbronchie.append(x2)
-                    pointsbronchie.append(y1)
-                    pointsbronchie.append(y2)
+        # # lines = cv2.HoughLinesP(edges, rho=1, theta=np.pi/180, threshold=15, minLineLength=35, maxLineGap=30)
+        # # # lines = cv2.HoughLinesP(grad, rho=1, theta=np.pi/180, threshold=40, minLineLength=100, maxLineGap=45)
+        # #
+        # # pointsbronchie = []
+        # #
+        # # for line in lines:
+        # #     for x1, y1, x2, y2 in line:
+        # #         if (x2-x1)!=0:
+        # #             slope = abs((y2-y1)/(x2-x1))
+        # #             # print(slope)
+        # #             if(slope > 3):
+        # #                 # print(slope)
+        # #                 # cv2.line(out, (x1, y1), (x2, y2), (255, 0, 0), 3)
+        # #                 pointsbronchie.append(x1)
+        # #                 pointsbronchie.append(x2)
+        # #                 pointsbronchie.append(y1)
+        # #                 pointsbronchie.append(y2)
 
         # plt.figure()
         # plt.imshow(out)
         # plt.show()
-        pt15 = (x1,y1)
-        pt13 = (x2,y2)
+        # pt15 = (0,0)
+        # pt13 = (0,0)
+        print(pt15)
+        print(pt13)
         return pt15,pt13
 
 
@@ -390,8 +459,11 @@ class Points():
         ordonnees = approxBouche2.T[1]
 
         ''' distance to line'''
-        pente =(approxBouche2[0][1]-left[1])/(approxBouche2[0][0]-left[0])
-        intercept = approxBouche2[0][1]-pente*approxBouche2[0][0]
+
+        pente,intercept = Fonctions.Externes.penteIntercept(left,approxBouche2[0])
+
+        # pente =(approxBouche2[0][1]-left[1])/(approxBouche2[0][0]-left[0])
+        # intercept = approxBouche2[0][1]-pente*approxBouche2[0][0]
         xx = np.linspace(max(approxBouche2[0][0],left[0]),min(approxBouche2[0][0],left[0]),len(abscisses))
         yy = np.round(pente*xx+intercept)
 
@@ -604,10 +676,10 @@ class Points():
         [left1,right1,top,bottom] = Points.pointExtremeContours(c)
         CV2_image_big = Points.rotate_image(out,Points.angleRot(left1,right1)[0],Points.angleRot(left1,right1)[1])
         _,c = Points.contoursCorpsBig(CV2_image_big)
-        [left1,_,_,_] = Points.pointExtremeContours(c)
+        [left1,right1,_,_] = Points.pointExtremeContours(c)
         print("\n### Chargement de l'image de la tête' ###")
         PIL_image_big = Image.fromarray(CV2_image_big)
-        return PIL_image_big,CV2_image_big,left1
+        return PIL_image_big,CV2_image_big,left1,right1
 '''
 *
 * Main function
@@ -644,11 +716,11 @@ class Points():
 # # # pt9 = Points.point9(c,pt19)
 # # # #
 # # # # #ne fonctionne pas pour l'instant
-# # # # [pt15,pt13] =Points.points15_13(imagerot)
+# # # [pt15,pt13] =Points.points15_13(imagerot,pt19,left,right)
 # # # # pt13 = (1288, 1228)
 # # # # pt15 = (1308, 1098)
-# # # # cv2.circle(imagerot, pt15, 20, (255, 0, 0), -1)
-# # # # cv2.circle(imagerot, pt13, 20, (255, 0, 0), -1)
+# # # cv2.circle(imagerot, pt15, 8, (255, 255, 0), -1)
+# # # cv2.circle(imagerot, pt13, 8, (255, 255, 0), -1)
 # # # #
 # # # # pt5,pt7 = Points.points5_7(imagerot,pt9)
 # # # pt5,pt7= Points.points5_7(imagerot,pt9,left)
