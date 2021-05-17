@@ -712,12 +712,11 @@ class Interface(tk.Tk):
             nbPointNonDetectes+=2
 
         """Initialisation des points 11 et 17 par détection auto """
-        pt17,pt11 = Placement.Points.points11_17(CV2_image_big,pt13,pt15)
-        # try:
-        #     pt17,pt11 = Placement.Points.points11_17(CV2_image_big,pt13,pt15)
-        # except:
-        #     print("Impossible de détecter les points 11 et 17")
-        #     nbPointNonDetectes+=2
+        try:
+            pt17,pt11 = Placement.Points.points11_17(CV2_image_big,pt13,pt15)
+        except:
+            print("Impossible de détecter les points 11 et 17")
+            nbPointNonDetectes+=2
 
         tete = Fonctions.Externes.centerPoints([pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19],HeadFish.centreOeil)
 

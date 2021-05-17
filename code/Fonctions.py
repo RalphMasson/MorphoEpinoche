@@ -291,34 +291,50 @@ class Externes():
 
     def isContoursLineLike(c):
         import numpy as np
-        #[[ [x1,y1]
         top = tuple(c[c[:, :, 1].argmin()][0])
         bottom = tuple(c[c[:, :, 1].argmax()][0])
         pente,intercept = Externes.penteIntercept(top,bottom)
-
-        # plt.plot(top[0],top[1],'ro')
-        # plt.plot(bottom[0],bottom[1],'go')
-
-        listPointDroite = []
         x = c.T[0][0]
         y = c.T[1][0]
-
         abscisse = x
         ordonnee = np.round(pente*abscisse+intercept,1)
-
-        # print(abscisse)
-        # print(ordonnee)
-        # plt.figure()
-        # plt.plot(abscisse,ordonnee)
         distanceTotale = 0
         for i in range(len(ordonnee)):
             distanceTotale += (y[i]-ordonnee[i])**2
-
-        # plt.plot(x,y)
-
-        # plt.show()
-
-
-
-
         return pente,distanceTotale
+
+    def averagePixelValue(imgNB,c,windowSize):
+        import numpy as np
+        x = c.T[0][0]
+        y = c.T[1][0]
+        #window size = 3,5,7...
+        test=[]
+        for i in range(len(x)):
+            xi = x[i]
+            yi = y[i]
+            low = (windowSize-1)//2
+            up = (windowSize+1)//2
+            # test =[[[j,i] for i,j in range(yi-low,yi+up)] for j in range(xi-low,xi+up)]
+
+            for k in range(yi-low,yi+up):
+                for l in range(xi-low,xi+up):
+                    test.append([l,k])
+            # test = np.array(test)
+            # test = test.flatten()
+            # test = [list(set(test[i:i+2])) for i in range(0, len(test),2)]
+
+
+            # print(xi,yi)
+        # print(test)
+        pixel = []
+        for x in test:
+            # print(x)
+            abscisse = x[0]
+            ordonnee = x[1]
+            pixel.append(imgNB[ordonnee][abscisse])
+            # print(imgNB[ordonnee][abscisse])
+        # print("toto")
+        moy = np.mean(pixel)
+        return moy
+
+
