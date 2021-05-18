@@ -10,7 +10,10 @@ import math
 # img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/2.JPG'
 # img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/3-3.JPG'
 
-
+male_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\images_all\\gimp_cut\\male\\"
+import sys,os
+male_img = os.listdir(male_path)
+male_img = [male_path+x for x in male_img]
 ''' TESTE AVEC FEMALE 1220F.JPG '''
 
 # img = cv2.imread(img_path)
@@ -295,13 +298,15 @@ class Points():
 
         # plt.figure()
         # plt.imshow(imgcopy)
-        contoursValide = contours[distances[0][2]]
-        top = tuple(contoursValide[contoursValide[:, :, 1].argmin()][0])
-        bottom = tuple(contoursValide[contoursValide[:, :, 1].argmax()][0])
-        pt15 = top
-        pt13 = bottom
-        # pt15=(0,0)
-        # pt13=(0,0)
+        try:
+            contoursValide = contours[distances[0][2]]
+            top = tuple(contoursValide[contoursValide[:, :, 1].argmin()][0])
+            bottom = tuple(contoursValide[contoursValide[:, :, 1].argmax()][0])
+            pt15 = top
+            pt13 = bottom
+        except:
+            pt15=(0,0)
+            pt13=(0,0)
         print(pt15)
         print(pt13)
         return pt15,pt13
@@ -337,9 +342,6 @@ class Points():
         ''' distance to line'''
 
         pente,intercept = Fonctions.Externes.penteIntercept(left,approxBouche2[0])
-
-        # pente =(approxBouche2[0][1]-left[1])/(approxBouche2[0][0]-left[0])
-        # intercept = approxBouche2[0][1]-pente*approxBouche2[0][0]
         xx = np.linspace(max(approxBouche2[0][0],left[0]),min(approxBouche2[0][0],left[0]),len(abscisses))
         yy = np.round(pente*xx+intercept)
 
@@ -624,3 +626,74 @@ class Points():
 # # # # plt.title("Vérification du positionnement des points avant interface")
 # # # # plt.grid(True)
 # # # # plt.show()
+
+def test(path):
+    img = cv2.imread(path)
+    img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
+    out,c = Points.contoursCorps(img,'head')
+    [left,right,top,bottom] = Points.pointExtremeContours(c)
+    imagerot = Points.rotate_image(out,Points.angleRot(left,right)[0],Points.angleRot(left,right)[1])
+    # #
+    _,c = Points.contoursCorps(imagerot,'head')
+    [left,right,top,bottom] = Points.pointExtremeContours(c)
+    print("left")
+    print(left)
+    # #
+    print("toto")
+    print(imagerot.shape)
+    [pt3,pt19]=Points.points3_19(imagerot)
+    print("pt3")
+    print(pt3)
+    print("pt19")
+    print(pt19)
+    # circles = Points.points3_19(imagerot)
+    print("pt9")
+    pt9 = Points.point9(c,pt19)
+    #
+    # #ne fonctionne pas pour l'instant
+    [pt15,pt13] =Points.points15_13(imagerot,pt19,left,right)
+    # pt13 = (1288, 1228)
+    # pt15 = (1308, 1098)
+    cv2.circle(imagerot, pt15, 8, (255, 255, 0), -1)
+    cv2.circle(imagerot, pt13, 8, (255, 255, 0), -1)
+    #
+    # pt5,pt7 = Points.points5_7(imagerot,pt9)
+    pt5,pt7= Points.points5_7(imagerot,pt9,left)
+    #
+    # pt11,pt17 = Points.points11_17(imagerot,pt13,pt15)
+    # pt11 = (pt11[0],pt11[1])
+    # pt17 = (pt17[0],pt17[1])
+    cv2.circle(imagerot, left, 12, (0, 50, 255), -1)
+    cv2.circle(imagerot, right, 12, (0, 255, 255), -1)
+    # cv2.circle(imagerot, top, 12, (255, 50, 0), -1)
+    # cv2.circle(imagerot, bottom, 12, (255, 255, 0), -1)
+    cv2.circle(imagerot, pt3, 4, (255, 0, 0), -1)
+    cv2.circle(imagerot, pt19, 4, (255, 0, 0), -1)
+    cv2.circle(imagerot, pt9, 8, (255, 0, 0), -1)
+    cv2.circle(imagerot, pt5, 8, (0, 255, 0), -1)
+    cv2.circle(imagerot, pt7, 8, (0, 255, 0), -1)
+    # cv2.circle(imagerot, pt11, 8, (0, 255, 0), -1)
+    # cv2.circle(imagerot, pt17, 8, (0, 255, 0), -1)
+    # plt.figure()
+    # plt.imshow(imagerot)
+    # plt.title("Vérification du positionnement des points avant interface")
+    # plt.grid(True)
+    # plt.show()
+    return imagerot
+
+
+# test_male = [test(path) for path in male_img]
+#
+# import numpy as np
+# import matplotlib.pyplot as plt
+#
+# w=10
+# h=10
+# fig=plt.figure(figsize=(8, 8))
+# columns = 4
+# rows = 3
+# for i in range(1, columns*rows +1):
+#     img = test_male[i-1]
+#     fig.add_subplot(rows, columns, i)
+#     plt.imshow(img)
+# plt.show()
