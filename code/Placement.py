@@ -21,32 +21,22 @@ sys.path.insert(0,'/'.join(inspect.stack()[0][1].split('\\')[:-1]))
 import Fonctions
 
 class Points():
-    '''
-    * Méthode pour obtenir le contours du poisson
-    * input : image img (type numpy.array) de taille 4000x3000 (ou même ratio) --> 1300x975
-    * return : contours c (type numpy.array)
-    '''
-    def contoursCorps(img):
-        diamond = cv2.getStructuringElement(cv2.MORPH_RECT,(5,5))
-        diamond[0, 0] = 0
-        diamond[0, 1] = 0
-        diamond[1, 0] = 0
-        diamond[4, 4] = 0
-        diamond[4, 3] = 0
-        diamond[3, 4] = 0
-        diamond[4, 0] = 0
-        diamond[4, 1] = 0
-        diamond[3, 0] = 0
-        diamond[0, 3] = 0
-        diamond[0, 4] = 0
-        diamond[1, 4] = 0
-        #avant 1500 1125
-        #apres 1300 975
-        img = cv2.resize(img,(1300,975))
+
+    def contoursCorps(img,param):
+        """!
+        Méthode pour obtenir le contours du poisson
+        @param image img (type numpy.array) de taille 4000x3000 (ou même ratio) --> 1300x975
+        @param size : 'head' 'body' (1300,975) or (3500,2625)
+        @return contours c (type numpy.array)
+        """
+        if param=='head':size=(3500,2625)
+        if param=='body':size=(1300,975)
+        diamond = Fonctions.Externes.diamondCV2()
+        img = cv2.resize(img,size)
         dst = cv2.addWeighted(img, 2, img, 0, 2)
         # plt.figure()
         # plt.imshow(dst)
-        dst = cv2.resize(dst,(1300,975))
+        dst = cv2.resize(dst,size)
         dst = cv2.cvtColor(dst,cv2.COLOR_RGB2GRAY)
         closing = cv2.morphologyEx(dst, cv2.MORPH_CLOSE, diamond,iterations=1)
         dilated = cv2.dilate(closing,diamond,iterations=1)
@@ -93,81 +83,12 @@ class Points():
         c=max(contours3, key=cv2.contourArea)
         return out,c
 
-
-    def contoursCorpsBig(img):
-        diamond = cv2.getStructuringElement(cv2.MORPH_RECT,(5,5))
-        diamond[0, 0] = 0
-        diamond[0, 1] = 0
-        diamond[1, 0] = 0
-        diamond[4, 4] = 0
-        diamond[4, 3] = 0
-        diamond[3, 4] = 0
-        diamond[4, 0] = 0
-        diamond[4, 1] = 0
-        diamond[3, 0] = 0
-        diamond[0, 3] = 0
-        diamond[0, 4] = 0
-        diamond[1, 4] = 0
-        #avant 1500 1125
-        #apres 1300 975
-        img = cv2.resize(img,(3500,2625))
-        dst = cv2.addWeighted(img, 2, img, 0, 2)
-        # plt.figure()
-        # plt.imshow(dst)
-        dst = cv2.resize(dst,(3500,2625))
-        dst = cv2.cvtColor(dst,cv2.COLOR_RGB2GRAY)
-        closing = cv2.morphologyEx(dst, cv2.MORPH_CLOSE, diamond,iterations=1)
-        dilated = cv2.dilate(closing,diamond,iterations=1)
-        blured = cv2.medianBlur(dilated,ksize=1)
-        binarized = cv2.threshold(blured,245,250,cv2.THRESH_BINARY)[1]
-        # plt.figure()
-        # plt.imshow(binarized,cmap='gray')
-        contours, hierarchy = cv2.findContours(binarized,cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-        list_area = [cv2.contourArea(c) for c in contours]
-        for c in contours:
-            area = cv2.contourArea(c)
-            if area < 100:
-                cv2.fillPoly(binarized, pts=[c], color=0)
-                continue
-        binarized = cv2.morphologyEx(binarized, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (4,4)));
-        imgcopy = img.copy()
-        imgcopy2 = np.copy(img)
-        # plt.imshow(binarized,cmap='gray')
-        contours2, hierarchy2 = cv2.findContours(binarized,cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-        # plt.figure()
-        # plt.imshow(imgcopy2,cmap="gray")
-        # cv2.drawContours(imgcopy2,contours2,-1,(255,0,0),4)
-        # plt.figure()
-        # plt.imshow(imgcopy2,cmap="gray")
-        list_area2 = [cv2.contourArea(c) for c in contours2]
-        drawing = np.ones((img.shape[0], img.shape[1], 3), np.uint8)*255
-        cv2.fillPoly(drawing,pts=contours2,color=(0,0,0))
-        drawing = cv2.dilate(drawing,diamond,iterations=1)
-        # plt.figure()
-        # plt.imshow(drawing)
-        drawing = cv2.morphologyEx(drawing, cv2.MORPH_CLOSE, diamond,iterations=5)
-        # plt.figure()
-        # plt.imshow(drawing,cmap="gray")
-        contours3, hierarchy3 = cv2.findContours(cv2.cvtColor(drawing,cv2.COLOR_BGR2GRAY),cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-        # Affichage du plus grand contours
-        # cv2.drawContours(img, max(contours3, key = cv2.contourArea), -1, (0,255,0), 3)
-        # plt.imshow(img)
-        # plt.show()
-        out_mask = np.zeros_like(img)
-        contours3 = sorted(contours3, key=cv2.contourArea)
-        out=img.copy()
-        # cv2.drawContours(out, [contours3[-1]], -1, (255,0,0), 3)
-        # out[out_mask == 0] = 255
-        c=max(contours3, key=cv2.contourArea)
-        return out,c
-
-
-    '''
-    * Méthode pour avoir les 4 points extrêmes du poisson
-    * input : contours c (type numpy.array) issu de l'image 1300x975
-    * return : [left,right,top,bottom] (type list of numpy.array)
-    '''
     def pointExtremeContours(c):
+        """!
+        Méthode pour avoir les 4 points extrêmes du poisson
+        @param contours c (type numpy.array) issu de l'image 1300x975
+        @return [left,right,top,bottom] (type list of numpy.array)
+        """
         left = tuple(c[c[:, :, 0].argmin()][0])
         right = tuple(c[c[:, :, 0].argmax()][0])
         top = tuple(c[c[:, :, 1].argmin()][0])
@@ -175,15 +96,12 @@ class Points():
         return [left,right,top,bottom]
 
 
-
-
-
-    '''
-    * Méthode pour avoir l'angle de rotation
-    * input : points left et right (type tuple) issu de l'image 1300x975
-    * return : angle (type float en degrés) et centre (type tuple of float)
-    '''
     def angleRot(left,right):
+        """!
+        Méthode pour avoir l'angle de rotation
+        @param points left et right (type tuple) issu de l'image 1300x975
+        @return angle (type float en degrés) et centre (type tuple of float)
+        """
         # rotate with angle to properly have top and bottom
         x1,y1 = left
         x2,y2 = right
@@ -193,21 +111,23 @@ class Points():
         return [angle,centre]
 
 
-
-
-
-    '''
-    * Méthode pour repencher l'image si necessaire
-    * input : image (type numpy.array) 1300x975, angle (type float en degrés), center (list of float)
-    * return : result (type numpy.array)
-    '''
     def rotate_image(image, angle,center):
+        """!
+        Méthode pour repencher l'image si necessaire
+        @param image (type numpy.array) 1300x975, angle (type float en degrés), center (list of float)
+        @return result (type numpy.array)
+        """
         rot_mat = cv2.getRotationMatrix2D(center, angle, 1.0)
         result = cv2.warpAffine(image, rot_mat, image.shape[1::-1], flags=cv2.INTER_LINEAR,borderValue=(255,255,255))
         return result
 
 
     def detect_eye(img):
+        """!
+        Méthode pour détecter la pupille
+        @param img (type numpy.array)
+        @return circles1[0][0] : centre de la pupille (type tuple)
+        """
         img_couleur = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
         img_gray=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
         img_gray = cv2.medianBlur(img_gray,21)
@@ -217,12 +137,12 @@ class Points():
         return circles1[0][0]
 
 
-    '''
-    * Routine pour détecter les points 3 et 19 (oeil)
-    * input : image (type numpy.array)
-    * return : pt3,pt19
-    '''
     def points3_19(img):
+        """!
+        Routine pour détecter les points 3 et 19 (oeil)
+        @param image (type numpy.array)
+        @return pt3,pt19
+        """
         img = cv2.resize(img,(3500,2625))
         print(img[:,:,0][1000][1500])
         pupille = Points.detect_eye(img)
@@ -274,14 +194,12 @@ class Points():
         return [pt3,pt19]
         # return circles
 
-
-
-    '''
-    * Routine pour détecter le point 9 (menton)
-    * input : contours (type numpy.array), pt19 (tuple of float)
-    * return : pt9
-    '''
     def point9(c,pt19):
+        """!
+        Routine pour détecter le point 9 (menton)
+        @param contours (type numpy.array), pt19 (tuple of float)
+        @return pt9
+        """
         approx = cv2.approxPolyDP(c,25,closed=True)
         # cv2.drawContours(out,approx,-1,(255,0,0),2)
         # cv2.polylines(imagerot, [approx], True, (255,0,0), 4)
@@ -306,31 +224,17 @@ class Points():
         print(pt9)
         return pt9
 
-
-
-
-
-
-    '''
-    * Routine pour détecter les points 15 et 13 (ouverture bronchiale)
-    * input : img (type numpy.array)
-    * return : pt15,pt13 (type tuple of tuple)
-    '''
-
     def points15_13(img,pt19,left,right):
-
+        """!
+        Routine pour détecter les points 15 et 13 (ouverture bronchiale)
+        @param img (type numpy.array)
+        @return pt15,pt13 (type tuple of tuple)
+        """
         imgcopy = img.copy()
-
-        ''' Noir et blanc '''
         img = cv2.cvtColor(img,cv2.COLOR_RGB2GRAY)
-
-        '''Rognage'''
         img[:,:int(pt19[0])]=255
-        milieu = [(left[0]+right[0])/2,(left[1]+right[1])/2]
         tiers = [(left[0]+right[0])/2.85,(left[1]+right[1])/2.85]
         # tiers = [(left[0]+right[0])/2.7,(left[1]+right[1])/2.7]
-
-        print(tiers)
         img[:,int(tiers[0]):int(right[0])]=255
         # plt.imshow(img)
         # plt.show()
@@ -340,7 +244,6 @@ class Points():
 
         # plt.figure()
         # plt.imshow(img)
-
 
         '''valeurs du filtre canny : 30,40   10 30'''
         '''valeurs pour contours 120 130'''
@@ -404,18 +307,17 @@ class Points():
         return pt15,pt13
 
 
-    '''
-    * Routine pour détecter les points 5 et 7 (lèvres)
-    * input : img,pt9,left
-    * return : pt5,pt7 (type tuple of tuple)
-    '''
-
     def points5_7(img,pt9,left):
+        """!
+        Routine pour détecter les points 5 et 7 (lèvres)
+        @param img,pt9,left
+        @return pt5,pt7 (type tuple of tuple)
+        """
         from scipy.signal import find_peaks
         import statistics
 
         ''' contours du corps '''
-        _,c = Points.contoursCorpsBig(img)
+        _,c = Points.contoursCorps(img,'head')
         cX = c.T[0][0]
         cY = c.T[1][0]
         cList = [[cX[i],cY[i]] for i in range(len(cX))]
@@ -517,6 +419,11 @@ class Points():
 
 
     def contoursCorpsFondBlanc(img):
+        """!
+        Routine pour détecter les points 5 et 7 (lèvres)
+        @param img,pt9,left
+        @return pt5,pt7 (type tuple of tuple)
+        """
         img_hsv = cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
         # img_hsv = cv2.bilateralFilter(img_hsv,15,75,75)
 
@@ -592,14 +499,13 @@ class Points():
 
 
 
-    '''
-    * Routine pour détecter les points 11 et 17 (ouverture bronchiale)
-    * input : img (type numpy.array)
-    * return : pt11,pt17 (type tuple of tuple)
-    '''
-
     def points11_17(img,pt13,pt15):
-        _,c = Points.contoursCorpsBig(img)
+        """!
+        Routine pour détecter les points 11 et 17 (ouverture bronchiale)
+        @param img (type numpy.array),pt13,pt15
+        @return pt11,pt17 (type tuple of tuple)
+        """
+        _,c = Points.contoursCorps(img,'head')
         approxCorps = cv2.approxPolyDP(c,0.0000001,closed=False)
         slope = (pt15[1]-pt13[1])/(pt15[0]-pt13[0])
         slopes = []
@@ -628,10 +534,10 @@ class Points():
         from PIL import Image
         PIL_image = imgPIL.resize((1300,975), Image.ANTIALIAS)
         CV2_image = np.array(imgPIL)
-        out,c = Points.contoursCorps(CV2_image)
+        out,c = Points.contoursCorps(CV2_image,'body')
         [left,right,top,bottom] = Points.pointExtremeContours(c)
         imagerot = Points.rotate_image(out,Points.angleRot(left,right)[0],Points.angleRot(left,right)[1])
-        _,c = Points.contoursCorps(imagerot)
+        _,c = Points.contoursCorps(imagerot,'body')
         [left,right,top,bottom] = Points.pointExtremeContours(c)
         corpsStandard = [[left[0],left[1]],[top[0],top[1]],[right[0],right[1]],[bottom[0],bottom[1]]]
         newPIL_image = Image.fromarray(imagerot)
@@ -646,10 +552,10 @@ class Points():
         CV2_image_big = cv2.imread(pathok[numImage])
         CV2_image_big = cv2.cvtColor(CV2_image_big,cv2.COLOR_BGR2RGB)
         # CV2_image_big = CV2_image_big[:, :, ::-1].copy()
-        out,c = Points.contoursCorpsBig(CV2_image_big)
+        out,c = Points.contoursCorps(CV2_image_big,'head')
         [left1,right1,top,bottom] = Points.pointExtremeContours(c)
         CV2_image_big = Points.rotate_image(out,Points.angleRot(left1,right1)[0],Points.angleRot(left1,right1)[1])
-        _,c = Points.contoursCorpsBig(CV2_image_big)
+        _,c = Points.contoursCorps(CV2_image_big,'head')
         [left1,right1,_,_] = Points.pointExtremeContours(c)
         print("\n### Chargement de l'image de la tête' ###")
         PIL_image_big = Image.fromarray(CV2_image_big)

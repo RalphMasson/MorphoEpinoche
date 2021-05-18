@@ -190,12 +190,8 @@ class HeadClass():
     def genererAllDistancesHead():
         """!
         Methode pour calculer toutes les distances de la tete
-
         """
-        # HeadClass.distances_all = Fonctions.Externes.genererAllDistancesHead(HeadClass.pointsEchelle,HeadClass.pointsFish,Interface.sexModele.get(),pypath)
         Fonctions.Externes.genererAllDistancesHead(HeadClass.pointsEchelle,HeadClass.pointsFish,Interface.sexModele.get(),pypath3)
-
-        Fonctions.Externes.nbClic +=1
 
     def calculDistances():
         """!
@@ -435,7 +431,6 @@ class Interface(tk.Tk):
         super().__init__()
 
         ''' Fenetre et menu'''
-        # root = tk.Tk()
         self.state('zoomed')
         self.title("Sex Determination for Three Spined Stickleback")
         menubar = tk.Menu(self)
@@ -470,7 +465,6 @@ class Interface(tk.Tk):
 
         self.config(menu=menubar)
         self.listeImages = []
-        CV2_image_big = None
         ''' Label Intro de presentation'''
         tk.Label(self,text=" ",font=("Purisa",12,"bold")).grid(ipadx=2)
         tk.Label(self,text=" Sexing procedure of three-spined stickleback \n",font=("Andalus",16,"bold")).place(x=750,y=40,anchor=tk.CENTER)
@@ -672,7 +666,7 @@ class Interface(tk.Tk):
 
         '''Initialisation du point 9 par détection auto '''
         print("\n### Calcul du point 9 ###")
-        _,c = Placement.Points.contoursCorpsBig(CV2_image_big)
+        _,c = Placement.Points.contoursCorps(CV2_image_big,'head')
         print(CV2_image_big.shape)
         try:
             pt9=Placement.Points.point9(c,pt19)
@@ -688,16 +682,16 @@ class Interface(tk.Tk):
 
         '''Initialisation du point 15 et 13 par détection auto '''
         print("\n### Calcul des points 15 et 13 ###")
-        # pt15,pt13=Placement.Points.points15_13(CV2_image_big,pt19,left1,right1)
-        try:
-            pt15,pt13=Placement.Points.points15_13(CV2_image_big,pt19,left1,right1)
-            pt15 = [pt15[0],pt15[1]]
-            pt13 = [pt13[0],pt13[1]]
-        except:
-            print("Impossible de déterminer les points 15 et 13")
-            pt13 = [1288, 1228]
-            pt15 = [1308, 1098]
-            nbPointNonDetectes+=2
+        pt15,pt13=Placement.Points.points15_13(CV2_image_big,pt19,left1,right1)
+        # try:
+        #     pt15,pt13=Placement.Points.points15_13(CV2_image_big,pt19,left1,right1)
+        #     pt15 = [pt15[0],pt15[1]]
+        #     pt13 = [pt13[0],pt13[1]]
+        # except:
+        #     print("Impossible de déterminer les points 15 et 13")
+        #     pt13 = [1288, 1228]
+        #     pt15 = [1308, 1098]
+        #     nbPointNonDetectes+=2
         print("### OK ###")
 
 
@@ -738,43 +732,36 @@ class Interface(tk.Tk):
         """!
         Méthode permettant de passer à l'image d'après
         """
-        import time
         if(self.numImageActuelle<len(self.listeImages)):
-            self.unbind_all("<Control-Return>")
-            self.unbind_all("<Control-BackSpace>")
-            self.numImageActuelle+=1
-            nbPointNonDetectes = 0
-            time.sleep(0.3)
-            self.boutonNext.configure(state=tk.DISABLED)
-            self.boutonPrevious.configure(state=tk.DISABLED)
-            self.calculPoints()
-            time.sleep(0.3)
-            self.boutonNext.configure(state=tk.ACTIVE)
-            self.boutonPrevious.configure(state=tk.ACTIVE)
-            self.bind_all("<Control-Return>",lambda e : self.nextImage())
-            self.bind_all("<Control-BackSpace>",lambda e : self.previousImage())
+            self.blockButton(+1)
 
 
     def previousImage(self):
         """!
         Méthode permettant de revenir a l'image précédente
         """
-        import time
         if(self.numImageActuelle>0):
-            self.unbind_all("<Control-Return>")
-            self.unbind_all("<Control-BackSpace>")
-            self.numImageActuelle-=1
-            nbPointNonDetectes = 0
-            time.sleep(0.3)
-            self.boutonPrevious.configure(state=tk.DISABLED)
-            self.boutonNext.configure(state=tk.DISABLED)
-            self.calculPoints()
-            time.sleep(0.3)
-            self.boutonPrevious.configure(state=tk.ACTIVE)
-            self.boutonNext.configure(state=tk.ACTIVE)
-            self.bind_all("<Control-Return>",lambda e : self.nextImage())
-            self.bind_all("<Control-BackSpace>",lambda e : self.previousImage())
+            self.blockButton(-1)
 
+    def blockButton(self,param):
+        """!
+        Méthode permettant de désactiver temporairement les boutons pour éviter une superposition d'images
+        @param param : +1 pour passer à l'image suivante, -1 pour la précédente
+        """
+        import time
+        self.unbind_all("<Control-Return>")
+        self.unbind_all("<Control-BackSpace>")
+        self.numImageActuelle+=param
+        nbPointNonDetectes = 0
+        time.sleep(0.3)
+        self.boutonPrevious.configure(state=tk.DISABLED)
+        self.boutonNext.configure(state=tk.DISABLED)
+        self.calculPoints()
+        time.sleep(0.3)
+        self.boutonPrevious.configure(state=tk.ACTIVE)
+        self.boutonNext.configure(state=tk.ACTIVE)
+        self.bind_all("<Control-Return>",lambda e : self.nextImage())
+        self.bind_all("<Control-BackSpace>",lambda e : self.previousImage())
 
     def openDataBase(self):
         """!

@@ -1,7 +1,6 @@
 ''' Bibliothèque de fonctions externes '''
 
 class Externes():
-    nbClic = 0
 
     def euclideDist(a,b):
         """!
@@ -33,12 +32,13 @@ class Externes():
         return listeAngle
 
     def calculAngleBis(pt1,pt2,pt3):
-        #calcul par alkashi des angles en degres du triangle reliant les 3 points
-        #        pt2
-        #     b /     \ a
-        #  pt1 ----- pt3
-        #         c
-        #angle au niveau du pt2
+        """!
+        Methode pour calculer les 3 angles du triangle crée par 3 points
+        @param pt1 tuple : coordonnees du point1 : [x1,y1]
+        @param pt2 tuple : coordonnees du point2 : [x2,y2]
+        @param pt3 tuple : coordonnees du point3 : [x3,y3]
+        @return Apt2 float : angle du point2
+        """
         b = Externes.euclideDist(pt1,pt2)
         a = Externes.euclideDist(pt2,pt3)
         c = Externes.euclideDist(pt1,pt3)
@@ -47,11 +47,28 @@ class Externes():
         return Apt2
 
     def reorder_from_idx(idx, a):
+        """!
+        Methode pour avoir la liste décalée de a indice vers la gauche
+        @param idx int : indice de décalage
+        @param a list : liste de référence
+        @return list : liste décalée
+        """
         return a[idx:] + a[:idx]
+
     def cyclic_perm(a):
+        """!
+        Methode pour avoir toutes les permutations circulaire possibles
+        @param a list : liste de référence
+        @return list of object : liste des permutations circulaires
+        """
         from functools import partial
         return [partial(Externes.reorder_from_idx, i) for i in range(len(a))]
+
     def allPointsAngles():
+        """!
+        Methode pour les combinaisons des points pour les distances (2 pts) et angles (3 pts)
+        @return listeDistance,listeAngle: liste des indices des points
+        """
         from itertools import combinations,permutations,combinations_with_replacement
         atest = list(combinations([i for i in range(9)],3))
         listeCombinaisonsAngle = []
@@ -65,24 +82,55 @@ class Externes():
         return listeCombinaisonsDistance,listeCombinaisonsAngle
 
     def px3mm(distance_px,echelle):
+        """!
+        Methode pour convertir pixel en mm
+        @param distance_px float : distance en pixel
+        @param echelle float : echelle en pixel
+        @return float : distance en mm
+        """
         return round(3*distance_px/echelle,4)
 
     def px3mmListe(distances_px,echelle):
+        """!
+        Methode pour convertir une liste de distances pixel en mm
+        @param distances_px list of float : liste de distances en pixel
+        @param echelle float : echelle en pixel
+        @return distances list of float : liste de distances en mm
+        """
         distances = []
         for x in distances_px:
             distances.append(Externes.px3mm(x,echelle))
         return distances
 
     def px10mm(distance_px,echelle):
+        """!
+        Methode pour convertir pixel en mm
+        @param distance_px float : distance en pixel
+        @param echelle float : echelle en pixel
+        @return float : distance en mm
+        """
         return round(10*distance_px/echelle,4)
 
     def px10mmListe(distances_px,echelle):
+        """!
+        Methode pour convertir une liste de distances pixel en mm
+        @param distances_px list of float : liste de distances en pixel
+        @param echelle float : echelle en pixel
+        @return distances list of float : liste de distances en mm
+        """
         distances = []
         for x in distances_px:
             distances.append(Externes.px10mm(x,echelle))
         return distances
 
     def genererAllDistancesHead(ptsEchelle,ptsFish,sex,chemin):
+        """!
+        Methode pour generer les distances et angles de la tete et remplir le fichier csv
+        @param ptsEchelle list of tuple : liste des points de l'echelle
+        @param ptsFish list of tuple : liste des points de la tête
+        @param sex char : F ou M
+        @param chemin String : chemin du fichier csv
+        """
         import numpy as np
         import time,os
         from win32com.client import Dispatch
@@ -187,9 +235,13 @@ class Externes():
             tk.messagebox.showwarning(title="Attention",message="Le sexe doit être F ou M")
 
 
-        # return distances_all
-
     def calculDistances(ptsEchelle,ptsFish):
+        """!
+        Methode pour calculer les distances affichées sur l'interface
+        @param ptsEchelle list of tuple : liste des points de l'echelle
+        @param ptsFish list of tuple : liste des points de la tête
+        @return distances_check list of float : liste des distances en mm
+        """
         echelle3mm = Externes.euclideDist(ptsEchelle[0],ptsEchelle[1])
         snout_eye = Externes.euclideDist(ptsFish[0],ptsFish[1])
         snout_length = Externes.euclideDist(ptsFish[1],ptsFish[2])
@@ -203,6 +255,12 @@ class Externes():
         return distances_check
 
     def calculDistances2(ptsEchelle,ptsFish):
+        """!
+        Methode pour calculer les distances affichées sur l'interface
+        @param ptsEchelle list of tuple : liste des points de l'echelle
+        @param ptsFish list of tuple : liste des points du corps
+        @return distances_check list of float : liste des distances en mm
+        """
         echelle10mm = Externes.euclideDist(ptsEchelle[0],ptsEchelle[1])
         body_size = Externes.euclideDist(ptsFish[0],ptsFish[2])
         body_depth = Externes.euclideDist(ptsFish[1],ptsFish[3])
@@ -211,17 +269,31 @@ class Externes():
         return distances_check
 
     def findNearestValueFromArray(array, value):
+        """!
+        Methode pour trouver a partir d'une valeur de référence, la valeur la plus proche dans une liste
+        @param array list : liste de référence
+        @param value float : valeur a trouver ou se rapprocher
+        @return idx float : indice de la valeur la plus proche de ce qu'on cherche
+        """
         import numpy as np
         array = np.asarray(array)
         idx = (np.abs(array - value)).argmin()
         return idx
 
     def openfn():
+        """!
+        Methode pour sélectionner les images dans la fenetre
+        """
         import tkinter.filedialog,tkinter as tk
         filepath = tk.filedialog.askopenfilenames(title="Ouvrir une image",filetypes=[('jpg files','.jpg'),('jpeg files','.jpeg')])
         return filepath
 
     def Longueur(distance):
+        """!
+        Methode pour modifier les distances affichées sur l'interface
+        @param distance list of tuple :liste des distances en mm
+        @return texte String : texte affiché sur l'interface
+        """
         texte = ""
         texte += "5 <-> 3 : distance nez oeil : "+str(distance[0])+" mm \n"
         texte += "5 <-> 7 : longueur museau : "+str(distance[1])+" mm \n"
@@ -233,24 +305,52 @@ class Externes():
         return texte
 
     def LongueurBody(distance):
+        """!
+        Methode pour modifier les distances affichées sur l'interface
+        @param distance list of tuple :liste des distances en mm
+        @return texte String : texte affiché sur l'interface
+        """
         texte = ""
         texte += "8 <-> 10 : Longueur Corps : "+str(distance[0])+" mm \n"
         texte += " 13 <-> 15 : Largeur corps : "+str(distance[1])+" mm \n"
         return texte
 
     def centerPoint(pt,eye):
+        """!
+        Methode pour centrer un point sur l'interface
+        @param pt tuple : point à décaler
+        @return tuple : point décalé
+        """
         return [pt[0]-(eye[0]-300),pt[1]-(eye[1]-250)]
 
     def decenterPoint(A,eye):
+        """!
+        Methode pour décentrer un point sur l'interface
+        @param pt tuple : point à décaler
+        @return tuple : point décalé
+        """
         return [A[0]+eye[0]-300,A[1]+eye[1]-250]
 
     def centerPoints(lstpt,eye):
+        """!
+        Methode pour centrer des points sur l'interface
+        @param lstpt tuple : liste de points à décaler
+        @return new_lstpt : liste de points décalés
+        """
         new_lstpt = []
         for x in lstpt:
             new_lstpt.append(Externes.centerPoint(x,eye))
         return new_lstpt
 
     def projeteOrtho(pente,intercept,xA,yA):
+        """!
+        Methode pour calculer le projete orthogonal d'un point sur une droite
+        @param float pente : pente de la droite
+        @param float intercept : ordonnee à l'origine de la droite
+        @param float xA : abscisse du point
+        @param float yA : ordonnee du point
+        @return projete float : coordonnées du projete
+        """
         import numpy as np
         matriceA = np.array([[pente,-1],[1,pente]])
         vecteurB = np.array([[-intercept],[xA+pente*yA]])
@@ -259,6 +359,14 @@ class Externes():
         return projete
 
     def findNearestPointFromListOfPoints(pointA,listeOfPoints):
+        """!
+        Methode pour trouver a partir d'une point de référence, le point le plus proche dans une liste
+        @param listeOfPoints list of tuple : liste de points
+        @param pointA tuple : point a trouver ou se rapprocher
+        @return indexMin int : indice du point le plus proche de ce qu'on cherche
+        @return pointB tuple : point le plus proche
+        @return distance float : distance du pointA au point le plus proche
+        """
         import numpy as np
         #liste = [[x,y],[x,y]...]
         #point = [x,y]
@@ -270,6 +378,11 @@ class Externes():
 
 
     def checkIfProcessRunning(processName):
+        """!
+        Methode pour déterminer si un processus est en cours ou non
+        @param processName String : nom du processus
+        @return boolean : Vrai ou Faux
+        """
         import psutil
         #Iterate over the all the running process
         for proc in psutil.process_iter():
@@ -282,6 +395,13 @@ class Externes():
         return False
 
     def penteIntercept(a,b):
+        """!
+        Methode pour trouver la droite passant par deux points
+        @param a tuple : point a
+        @param b tuple : point b
+        @return pente : pente de la droite
+        @return intercept : ordonnees à l'origine de la droite
+        """
         if(b[0]-a[0]==0):
             pente =  (b[1]-a[1])/0.001
         else:
@@ -290,6 +410,12 @@ class Externes():
         return (pente,intercept)
 
     def isContoursLineLike(c):
+        """!
+        Methode pour avoir des informations sur le caractère longiligne du contours
+        @param c contours (list of tuple) : contours de l'image
+        @return pente float : pente de la droite passant par le contours
+        @return distanceTotale float : distance des points du contours à la droite du contours
+        """
         import numpy as np
         top = tuple(c[c[:, :, 1].argmin()][0])
         bottom = tuple(c[c[:, :, 1].argmax()][0])
@@ -304,37 +430,41 @@ class Externes():
         return pente,distanceTotale
 
     def averagePixelValue(imgNB,c,windowSize):
+        """!
+        Methode pour calculer la valeur moyenne autour d'un contour
+        @param imgNB list of list: matrice de l'image en noir et blanc
+        @param c contours : 1 contour de l'image
+        @param windowSize : taille du voisinage (à choisir impair)
+        @return moy float : valeur moyenne de niveau de gris
+        """
         import numpy as np
+        import itertools
         x = c.T[0][0]
         y = c.T[1][0]
-        #window size = 3,5,7...
-        test=[]
-        for i in range(len(x)):
-            xi = x[i]
-            yi = y[i]
-            low = (windowSize-1)//2
-            up = (windowSize+1)//2
-            # test =[[[j,i] for i,j in range(yi-low,yi+up)] for j in range(xi-low,xi+up)]
-
-            for k in range(yi-low,yi+up):
-                for l in range(xi-low,xi+up):
-                    test.append([l,k])
-            # test = np.array(test)
-            # test = test.flatten()
-            # test = [list(set(test[i:i+2])) for i in range(0, len(test),2)]
-
-
-            # print(xi,yi)
-        # print(test)
-        pixel = []
-        for x in test:
-            # print(x)
-            abscisse = x[0]
-            ordonnee = x[1]
-            pixel.append(imgNB[ordonnee][abscisse])
-            # print(imgNB[ordonnee][abscisse])
-        # print("toto")
+        low = (windowSize-1)//2
+        up = (windowSize+1)//2
+        test =  list(itertools.chain.from_iterable([list(itertools.product(range(x[i]-low,x[i]+up),range(y[i]-low,y[i]+up))) for i in range(len(x))]))
+        pixel = [imgNB[x[1]][x[0]] for x in test]
         moy = np.mean(pixel)
         return moy
 
-
+    def diamondCV2():
+        """!
+        Methode pour avoir le patron de diamant
+        @return diamond list of list : matrice de 1 et de 0 représentant un diamant
+        """
+        import cv2
+        diamond = cv2.getStructuringElement(cv2.MORPH_RECT,(5,5))
+        diamond[0, 0] = 0
+        diamond[0, 1] = 0
+        diamond[1, 0] = 0
+        diamond[4, 4] = 0
+        diamond[4, 3] = 0
+        diamond[3, 4] = 0
+        diamond[4, 0] = 0
+        diamond[4, 1] = 0
+        diamond[3, 0] = 0
+        diamond[0, 3] = 0
+        diamond[0, 4] = 0
+        diamond[1, 4] = 0
+        return diamond
