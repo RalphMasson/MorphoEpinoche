@@ -421,7 +421,7 @@ class BodyFish():
 
 class Interface(tk.Tk):
     sexModele = None
-    version = 1.4
+    version = 1.5
     def __init__(self):
         """!
         Constructeur de l'interface
@@ -608,16 +608,37 @@ class Interface(tk.Tk):
         self.numImageActuelle = 0
 
     def getVersion(self):
-        import git
-        g = git.cmd.Git()
-        blob = g.ls_remote('https://github.com/RalphMasson/MorphoEpinoche', sort='-v:refname', tags=True)
-        version = float(blob.split('\n')[0].split('/')[-1].replace('v',''))
+
+        try:
+            import requests
+            response = str(requests.get('https://github.com/RalphMasson/MorphoEpinoche/tags').content)
+            response = response.split('\\n')
+            response = [x if ".zip" in x else '' for x in response]
+            response = list(filter(None, response))
+            response = ''.join(response).split(" ")
+            response = list(filter(None, response))
+            response = [x if x.startswith("href") else '' for x in response]
+            response = list(filter(None, response))
+            response = ','.join(response).split('"')
+            response = [x if x.endswith(".zip") else '' for x in response]
+            response = list(filter(None, response))
+            response = ''.join(response).split("/")
+            response = [x if x.endswith(".zip") else '' for x in response]
+            response = list(filter(None, response))
+            response = ','.join(response).replace(".zip","").replace("v","").split(",")
+            response = max(list(map(float,response)))
+            version = response
+
+        except:
+            version = 0
 
         message = "Dernière version disponible : "+"v"+str(version)
         message += "\nVersion actuelle : "+"v"+str(Interface.version)
-        # tk.messagebox.showinfo(title="Informations",message=message)
-        Dialog('Mise à jour',message)
+        message += "\nCliquez sur OK pour télécharger"
 
+        reponse = tk.messagebox.askyesnocancel(title="Informations",message=message)
+        if(reponse):
+            Interface.updateVersion()
 
 
     def updateVersion():
@@ -837,44 +858,41 @@ class Interface(tk.Tk):
         message += "\n\n\n Interface développée par R. Masson pour l'INERIS"
         tk.messagebox.showinfo(title="Informations",message=message)
 
+#
+# class Dialog(tk.Toplevel):
+#     def __init__(self, title, message):
+#         from tkinter import ttk
+        # tk.Toplevel.__init__(self)
+        # self.details_expanded = False
+        # self.title(title)
+        # self.geometry('350x75')
+        # self.minsize(350, 75)
+        # self.maxsize(425, 250)
+        # self.rowconfigure(0, weight=0)
+        # self.rowconfigure(1, weight=1)
+        # self.columnconfigure(0, weight=1)
+        #
+        # button_frame = tk.Frame(self)
+        # button_frame.grid(row=0, column=0, sticky='nsew')
+        # button_frame.columnconfigure(0, weight=1)
+        # button_frame.columnconfigure(1, weight=1)
+        #
+        # text_frame = tk.Frame(self)
+        # text_frame.grid(row=1, column=0, padx=(7, 7), pady=(7, 7), sticky='nsew')
+        # text_frame.rowconfigure(0, weight=1)
+        # text_frame.columnconfigure(0, weight=1)
+        #
+        # ttk.Label(button_frame, text=message).grid(row=0, column=0, columnspan=2, pady=(7, 7))
+        # ttk.Button(button_frame, text='Télécharger', command=self.buttonTelecharger).grid(row=1, column=0, sticky='e')
+        # ttk.Button(button_frame, text='OK', command=self.destroy).grid(row=1, column=1, sticky='w')
 
-class Dialog(tk.Toplevel):
-    def __init__(self, title, message):
-        from tkinter import ttk
-        tk.Toplevel.__init__(self)
-        self.details_expanded = False
-        self.title(title)
-        self.geometry('350x75')
-        self.minsize(350, 75)
-        self.maxsize(425, 250)
-        self.rowconfigure(0, weight=0)
-        self.rowconfigure(1, weight=1)
-        self.columnconfigure(0, weight=1)
 
-        button_frame = tk.Frame(self)
-        button_frame.grid(row=0, column=0, sticky='nsew')
-        button_frame.columnconfigure(0, weight=1)
-        button_frame.columnconfigure(1, weight=1)
-
-        text_frame = tk.Frame(self)
-        text_frame.grid(row=1, column=0, padx=(7, 7), pady=(7, 7), sticky='nsew')
-        text_frame.rowconfigure(0, weight=1)
-        text_frame.columnconfigure(0, weight=1)
-
-        ttk.Label(button_frame, text=message).grid(row=0, column=0, columnspan=2, pady=(7, 7))
-        ttk.Button(button_frame, text='Télécharger', command=self.buttonTelecharger).grid(row=1, column=0, sticky='e')
-        ttk.Button(button_frame, text='OK', command=self.destroy).grid(row=1, column=1, sticky='w')
-
-        self.textbox = tk.Text(text_frame, height=6)
-        self.textbox.insert('1.0', detail)
-        self.textbox.config(state='disabled')
-        self.scrollb = tk.Scrollbar(text_frame, command=self.textbox.yview)
-        self.textbox.config(yscrollcommand=self.scrollb.set)
-
-    def buttonTelecharger(self):
-        Interface.updateVersion()
-        self.destroy()
-
+    #
+    #
+    # def buttonTelecharger(self):
+    #     Interface.updateVersion()
+    #     self.destroy()
+    #
 
 app = Interface()
 app.mainloop()
