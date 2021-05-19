@@ -37,6 +37,10 @@ import Placement,Fonctions,Classification
 import numpy as np
 
 # Classe pour les points de la tête
+
+class Temp():
+    chemin = ""
+
 class HeadClass():
     """Variables globales pour export
     id_polygons : liste des id des polygons (la tete et l'echelle)
@@ -424,7 +428,7 @@ class BodyFish():
 class Interface(tk.Frame):
     sexModele = None
     app = None
-
+    chemin = ""
     def __init__(self, master, **kwargs):
         """!
         Constructeur de l'interface
@@ -492,7 +496,7 @@ class Interface(tk.Frame):
         self.boutonImport.pack(anchor=tk.W,padx=5,pady=5,ipady=15,expand=True,fill='x')
 
         self.boutonImport.bind('<Control-o>',self.importImage)
-        tk.Button(self.frame,text = "Predict",command = Interface.affichePrediction,fg='purple').pack(anchor=tk.W,padx=5,fill='x')
+        tk.Button(self.frame,text = "Predict",command = Interface.affichePrediction,fg='purple').pack(anchor=tk.W,padx=5,ipady=8,fill='x')
         tk.Label(self.frame, text = 'ADD THESE VALUES TO MODEL',font=("Purisa",12,"bold"),fg='green').pack(padx=0,pady=0)
         Interface.sexModele = tk.StringVar(self.frame)
 
@@ -573,14 +577,14 @@ class Interface(tk.Frame):
         """
         try:
             base_path = sys._MEIPASS
-            print(base_path)
+            # print(base_path)
         except Exception:
             base_path = pypath2+"/images/"
             base_path = '/'.join(pypath1.split("/")[:-1])+"/images"
-            print(base_path)
+            # print(base_path)
             print('/'.join(pypath1.split("/")[:-1])+"/images")
-            print(pypath2)
-            print(pypath3)
+            # print(pypath2)
+            # print(pypath3)
 
         return os.path.join(base_path, relative_path)
 
@@ -799,17 +803,21 @@ class Interface(tk.Frame):
         pypath = inspect.getfile(lambda: None)
         pypath = '/'.join(pypath.split('\\')[:-1])
         import subprocess
-        if(os.path.exists(pypath3+"/DistancesPourModele.csv")):
+        print("toto")
+        print('/'.join(inspect.getfile(lambda: None).split('\\')[:-2])+"/executable/DistancesPourModele.csv")
+        print(pypath3+"\DistancesPourModele.csv")
+        print(Temp.chemin+"/DistancesPourModele.csv")
+        if(os.path.exists('/'.join(inspect.getfile(lambda: None).split('\\')[:-2])+"/executable/DistancesPourModele.csv")):
             try:
-                subprocess.Popen(pypath3+"/DistancesPourModele.csv",shell=True)
+                subprocess.Popen('/'.join(inspect.getfile(lambda: None).split('\\')[:-2])+"/executable/DistancesPourModele.csv",shell=True)
             except:
                 commande = "start notepad.EXE "
                 commande += pypath3+"/DistancesPourModele.csv"
                 os.system(commande)
 
-        elif(os.path.exists(os.getcwd()+"\DistancesPourModele.csv")):
+        elif(os.path.exists(Temp.chemin+"/DistancesPourModele.csv")):
             try:
-                subprocess.Popen(os.getcwd()+"\DistancesPourModele.csv",shell=True)
+                subprocess.Popen(Temp.chemin+"/DistancesPourModele.csv",shell=True)
             except:
                 commande = "start notepad.EXE "
                 commande += os.getcwd()+"\DistancesPourModele.csv"
@@ -822,7 +830,7 @@ class Interface(tk.Frame):
             test = os.getcwd()
             test2 = inspect.getfile(lambda: None)
             message += "\n"+test
-            message += "\n"+'/'.join(test2.split('\\')[:-1])+"/DistancesPourModele.csv"
+            message += "\n"+'/'.join(test2.split('\\')[:-2])+"executable/DistancesPourModele.csv"
             message += "\n\n2) Commencer par créer une base de données"
             # message += "\n"+str(len(test))
             # message += "\n"+str(len('/'.join(test2.split('\\')[:-1])))

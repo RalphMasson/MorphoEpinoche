@@ -559,6 +559,7 @@ class Interface(tk.Tk):
         return os.path.join(base_path, relative_path)
 
     def changeView(self):
+        Interface_Sexage_Little.Temp.chemin = pypath3
         self.destroy()
         root = tk.Tk()
 
