@@ -4,7 +4,7 @@ block_cipher = None
 
 added_files = [('C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\images\\logo2.png', '.'),('C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\images\\schema.png', '.')]
 
-a = Analysis(['Interface_Sexage.py'],
+a = Analysis(['Interface_Sexage_Normal.py'],
              pathex=['C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\code\\Interface_Sexage_Normal.py'],
              binaries=[],
              datas=added_files,

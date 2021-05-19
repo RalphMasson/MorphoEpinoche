@@ -470,25 +470,25 @@ class Interface(tk.Tk):
         self.listeImages = []
         ''' Label Intro de presentation'''
         tk.Label(self,text=" ",font=("Purisa",12,"bold")).grid(ipadx=2)
-        tk.Label(self,text=" Sexing procedure of three-spined stickleback \n",font=("Andalus",16,"bold")).place(x=750,y=40,anchor=tk.CENTER)
+        tk.Label(self,text=" Sexing procedure of three-spined stickleback \n",font=("Andalus",16,"bold")).place(relx=0.35,rely=0.01)
         tk.Label(self,text="\n \n \n \n ").grid(column=0,row=1)
 
         ''' Boutons '''
-        tk.Label(self, text = 'PREDICTION',font=("Purisa",12,"bold"),fg='purple').place(x=460,y=70)
-        self.boutonImport = tk.Button(self,text = "Import image and autoplace",command = self.importImage,fg='purple')
-        self.boutonImport.place(x=400,y=100)
+        tk.Label(self, text = 'PREDICTION',font=("Purisa",12,"bold"),fg='purple').place(relx=0.25,rely=0.08)
+        self.boutonImport = tk.Button(self,text = "Import images",command = self.importImage,fg='purple')
+        self.boutonImport.place(relx=0.25,rely=0.12)
         self.boutonImport.bind('<Control-o>',self.importImage)
-        tk.Button(self,text = "Predict",command = Interface.affichePrediction,fg='purple').place(x=570,y=100)
-        tk.Label(self, text = 'ADD THESE VALUES TO MODEL',font=("Purisa",12,"bold"),fg='green').place(x=760,y=70)
+        tk.Button(self,text = "Predict",command = Interface.affichePrediction,fg='purple').place(relx=0.25,rely=0.155)
+        tk.Label(self, text = 'ADD THESE VALUES TO MODEL',font=("Purisa",12,"bold"),fg='green').place(relx=0.46,rely=0.08)
         Interface.sexModele = tk.StringVar(self)
         self.sexModel = tk.Entry(self,width=3,textvariable=Interface.sexModele)
-        self.sexModel.place(x=810,y=105)
-        tk.Button(self,text = "Model Update (close Excel before)",command = HeadClass.genererAllDistancesHead,fg='green').place(x=850,y=100)
-        tk.Label(self,text='Sex for model: ',fg='green').place(x=725,y=105)
-        self.boutonPrevious = tk.Button(self,text='<--',command = self.previousImage)
-        self.boutonPrevious.place(x=570,y=780)
-        self.boutonNext = tk.Button(self,text='-->',command = self.nextImage)
-        self.boutonNext.place(x=610,y=780)
+        self.sexModel.place(relx=0.52,rely=0.125)
+        tk.Button(self,text = "Model Update (close Excel before)",command = HeadClass.genererAllDistancesHead,fg='green').place(relx=0.46,rely=0.158)
+        tk.Label(self,text='Sex for model:',fg='green').place(relx=0.46,rely=0.125)
+        self.boutonPrevious = tk.Button(self,text='<--',fg='red',command = self.previousImage)
+        self.boutonPrevious.place(relx=0.38,rely=0.3)
+        self.boutonNext = tk.Button(self,text='-->',fg='red',command = self.nextImage)
+        self.boutonNext.place(relx=0.40,rely=0.3)
 
 
 
@@ -496,16 +496,16 @@ class Interface(tk.Tk):
         self.labelSex = tk.Label(self,text="")
         self.labelSex.place(x=650,y=190)
 
-        self.labelInfoPoints = tk.Label(self,text="")
-        self.labelInfoPoints.place(x=650,y=160)
+        self.labelInfoPoints = tk.Label(self,text="",font=("Purisa",11),fg='gray')
+        self.labelInfoPoints.place(relx=0.1,rely=0.975)
 
-        self.labelVide = tk.Label(self,text="\n ")
+        self.labelVide = tk.Label(self,text="\n\n ")
         self.labelVide.grid(column=0,row=3)
 
-        self.labelNumImage = tk.Label(self,text="Image :",font=("Purisa",11),fg='gray')
-        self.labelNumImage.place(x=650,y=780)
+        self.labelNumImage = tk.Label(self,text="",font=("Purisa",11),fg='gray')
+        self.labelNumImage.place(relx=0.45,rely=0.975)
         self.labelNomImage = tk.Label(self,text="",font=("Purisa",11),fg='gray')
-        self.labelNomImage.place(x=760,y=780)
+        self.labelNomImage.place(relx=0.5,rely=0.975)
 
         ''' Labels pour les longueurs de la tête '''
         tk.Label(self,text="Longueurs caractéristiques de la tête : \n",justify=tk.LEFT,font=("Purisa",8,"bold","underline")).grid(column=0,row=4)

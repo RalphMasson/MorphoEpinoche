@@ -823,6 +823,12 @@ class Interface(tk.Frame):
                 commande += os.getcwd()+"\DistancesPourModele.csv"
                 os.system(commande)
 
+        elif(os.path.exists(os.getcwd()+"\DistancesPourModele.csv"):
+            try:
+                subprocess.Popen(os.getcwd()+"\DistancesPourModele.csv",shell=True)
+            except:
+                None
+
         else:
             message = "La base de données n'a pas été trouvée"
             message += "\n\n1) Vérifier qu'elle est située ici : "

@@ -1,7 +1,7 @@
 ''' Bibliothèque de fonctions de placement '''
 
 import cv2
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import numpy as np
 import math
 
@@ -9,11 +9,11 @@ import math
 # img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/1-1.JPG'
 # img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/2.JPG'
 # img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/3-3.JPG'
-
-male_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\images_all\\gimp_cut\\male\\"
-import sys,os
-male_img = os.listdir(male_path)
-male_img = [male_path+x for x in male_img]
+# # #
+# # # male_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\images_all\\gimp_cut\\male\\"
+# # # import sys,os
+# # # male_img = os.listdir(male_path)
+# # # male_img = [male_path+x for x in male_img]
 ''' TESTE AVEC FEMALE 1220F.JPG '''
 
 # img = cv2.imread(img_path)
@@ -461,8 +461,8 @@ class Points():
         # plt.show()
         img_out1 = cv2.adaptiveThreshold(res_hsv_gr,220,cv2.ADAPTIVE_THRESH_MEAN_C,\
             cv2.THRESH_BINARY,21,2)
-        plt.figure()
-        plt.imshow(img_out1)
+        # plt.figure()
+        # plt.imshow(img_out1)
         # plt.figure()
         # plt.imshow(img_out2)
         # plt.figure()

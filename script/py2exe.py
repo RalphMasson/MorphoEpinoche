@@ -18,9 +18,11 @@ def supprimer_spec():
         os.remove(chemin2+file)
 
 def supprimer_build():
-    shutil.rmtree(chemin2+"build\\")
-    shutil.rmtree(chemin+"build\\")
-
+    try:
+        shutil.rmtree(chemin2+"build\\")
+        shutil.rmtree(chemin+"build\\")
+    except:
+        None
 def deplacer_exe():
     chemin3 = chemin2+"dist\\"
     os.chdir(chemin3)
