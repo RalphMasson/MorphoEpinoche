@@ -23,13 +23,25 @@ for file in glob.glob("*.png"):
         last_version = max(liste_version)
         new_version = str(int(last_version)+1)
         os.replace(chemin2+file,chemin3+"class_diagram_v"+new_version+".png")
-    if('Interface' in file):
+    if('Normal' in file):
         chemin3 = chemin+"class_diagram\\interface\\"
         liste_fichiers = os.listdir(chemin3)
         liste_version = [liste_fichiers[i][-5] for i in range(len(liste_fichiers))]
         last_version = max(liste_version)
         new_version = str(int(last_version)+1)
         os.replace(chemin2+file,chemin3+"class_diagram_v"+new_version+".png")
+    if('Little' in file):
+        chemin3 = chemin+"class_diagram\\interface_mini\\"
+        liste_fichiers = os.listdir(chemin3)
+        try:
+            liste_version = [liste_fichiers[i][-5] for i in range(len(liste_fichiers))]
+            last_version = max(liste_version)
+            new_version = str(int(last_version)+1)
+            os.replace(chemin2+file,chemin3+"class_diagram_v"+new_version+".png")
+        except:
+            last_version = 1
+            new_version = str(int(last_version)+1)
+            os.replace(chemin2+file,chemin3+"class_diagram_v"+new_version+".png")
     if('Placement' in file):
         chemin3 = chemin+"class_diagram\\placement\\"
         liste_fichiers = os.listdir(chemin3)
