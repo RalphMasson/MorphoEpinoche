@@ -1,5 +1,12 @@
 ''' Bibliothèque de fonctions externes '''
 
+import sys,inspect,os
+pypath = inspect.stack()[0][1]
+pypath = pypath.split('\\')
+pypath1 = '/'.join(pypath[:-1])
+pypath3 = '/'.join(pypath[:-2])+"/executable"
+pypath2 = '/'.join(pypath[:-2])
+
 class Externes():
 
     def euclideDist(a,b):
@@ -468,3 +475,40 @@ class Externes():
         diamond[0, 4] = 0
         diamond[1, 4] = 0
         return diamond
+
+    def resource_path(relative_path):
+        """!
+        Méthode permettant d'avoir le chemin absolu temporaire (pour l'exe) ou normal
+        @param relative_path String : chemin du fichier dans le pc
+        @return resource_path : chemin temporaire
+        """
+
+        try:
+            base_path = sys._MEIPASS
+            print(base_path)
+        except Exception:
+            base_path = pypath2+"/images/"
+            base_path = '/'.join(pypath1.split("/")[:-1])+"/images"
+
+        return os.path.join(base_path, relative_path)
+
+    def getVersion():
+        import requests
+        response = str(requests.get('https://github.com/RalphMasson/MorphoEpinoche/tags').content)
+        response = response.split('\\n')
+        response = [x if ".zip" in x else '' for x in response]
+        response = list(filter(None, response))
+        response = ''.join(response).split(" ")
+        response = list(filter(None, response))
+        response = [x if x.startswith("href") else '' for x in response]
+        response = list(filter(None, response))
+        response = ','.join(response).split('"')
+        response = [x if x.endswith(".zip") else '' for x in response]
+        response = list(filter(None, response))
+        response = ''.join(response).split("/")
+        response = [x if x.endswith(".zip") else '' for x in response]
+        response = list(filter(None, response))
+        response = ','.join(response).replace(".zip","").replace("v","").split(",")
+        response = max(list(map(float,response)))
+        version = response
+        return version

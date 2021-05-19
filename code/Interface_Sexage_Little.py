@@ -429,36 +429,33 @@ class Interface(tk.Frame):
     sexModele = None
     app = None
     chemin = ""
+    version = 1.5
     def __init__(self, master, **kwargs):
         """!
         Constructeur de l'interface
         """
-
         tk.Frame.__init__(self)
-
         self.root = master
         self.add_menu()
         self.canvasGeneral = tk.Canvas(self,width=600,height=700,highlightthickness=0, highlightbackground="black")
         self.frame = tk.Frame(self.canvasGeneral)
         self.frame.pack(fill=tk.BOTH,expand=True)
+        self.add_scrollbar()
+        self.populate()
+
+
+    def add_scrollbar(self):
         self.vsb = tk.Scrollbar(self,orient="vertical",command=self.canvasGeneral.yview)
         self.hsb = tk.Scrollbar(self,orient="horizontal",command=self.canvasGeneral.xview)
         self.canvasGeneral.configure(yscrollcommand=self.vsb.set)
         self.canvasGeneral.configure(xscrollcommand=self.hsb.set)
-
-
         self.vsb.pack(side="right", fill="y")
         self.hsb.pack(side="bottom", fill="x")
-
         self.canvasGeneral.pack(side="left", fill="both", expand=True)
-        self.canvasGeneral.create_window((0,0), window=self.frame, anchor="nw",
-                                  tags="self.frame")
-
+        self.canvasGeneral.create_window((0,0), window=self.frame, anchor="nw",tags="self.frame")
         self.frame.bind("<Configure>", self.onFrameConfigure)
         self.canvasGeneral.bind_all("<MouseWheel>", self.on_mousewheel)
         self.canvasGeneral.bind_all("<Control-MouseWheel>", self.on_mousewheel2)
-
-        self.populate()
 
     def on_mousewheel2(self,event):
         scroll = -1 if event.delta > 0 else 1
@@ -468,7 +465,6 @@ class Interface(tk.Frame):
         scroll = -1 if event.delta > 0 else 1
         self.canvasGeneral.yview_scroll(scroll, "units")
     def populate(self):
-
 
         self.listeImages = []
         """Canvas pour logo"""
@@ -562,12 +558,24 @@ class Interface(tk.Frame):
         menuAide = tk.Menu(menubar, tearoff=0)
         menuAide.add_command(label="A propos", command=self.help,accelerator="(Ctrl+I)")
         self.bind_all("<Control-i>",lambda e : self.help())
-        menuAide.add_command(label="Télécharger la dernière version",command=Interface.updateVersion)
+        menuAide.add_command(label="Version",command=Interface.getVersion)
         menubar.add_cascade(label="Aide", menu=menuAide)
-
 
         self.root.config(menu=menubar)
 
+    def getVersion():
+        try:
+            version = Fonctions.Externes.getVersion()
+        except:
+            version = "-- No internet connection --"
+
+        message = "Dernière version disponible : "+"v"+str(version)
+        message += "\nVersion actuelle : "+"v"+str(Interface.version)
+        message += "\nCliquez sur OK pour télécharger"
+
+        reponse = tk.messagebox.askyesnocancel(title="Informations",message=message)
+        if(reponse):
+            Interface.updateVersion()
 
     def resource_path(relative_path):
         """!

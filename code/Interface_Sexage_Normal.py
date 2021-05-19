@@ -426,9 +426,95 @@ class Interface(tk.Tk):
         """!
         Constructeur de l'interface
         """
-
         super().__init__()
+        self.listeImages = []
+        self.numImageActuelle = 0
+        self.add_menu()
+        self.add_buttons()
+        self.add_labels()
+        self.add_canvas()
+        self.add_entrys()
 
+    def add_entrys(self):
+        Interface.sexModele = tk.StringVar(self)
+        self.sexModel = tk.Entry(self,width=3,textvariable=Interface.sexModele)
+        self.sexModel.place(relx=0.52,rely=0.125)
+
+
+    def add_canvas(self):
+        ''' Canvas pour la tête '''
+        self.canvasTete = tk.Canvas(self,bg='#f0f0f0',bd=0,highlightthickness=1, highlightbackground="black")
+        self.canvasTete.config(width=600, height=500)
+        self.canvasTete.grid(column=0,row=8)
+
+        ''' Canvas pour le corps '''
+        self.canvasCorps = tk.Canvas(self,bg='#f0f0f0',highlightthickness=1, highlightbackground="black")
+        self.canvasCorps.config(width=960, height=500)
+        self.canvasCorps.grid(column=1,row=8)
+
+        """Canvas pour logo"""
+        pathLogo = Fonctions.Externes.resource_path("logo2.png")
+        self.canvasLogo = tk.Canvas(self,bg='#f0f0f0')
+        self.canvasLogo.config(width=157,height=84)
+        self.canvasLogo.place(x=0,y=0)
+        self.imgLogo = ImageTk.PhotoImage(Image.open(pathLogo).resize((157,84)))
+        self.canvasLogo.create_image(0, 0, anchor=tk.NW,image=self.imgLogo)
+
+        ''' Canvas pour le schema '''
+        pathSchema = Fonctions.Externes.resource_path("schema.png")
+        self.canvasSchema = tk.Canvas(self,bg='#f0f0f0')
+        self.canvasSchema.config(width = 288,height=192)
+        self.canvasSchema.place(x=1250,y=0)
+        self.imgSchema = ImageTk.PhotoImage(Image.open(pathSchema).resize((288,192)))
+        self.canvasSchema.create_image(0,0,anchor=tk.NW,image=self.imgSchema)
+
+
+    def add_buttons(self):
+        self.boutonImport = tk.Button(self,text = "Import images",command = self.importImage,fg='purple')
+        self.boutonImport.place(relx=0.25,rely=0.12)
+        self.boutonImport.bind('<Control-o>',self.importImage)
+        tk.Button(self,text = "Predict",command = Interface.affichePrediction,fg='purple').place(relx=0.25,rely=0.155)
+        tk.Button(self,text = "Model Update (close Excel before)",command = HeadClass.genererAllDistancesHead,fg='green').place(relx=0.46,rely=0.158)
+        self.boutonPrevious = tk.Button(self,text='<--',fg='red',command = self.previousImage)
+        self.boutonPrevious.place(relx=0.38,rely=0.3)
+        self.boutonNext = tk.Button(self,text='-->',fg='red',command = self.nextImage)
+        self.boutonNext.place(relx=0.40,rely=0.3)
+
+    def add_labels(self):
+        ''' Label Intro de presentation'''
+        tk.Label(self, text = 'PREDICTION',font=("Purisa",12,"bold"),fg='purple').place(relx=0.25,rely=0.08)
+        tk.Label(self,text=" ",font=("Purisa",12,"bold")).grid(ipadx=2)
+        tk.Label(self,text=" Sexing procedure of three-spined stickleback \n",font=("Andalus",16,"bold")).place(relx=0.35,rely=0.01)
+        tk.Label(self,text="\n \n \n \n ").grid(column=0,row=1)
+        tk.Label(self, text = 'ADD THESE VALUES TO MODEL',font=("Purisa",12,"bold"),fg='green').place(relx=0.46,rely=0.08)
+        tk.Label(self,text='Sex for model:',fg='green').place(relx=0.46,rely=0.125)
+        self.labelSex = tk.Label(self,text="")
+        self.labelSex.place(x=650,y=190)
+
+
+        self.labelInfoPoints = tk.Label(self,text="",font=("Purisa",11),fg='gray')
+        self.labelInfoPoints.place(relx=0.1,rely=0.975)
+
+        self.labelVide = tk.Label(self,text="\n\n ")
+        self.labelVide.grid(column=0,row=3)
+
+        self.labelNumImage = tk.Label(self,text="",font=("Purisa",11),fg='gray')
+        self.labelNumImage.place(relx=0.45,rely=0.975)
+        self.labelNomImage = tk.Label(self,text="",font=("Purisa",11),fg='gray')
+        self.labelNomImage.place(relx=0.5,rely=0.975)
+
+        ''' Labels pour les longueurs de la tête '''
+        tk.Label(self,text="Longueurs caractéristiques de la tête : \n",justify=tk.LEFT,font=("Purisa",8,"bold","underline")).grid(column=0,row=4)
+        self.labelLongueur = tk.Label(self,text="",justify=tk.LEFT)
+        self.labelLongueur.grid(column=0,row=5)
+
+        ''' Labels pour les longueurs du corps '''
+        tk.Label(self,text="Longueurs caractéristiques du corps : \n",justify=tk.LEFT,font=("Purisa",8,"bold","underline")).grid(column=1,row=4)
+        self.labelLongueurBody = tk.Label(self,text="",justify=tk.LEFT)
+        self.labelLongueurBody.grid(column=1,row=5)
+
+
+    def add_menu(self):
         ''' Fenetre et menu'''
         self.state('zoomed')
         self.title("Sex Determination for Three Spined Stickleback")
@@ -462,101 +548,9 @@ class Interface(tk.Tk):
         menuAide = tk.Menu(menubar, tearoff=0)
         menuAide.add_command(label="A propos", command=self.help,accelerator="(Ctrl+I)")
         self.bind_all("<Control-i>",lambda e : self.help())
-        menuAide.add_command(label="Version",command=self.getVersion)
+        menuAide.add_command(label="Version",command=Interface.getVersion)
         menubar.add_cascade(label="Aide", menu=menuAide)
-
-
         self.config(menu=menubar)
-        self.listeImages = []
-        ''' Label Intro de presentation'''
-        tk.Label(self,text=" ",font=("Purisa",12,"bold")).grid(ipadx=2)
-        tk.Label(self,text=" Sexing procedure of three-spined stickleback \n",font=("Andalus",16,"bold")).place(relx=0.35,rely=0.01)
-        tk.Label(self,text="\n \n \n \n ").grid(column=0,row=1)
-
-        ''' Boutons '''
-        tk.Label(self, text = 'PREDICTION',font=("Purisa",12,"bold"),fg='purple').place(relx=0.25,rely=0.08)
-        self.boutonImport = tk.Button(self,text = "Import images",command = self.importImage,fg='purple')
-        self.boutonImport.place(relx=0.25,rely=0.12)
-        self.boutonImport.bind('<Control-o>',self.importImage)
-        tk.Button(self,text = "Predict",command = Interface.affichePrediction,fg='purple').place(relx=0.25,rely=0.155)
-        tk.Label(self, text = 'ADD THESE VALUES TO MODEL',font=("Purisa",12,"bold"),fg='green').place(relx=0.46,rely=0.08)
-        Interface.sexModele = tk.StringVar(self)
-        self.sexModel = tk.Entry(self,width=3,textvariable=Interface.sexModele)
-        self.sexModel.place(relx=0.52,rely=0.125)
-        tk.Button(self,text = "Model Update (close Excel before)",command = HeadClass.genererAllDistancesHead,fg='green').place(relx=0.46,rely=0.158)
-        tk.Label(self,text='Sex for model:',fg='green').place(relx=0.46,rely=0.125)
-        self.boutonPrevious = tk.Button(self,text='<--',fg='red',command = self.previousImage)
-        self.boutonPrevious.place(relx=0.38,rely=0.3)
-        self.boutonNext = tk.Button(self,text='-->',fg='red',command = self.nextImage)
-        self.boutonNext.place(relx=0.40,rely=0.3)
-
-
-
-
-        self.labelSex = tk.Label(self,text="")
-        self.labelSex.place(x=650,y=190)
-
-        self.labelInfoPoints = tk.Label(self,text="",font=("Purisa",11),fg='gray')
-        self.labelInfoPoints.place(relx=0.1,rely=0.975)
-
-        self.labelVide = tk.Label(self,text="\n\n ")
-        self.labelVide.grid(column=0,row=3)
-
-        self.labelNumImage = tk.Label(self,text="",font=("Purisa",11),fg='gray')
-        self.labelNumImage.place(relx=0.45,rely=0.975)
-        self.labelNomImage = tk.Label(self,text="",font=("Purisa",11),fg='gray')
-        self.labelNomImage.place(relx=0.5,rely=0.975)
-
-        ''' Labels pour les longueurs de la tête '''
-        tk.Label(self,text="Longueurs caractéristiques de la tête : \n",justify=tk.LEFT,font=("Purisa",8,"bold","underline")).grid(column=0,row=4)
-        self.labelLongueur = tk.Label(self,text="",justify=tk.LEFT)
-        self.labelLongueur.grid(column=0,row=5)
-        self.numImageActuelle = 0
-
-        ''' Labels pour les longueurs du corps '''
-        tk.Label(self,text="Longueurs caractéristiques du corps : \n",justify=tk.LEFT,font=("Purisa",8,"bold","underline")).grid(column=1,row=4)
-        self.labelLongueurBody = tk.Label(self,text="",justify=tk.LEFT)
-        self.labelLongueurBody.grid(column=1,row=5)
-
-        ''' Canvas pour la tête '''
-        self.canvasTete = tk.Canvas(self,bg='#f0f0f0',bd=0,highlightthickness=1, highlightbackground="black")
-        self.canvasTete.config(width=600, height=500)
-        self.canvasTete.grid(column=0,row=8)
-
-        ''' Canvas pour le corps '''
-        self.canvasCorps = tk.Canvas(self,bg='#f0f0f0',highlightthickness=1, highlightbackground="black")
-        self.canvasCorps.config(width=960, height=500)
-        self.canvasCorps.grid(column=1,row=8)
-
-        """Canvas pour logo"""
-        pathLogo = Interface.resource_path("logo2.png")
-        self.canvasLogo = tk.Canvas(self,bg='#f0f0f0')
-        self.canvasLogo.config(width=157,height=84)
-        self.canvasLogo.place(x=0,y=0)
-        self.imgLogo = ImageTk.PhotoImage(Image.open(pathLogo).resize((157,84)))
-        self.canvasLogo.create_image(0, 0, anchor=tk.NW,image=self.imgLogo)
-
-        ''' Canvas pour le schema '''
-        pathSchema = Interface.resource_path("schema.png")
-        self.canvasSchema = tk.Canvas(self,bg='#f0f0f0')
-        self.canvasSchema.config(width = 288,height=192)
-        self.canvasSchema.place(x=1250,y=0)
-        self.imgSchema = ImageTk.PhotoImage(Image.open(pathSchema).resize((288,192)))
-        self.canvasSchema.create_image(0,0,anchor=tk.NW,image=self.imgSchema)
-
-    def resource_path(relative_path):
-        """!
-        Méthode permettant d'avoir le chemin absolu temporaire (pour l'exe) ou normal
-        @param relative_path String : chemin du fichier dans le pc
-        @return resource_path : chemin temporaire
-        """
-        try:
-            base_path = sys._MEIPASS
-            print(base_path)
-        except Exception:
-            base_path = pypath2+"/images/"
-
-        return os.path.join(base_path, relative_path)
 
     def changeView(self):
         Interface_Sexage_Little.Temp.chemin = pypath3
@@ -607,30 +601,12 @@ class Interface(tk.Tk):
         self.listeImages = []
         self.numImageActuelle = 0
 
-    def getVersion(self):
+    def getVersion():
 
         try:
-            import requests
-            response = str(requests.get('https://github.com/RalphMasson/MorphoEpinoche/tags').content)
-            response = response.split('\\n')
-            response = [x if ".zip" in x else '' for x in response]
-            response = list(filter(None, response))
-            response = ''.join(response).split(" ")
-            response = list(filter(None, response))
-            response = [x if x.startswith("href") else '' for x in response]
-            response = list(filter(None, response))
-            response = ','.join(response).split('"')
-            response = [x if x.endswith(".zip") else '' for x in response]
-            response = list(filter(None, response))
-            response = ''.join(response).split("/")
-            response = [x if x.endswith(".zip") else '' for x in response]
-            response = list(filter(None, response))
-            response = ','.join(response).replace(".zip","").replace("v","").split(",")
-            response = max(list(map(float,response)))
-            version = response
-
+            version = Fonctions.Externes.getVersion()
         except:
-            version = 0
+            version = "-- No internet connection --"
 
         message = "Dernière version disponible : "+"v"+str(version)
         message += "\nVersion actuelle : "+"v"+str(Interface.version)
@@ -646,8 +622,6 @@ class Interface(tk.Tk):
         Méthode permettant d'ouvrir le lien github du projet
         """
         webbrowser.open('https://github.com/RalphMasson/MorphoEpinoche/releases/')
-
-
 
 
     def importImage(self,event=' '):
@@ -858,41 +832,6 @@ class Interface(tk.Tk):
         message += "\n\n\n Interface développée par R. Masson pour l'INERIS"
         tk.messagebox.showinfo(title="Informations",message=message)
 
-#
-# class Dialog(tk.Toplevel):
-#     def __init__(self, title, message):
-#         from tkinter import ttk
-        # tk.Toplevel.__init__(self)
-        # self.details_expanded = False
-        # self.title(title)
-        # self.geometry('350x75')
-        # self.minsize(350, 75)
-        # self.maxsize(425, 250)
-        # self.rowconfigure(0, weight=0)
-        # self.rowconfigure(1, weight=1)
-        # self.columnconfigure(0, weight=1)
-        #
-        # button_frame = tk.Frame(self)
-        # button_frame.grid(row=0, column=0, sticky='nsew')
-        # button_frame.columnconfigure(0, weight=1)
-        # button_frame.columnconfigure(1, weight=1)
-        #
-        # text_frame = tk.Frame(self)
-        # text_frame.grid(row=1, column=0, padx=(7, 7), pady=(7, 7), sticky='nsew')
-        # text_frame.rowconfigure(0, weight=1)
-        # text_frame.columnconfigure(0, weight=1)
-        #
-        # ttk.Label(button_frame, text=message).grid(row=0, column=0, columnspan=2, pady=(7, 7))
-        # ttk.Button(button_frame, text='Télécharger', command=self.buttonTelecharger).grid(row=1, column=0, sticky='e')
-        # ttk.Button(button_frame, text='OK', command=self.destroy).grid(row=1, column=1, sticky='w')
-
-
-    #
-    #
-    # def buttonTelecharger(self):
-    #     Interface.updateVersion()
-    #     self.destroy()
-    #
 
 app = Interface()
 app.mainloop()
