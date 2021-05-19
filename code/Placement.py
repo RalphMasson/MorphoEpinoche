@@ -245,61 +245,34 @@ class Points():
         img = cv2.addWeighted(img, 2, img, 0, -2)
         img = cv2.threshold(img,40,255,cv2.THRESH_TOZERO)[1]
 
-        # plt.figure()
-        # plt.imshow(img)
-
-        '''valeurs du filtre canny : 30,40   10 30'''
-        '''valeurs pour contours 120 130'''
+        #valeurs du filtre canny : 30,40   10,30  120,130
         edges = cv2.Canny(img,120,130)
         edges = cv2.blur(edges,(1,1))
         distances = []
         contours,hierarchy = cv2.findContours(edges,cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-        i=0
-        pente = []
-        pixelValue = []
-        for x in contours:
-            if(cv2.arcLength(x,True)>100 and cv2.arcLength(x,True)<500):
-                # cv2.drawContours(imgcopy,x,-1,(255,0,0),2,lineType=-1)
-                pente = abs(Fonctions.Externes.isContoursLineLike(x)[0])
-                if (pente > 5):
-                        c=x
-                        top = tuple(c[c[:, :, 1].argmin()][0])
-                        bottom = tuple(c[c[:, :, 1].argmax()][0])
-                        if(Fonctions.Externes.euclideDist(top,bottom)>80):
-                            # cv2.drawContours(imgcopy,x,-1,(0,255,0),2,lineType=-1)
-                            # distances.append([Fonctions.Externes.isContoursLineLike(c)[0],Fonctions.Externes.isContoursLineLike(c)[1],i])
-                            pixelValue.append(Fonctions.Externes.averagePixelValue(img,c,5))
-        print(pixelValue)
-        for x in contours:
-            if(cv2.arcLength(x,True)>100 and cv2.arcLength(x,True)<500):
-                pente = abs(Fonctions.Externes.isContoursLineLike(x)[0])
-                if (pente > 5):
-                    c=x
-                    top = tuple(c[c[:, :, 1].argmin()][0])
-                    bottom = tuple(c[c[:, :, 1].argmax()][0])
-                    if(Fonctions.Externes.euclideDist(top,bottom)>80):
-                        cv2.drawContours(imgcopy,x,-1,(255,0,0),2,lineType=-1)
-                        if(len(pixelValue)==1):
-                            # cv2.drawContours(imgcopy,x,-1,(255,0,0),2,lineType=-1)
-                            distances.append([Fonctions.Externes.isContoursLineLike(c)[0],Fonctions.Externes.isContoursLineLike(c)[1],i])
-                        if(len(pixelValue)>1):
-                            if(Fonctions.Externes.averagePixelValue(img,c,5)<np.percentile(pixelValue,40)):
-                                # cv2.drawContours(imgcopy,x,-1,(255,0,0),2,lineType=-1)
-                                distances.append([Fonctions.Externes.isContoursLineLike(c)[0],Fonctions.Externes.isContoursLineLike(c)[1],i])
-            i+=1
+        pixelValue = np.array([], dtype=np.int64).reshape(0,2)
+
+        for indx,x in enumerate(contours):
+            longueur = cv2.arcLength(x,True)>100 and cv2.arcLength(x,True)<500
+            pente = abs(Fonctions.Externes.isContoursLineLike(x)[0])>5
+            top = tuple(x[x[:, :, 1].argmin()][0])
+            bottom = tuple(x[x[:, :, 1].argmax()][0])
+            distance = Fonctions.Externes.euclideDist(top,bottom)>80
+            if(longueur and pente and distance):
+                pixelValue = np.vstack([pixelValue,np.array([[Fonctions.Externes.averagePixelValue(img,x,5),int(indx)]])])
+
+        for x in pixelValue.T[1]:
+            if(len(pixelValue)==1):
+                distances.append([Fonctions.Externes.isContoursLineLike(contours[int(x)])[0],Fonctions.Externes.isContoursLineLike(contours[int(x)])[1],x])
+            if(len(pixelValue)>1):
+                if(Fonctions.Externes.averagePixelValue(img,contours[int(x)],5)<np.percentile(pixelValue,40)):
+                    distances.append([Fonctions.Externes.isContoursLineLike(contours[int(x)])[0],Fonctions.Externes.isContoursLineLike(contours[int(x)])[1],x])
 
 
-
-        print(distances)
         distances.sort(key=lambda x:x[1])
 
-
-        # cv2.drawContours(imgcopy,[contours[distances[0][2]]],-1,(0,255,0),2,lineType=-1)
-
-        # plt.figure()
-        # plt.imshow(imgcopy)
         try:
-            contoursValide = contours[distances[0][2]]
+            contoursValide = contours[int(distances[0][2])]
             top = tuple(contoursValide[contoursValide[:, :, 1].argmin()][0])
             bottom = tuple(contoursValide[contoursValide[:, :, 1].argmax()][0])
             pt15 = top
@@ -307,6 +280,7 @@ class Points():
         except:
             pt15=(0,0)
             pt13=(0,0)
+
         print(pt15)
         print(pt13)
         return pt15,pt13
