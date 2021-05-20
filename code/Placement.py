@@ -1,7 +1,7 @@
 ''' Bibliothèque de fonctions de placement '''
 
 import cv2
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 import numpy as np
 import math
 
@@ -628,8 +628,8 @@ def test(path):
     [pt15,pt13] =Points.points15_13(imagerot,pt19,left,right)
     # pt13 = (1288, 1228)
     # pt15 = (1308, 1098)
-    cv2.circle(imagerot, pt15, 8, (255, 255, 0), -1)
-    cv2.circle(imagerot, pt13, 8, (255, 255, 0), -1)
+    cv2.circle(imagerot, pt15, 15, (255, 255, 0), -1)
+    cv2.circle(imagerot, pt13, 15, (255, 255, 0), -1)
     #
     # pt5,pt7 = Points.points5_7(imagerot,pt9)
     pt5,pt7= Points.points5_7(imagerot,pt9,left)
@@ -655,19 +655,19 @@ def test(path):
     # plt.show()
     return imagerot
 
-
-# test_male = [test(path) for path in male_img]
-#
-# import numpy as np
-# import matplotlib.pyplot as plt
-#
-# w=10
-# h=10
-# fig=plt.figure(figsize=(8, 8))
-# columns = 4
-# rows = 3
-# for i in range(1, columns*rows +1):
-#     img = test_male[i-1]
-#     fig.add_subplot(rows, columns, i)
-#     plt.imshow(img)
-# plt.show()
+# # #
+# # # test_male = [test(path) for path in male_img]
+# # #
+# # # import numpy as np
+# # # import matplotlib.pyplot as plt
+# # #
+# # # w=10
+# # # h=10
+# # # fig=plt.figure(figsize=(8, 8))
+# # # columns = 4
+# # # rows = 3
+# # # for i in range(1, columns*rows +1):
+# # #     img = test_male[i-1]
+# # #     fig.add_subplot(rows, columns, i)
+# # #     plt.imshow(img)
+# # # plt.show()
