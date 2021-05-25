@@ -537,7 +537,7 @@ class Externes():
         """
         import cv2
         IMG_POINTE_hsv = cv2.cvtColor(img,cv2.COLOR_RGB2HSV)
-        lower,upper = low_up_red()
+        lower,upper = Externes.low_up_red()
         mask = cv2.inRange(IMG_POINTE_hsv, lower, upper)
         return mask
 
@@ -564,8 +564,8 @@ class Externes():
         IMG_DETOURE = cv2.imread(img_detoure)
         IMG_DETOURE = cv2.cvtColor(IMG_DETOURE,cv2.COLOR_BGR2RGB)
         IMG_DETOURE = cv2.resize(IMG_DETOURE,(4000,3000))
-        IMG_DETOURE = changer_noir_en_blanc(IMG_DETOURE)
-        mask = mask_points_rouges(IMG_POINTE)
+        IMG_DETOURE = Externes.changer_noir_en_blanc(IMG_DETOURE)
+        mask = Externes.mask_points_rouges(IMG_POINTE)
         IMG_DETOURE[mask != 0] = [255,0,0]
 
         return IMG_DETOURE
@@ -581,7 +581,7 @@ class Externes():
         import numpy as np
         for k in range(iterations):
             IMG_DETOURE_hsv = cv2.cvtColor(IMG_DETOURE,cv2.COLOR_RGB2HSV)
-            lower,upper = low_up_red()
+            lower,upper = Externes.low_up_red()
             mask = cv2.inRange(IMG_DETOURE_hsv, lower, upper)
             x_red = np.where(mask!=0)[0]
             y_red = np.where(mask!=0)[1]
@@ -596,15 +596,15 @@ class Externes():
                 IMG_DETOURE[x_red[i]+1][y_red[i]-1] = [255,0,0]
         return IMG_DETOURE
 
-    def traitement_final_pointage(img_pointe,img_detoure):
+    def traitement_final_pointage(path_img_pointe,path_img_detoure):
         """!
         Méthode utilisant les méthodes décrites précédemment
         @param img_pointe : path image non détourée et pointée
         @param img_detoure : path image détourée et non pointée
         @return img_detoure : image detouree et pointee
         """
-        img_detoure = pointage_image_detouree(path_img_pointe,path_img_detoure)
-        img_detoure = grossir_point(img_detoure,5)
+        img_detoure = Externes.pointage_image_detouree(path_img_pointe,path_img_detoure)
+        img_detoure = Externes.grossir_point(img_detoure,5)
         # path_img_pointe = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\DATASETS_pointe\\Dataset1\\IMGP1862M.JPG"
         # path_img_detoure = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\DATASETS_detoure\\Dataset1\\IMGP1862M.JPG"
 
