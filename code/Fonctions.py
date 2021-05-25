@@ -493,6 +493,10 @@ class Externes():
         return os.path.join(base_path, relative_path)
 
     def getVersion():
+        """!
+        Méthode permettant d'avoir la dernière version du projet
+        @return version float (par exemple 1.4, 1.5)
+        """
         import requests
         response = str(requests.get('https://github.com/RalphMasson/MorphoEpinoche/tags').content)
         response = response.split('\\n')
@@ -512,3 +516,96 @@ class Externes():
         response = max(list(map(float,response)))
         version = response
         return version
+
+    def changer_noir_en_blanc(img):
+        """!
+        Méthode permettant de changer le fond noir en blanc
+        @param img : image detouree avec fond noir
+        @return img : image detouree avec fond blanc
+        """
+        import cv2
+        IMG_DETOURE_gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+        mask = cv2.compare(IMG_DETOURE_gray,5,cv2.CMP_LT)
+        img[mask > 0] = 255
+        return img
+
+    def mask_points_rouges(img):
+        """!
+        Méthode permettant d'avoir le masque des points rouges (pointage)
+        @param img : image non détourée pointée en rouge
+        @return mask : masque des points rouges de l'image non détourée
+        """
+        import cv2
+        IMG_POINTE_hsv = cv2.cvtColor(img,cv2.COLOR_RGB2HSV)
+        lower,upper = low_up_red()
+        mask = cv2.inRange(IMG_POINTE_hsv, lower, upper)
+        return mask
+
+    def low_up_red():
+        """!
+        Méthode permettant les bornes de la couleur rouge
+        @return lower,upper : bornes inférieure et supérieure du rouge
+        """
+        import numpy as np
+        lower = np.array([0,230,230])
+        upper = np.array([1,255,255])
+        return lower,upper
+
+    def pointage_image_detouree(img_pointe,img_detoure):
+        """!
+        Méthode permettant de transferer les points rouges sur l'image détourée
+        @param img_pointe : path image non détourée et pointée
+        @param img_detoure : path image détourée et non pointée
+        @return IMG_DETOURE : image détourée et pointée
+        """
+        import cv2
+        IMG_POINTE = cv2.imread(img_pointe)
+        IMG_POINTE = cv2.cvtColor(IMG_POINTE,cv2.COLOR_BGR2RGB)
+        IMG_DETOURE = cv2.imread(img_detoure)
+        IMG_DETOURE = cv2.cvtColor(IMG_DETOURE,cv2.COLOR_BGR2RGB)
+        IMG_DETOURE = cv2.resize(IMG_DETOURE,(4000,3000))
+        IMG_DETOURE = changer_noir_en_blanc(IMG_DETOURE)
+        mask = mask_points_rouges(IMG_POINTE)
+        IMG_DETOURE[mask != 0] = [255,0,0]
+
+        return IMG_DETOURE
+
+    def grossir_point(IMG_DETOURE,iterations):
+        """!
+        Méthode permettant de grossir les points après transfert
+        @param IMG_DETOURE : image detouree et pointee
+        @param iterations : nombre d'itérations (default = 5)
+        @return IMG_DETOURE : image detouree et pointee
+        """
+        import cv2
+        import numpy as np
+        for k in range(iterations):
+            IMG_DETOURE_hsv = cv2.cvtColor(IMG_DETOURE,cv2.COLOR_RGB2HSV)
+            lower,upper = low_up_red()
+            mask = cv2.inRange(IMG_DETOURE_hsv, lower, upper)
+            x_red = np.where(mask!=0)[0]
+            y_red = np.where(mask!=0)[1]
+            for i in range(len(x_red)):
+                IMG_DETOURE[x_red[i]-1][y_red[i]+1] = [255,0,0]
+                IMG_DETOURE[x_red[i]][y_red[i]+1] = [255,0,0]
+                IMG_DETOURE[x_red[i]+1][y_red[i]+1] = [255,0,0]
+                IMG_DETOURE[x_red[i]-1][y_red[i]] = [255,0,0]
+                IMG_DETOURE[x_red[i]+1][y_red[i]] = [255,0,0]
+                IMG_DETOURE[x_red[i]-1][y_red[i]-1] = [255,0,0]
+                IMG_DETOURE[x_red[i]][y_red[i]-1] = [255,0,0]
+                IMG_DETOURE[x_red[i]+1][y_red[i]-1] = [255,0,0]
+        return IMG_DETOURE
+
+    def traitement_final_pointage(img_pointe,img_detoure):
+        """!
+        Méthode utilisant les méthodes décrites précédemment
+        @param img_pointe : path image non détourée et pointée
+        @param img_detoure : path image détourée et non pointée
+        @return img_detoure : image detouree et pointee
+        """
+        img_detoure = pointage_image_detouree(path_img_pointe,path_img_detoure)
+        img_detoure = grossir_point(img_detoure,5)
+        # path_img_pointe = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\DATASETS_pointe\\Dataset1\\IMGP1862M.JPG"
+        # path_img_detoure = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\DATASETS_detoure\\Dataset1\\IMGP1862M.JPG"
+
+        return img_detoure
