@@ -15,7 +15,7 @@ import math
 # # # male_img = os.listdir(male_path)
 # # # male_img = [male_path+x for x in male_img]
 ''' TESTE AVEC FEMALE 1220F.JPG '''
-
+img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\DATASETS_final\\Dataset1\\IMGP1895M.JPG"
 # img = cv2.imread(img_path)
 # img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
 
@@ -36,17 +36,21 @@ class Points():
         if param=='body':size=(1300,975)
         diamond = Fonctions.Externes.diamondCV2()
         img = cv2.resize(img,size)
-        dst = cv2.addWeighted(img, 2, img, 0, 2)
+        # dst = cv2.addWeighted(img, 2, img, 0, 2)
         # plt.figure()
         # plt.imshow(dst)
+        dst=img
         dst = cv2.resize(dst,size)
         dst = cv2.cvtColor(dst,cv2.COLOR_RGB2GRAY)
         closing = cv2.morphologyEx(dst, cv2.MORPH_CLOSE, diamond,iterations=1)
         dilated = cv2.dilate(closing,diamond,iterations=1)
         blured = cv2.medianBlur(dilated,ksize=1)
-        binarized = cv2.threshold(blured,245,250,cv2.THRESH_BINARY)[1]
+        binarized = cv2.threshold(blured,253,255,cv2.THRESH_BINARY)[1]
+        # print(binarized)
+        # binarized = blured
         # plt.figure()
         # plt.imshow(binarized,cmap='gray')
+        # plt.show()
         contours, hierarchy = cv2.findContours(binarized,cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
         list_area = [cv2.contourArea(c) for c in contours]
         for c in contours:
@@ -139,6 +143,53 @@ class Points():
         circles = np.round(circles[0, :]).astype("int32")
         return circles1[0][0]
 
+    def points3_19_independant(img):
+        from scipy.signal import savgol_filter
+        from scipy.signal import find_peaks,argrelextrema
+
+        img = cv2.resize(img,(3500,2625))
+        pupille = Points.detect_eye(img)
+        imgNB = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+        imgNB = cv2.erode(imgNB,(5,5),iterations=10)
+        pt3 = [pupille[0]-2,pupille[1]]
+        pt19 = [pupille[1]+2,pupille[1]]
+        longueur_deplacement = np.linspace(0,180,181)
+        #imgNB[y][x]
+        intensite_est = savgol_filter([imgNB[int(pt3[1])][int(pt3[0]+x)] for x in longueur_deplacement],61,6)
+        intensite_ouest = savgol_filter([imgNB[int(pt3[1])][int(pt3[0]-x)] for x in longueur_deplacement],61,6)
+        intensite_est = [x if x<150 else 150 for x in intensite_est]
+        intensite_ouest = [x if x<150 else 150 for x in intensite_ouest]
+        intensite_est = [x if x>80 else 80 for x in intensite_est]
+        intensite_ouest = [x if x>80 else 80 for x in intensite_ouest]
+
+        peaks1, _ = find_peaks(intensite_est, prominence=1)
+        print(peaks1)
+
+        plt.figure()
+        plt.plot(longueur_deplacement,intensite_est)
+        ordo1 = [intensite_est[peak1] for peak1 in peaks1]
+        plt.plot(peaks1, ordo1, "x")
+        print(np.mean(intensite_est))
+        print(np.median(intensite_est))
+        plt.title("Est")
+        plt.grid(True)
+
+        peaks2, _ = find_peaks(intensite_ouest,prominence=1)
+
+        plt.figure()
+        plt.plot(longueur_deplacement,intensite_ouest)
+        ordo2 = [intensite_est[peak2] for peak2 in peaks2]
+        print(np.mean(intensite_ouest))
+        print(np.median(intensite_ouest))
+        plt.plot(peaks2, ordo2, "x")
+        plt.title("Ouest")
+        plt.grid(True)
+
+        # cv2.circle(imgNB,(int(pupille[0]),int(pupille[1])),180,(255,0,0),3)
+        # cv2.circle(imgNB,(int(pupille[0]),int(pupille[1])),2,(255,0,0),3)
+        # plt.figure()
+        # plt.imshow(imgNB)
+        plt.show()
 
     def points3_19(img):
         """!
@@ -150,7 +201,7 @@ class Points():
         print(img[:,:,0][1000][1500])
         pupille = Points.detect_eye(img)
         # # print("toto")
-        # # print(pupille)
+        print(pupille)
         imgNB = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
         # imgNB = cv2.GaussianBlur(imgNB,(15,15),0)
         imgNB = cv2.addWeighted(imgNB, 4, imgNB, 0, 1)
@@ -182,7 +233,8 @@ class Points():
             circles = np.round(circles[0, :]).astype("int")
         listPotentiels = [x[0] for x in circles]
         # # print(circles)
-        i = Fonctions.Externes.findNearestValueFromArray(listPotentiels,pupille[0])
+        i,dist = Fonctions.Externes.findNearestValueFromArray(listPotentiels,pupille[0])
+        print("titi")
         # # print(i)
         # print(circles[i][0])
         # points 3 et 19
@@ -190,8 +242,13 @@ class Points():
         # cv2.line(out,(circles[0][0],circles[0][1]),(circles[0][0]-circles[0][2],circles[0][1]),(255, 0, 0), 1)
         # plt.imshow(out)
         # plt.show()
-        pt3 = (circles[i][0]-circles[i][2],circles[i][1])
-        pt19 = (circles[i][0]+circles[i][2],circles[i][1])
+        if(dist>100):
+            pt3 = (int(pupille[0]-120),int(pupille[1]))
+            pt19 = (int(pupille[0]+120),int(pupille[1]))
+
+        else:
+            pt3 = (circles[i][0]-circles[i][2],circles[i][1])
+            pt19 = (circles[i][0]+circles[i][2],circles[i][1])
         # # print(pt3)
         # # print(pt19)
         return [pt3,pt19]
@@ -236,7 +293,7 @@ class Points():
         imgcopy = img.copy()
         img = cv2.cvtColor(img,cv2.COLOR_RGB2GRAY)
         img[:,:int(pt19[0])]=255
-        tiers = [(left[0]+right[0])/2.85,(left[1]+right[1])/2.85]
+        tiers = [(left[0]+right[0])/2.8,(left[1]+right[1])/2.8]
         # tiers = [(left[0]+right[0])/2.7,(left[1]+right[1])/2.7]
         img[:,int(tiers[0]):int(right[0])]=255
         # plt.imshow(img)
@@ -483,7 +540,10 @@ class Points():
         """
         _,c = Points.contoursCorps(img,'head')
         approxCorps = cv2.approxPolyDP(c,0.0000001,closed=False)
-        slope = (pt15[1]-pt13[1])/(pt15[0]-pt13[0])
+        if(pt15[0]-pt13[0]!=0):
+            slope = (pt15[1]-pt13[1])/(pt15[0]-pt13[0])
+        if(pt15[0]-pt13[0]==0):
+            slope = (pt15[1]-pt13[1])/0.00001
         slopes = []
         for p11 in approxCorps:
             p11 = list(p11[0])
@@ -616,6 +676,8 @@ def test(path):
     print("toto")
     print(imagerot.shape)
     [pt3,pt19]=Points.points3_19(imagerot)
+    Points.points3_19_independant(imagerot)
+
     print("pt3")
     print(pt3)
     print("pt19")
@@ -634,9 +696,9 @@ def test(path):
     # pt5,pt7 = Points.points5_7(imagerot,pt9)
     pt5,pt7= Points.points5_7(imagerot,pt9,left)
     #
-    # pt11,pt17 = Points.points11_17(imagerot,pt13,pt15)
-    # pt11 = (pt11[0],pt11[1])
-    # pt17 = (pt17[0],pt17[1])
+    pt11,pt17 = Points.points11_17(imagerot,pt13,pt15)
+    pt11 = (pt11[0],pt11[1])
+    pt17 = (pt17[0],pt17[1])
     cv2.circle(imagerot, left, 12, (0, 50, 255), -1)
     cv2.circle(imagerot, right, 12, (0, 255, 255), -1)
     # cv2.circle(imagerot, top, 12, (255, 50, 0), -1)
@@ -654,6 +716,9 @@ def test(path):
     # plt.grid(True)
     # plt.show()
     return imagerot
+
+
+test(img_path)
 
 # # #
 # # # test_male = [test(path) for path in male_img]

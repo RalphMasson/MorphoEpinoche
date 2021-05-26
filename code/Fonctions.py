@@ -285,7 +285,9 @@ class Externes():
         import numpy as np
         array = np.asarray(array)
         idx = (np.abs(array - value)).argmin()
-        return idx
+        dist = np.min(np.abs(array - value))
+        print(dist)
+        return idx,dist
 
     def openfn():
         """!

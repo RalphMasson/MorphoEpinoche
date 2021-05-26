@@ -371,25 +371,25 @@ class HeadFish():
         Méthode pour déplacer l'image à gauche
         @param event : event
         """
-        canvas.move(HeadFish.poisson,-10,0)
+        Interface.canvasTete.move(HeadFish.poisson,10,0)
     def moveRight(self,event):
         """!
         Méthode pour déplacer l'image à droite
         @param event : event
         """
-        canvas.move(HeadFish.poisson,10,0)
+        Interface.canvasTete.move(HeadFish.poisson,-10,0)
     def moveUp(self,event):
         """!
         Méthode pour déplacer l'image en haut
         @param event : event
         """
-        canvas.move(HeadFish.poisson,0,-10)
+        Interface.canvasTete.move(HeadFish.poisson,0,-10)
     def moveDown(self,event):
         """!
         Méthode pour déplacer l'image en bas
         @param event : event
         """
-        canvas.move(HeadFish.poisson,0,10)
+        Interface.canvasTete.move(HeadFish.poisson,0,10)
 
 class BodyFish():
     poisson = None
@@ -422,6 +422,7 @@ class BodyFish():
 class Interface(tk.Tk):
     sexModele = None
     version = 1.5
+    canvasTete = None
     def __init__(self):
         """!
         Constructeur de l'interface
@@ -443,9 +444,9 @@ class Interface(tk.Tk):
 
     def add_canvas(self):
         ''' Canvas pour la tête '''
-        self.canvasTete = tk.Canvas(self,bg='#f0f0f0',bd=0,highlightthickness=1, highlightbackground="black")
-        self.canvasTete.config(width=600, height=500)
-        self.canvasTete.grid(column=0,row=8)
+        Interface.canvasTete = tk.Canvas(self,bg='#f0f0f0',bd=0,highlightthickness=1, highlightbackground="black")
+        Interface.canvasTete.config(width=600, height=500)
+        Interface.canvasTete.grid(column=0,row=8)
 
         ''' Canvas pour le corps '''
         self.canvasCorps = tk.Canvas(self,bg='#f0f0f0',highlightthickness=1, highlightbackground="black")
