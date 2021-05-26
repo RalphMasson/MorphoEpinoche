@@ -15,7 +15,7 @@ import math
 # # # male_img = os.listdir(male_path)
 # # # male_img = [male_path+x for x in male_img]
 ''' TESTE AVEC FEMALE 1220F.JPG '''
-img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\DATASETS_final\\Dataset1\\IMGP1895M.JPG"
+img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\DATASETS_final\\Dataset1\\IMGP1868M.JPG"
 # img = cv2.imread(img_path)
 # img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
 
@@ -145,50 +145,46 @@ class Points():
 
     def points3_19_independant(img):
         from scipy.signal import savgol_filter
-        from scipy.signal import find_peaks,argrelextrema
+        from scipy.signal import find_peaks
 
         img = cv2.resize(img,(3500,2625))
         pupille = Points.detect_eye(img)
         imgNB = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-        imgNB = cv2.erode(imgNB,(5,5),iterations=10)
+        imgNB = cv2.erode(imgNB,(5,5),iterations=12)
         pt3 = [pupille[0]-2,pupille[1]]
         pt19 = [pupille[1]+2,pupille[1]]
-        longueur_deplacement = np.linspace(0,180,181)
+        longueur_deplacement = np.linspace(0,170,171)
         #imgNB[y][x]
-        intensite_est = savgol_filter([imgNB[int(pt3[1])][int(pt3[0]+x)] for x in longueur_deplacement],61,6)
-        intensite_ouest = savgol_filter([imgNB[int(pt3[1])][int(pt3[0]-x)] for x in longueur_deplacement],61,6)
+        intensite_est = savgol_filter([imgNB[int(pt3[1])][int(pt3[0]+x)] for x in longueur_deplacement],51,6)
+        intensite_ouest = savgol_filter([imgNB[int(pt3[1])][int(pt3[0]-x)] for x in longueur_deplacement],51,6)
         intensite_est = [x if x<150 else 150 for x in intensite_est]
         intensite_ouest = [x if x<150 else 150 for x in intensite_ouest]
         intensite_est = [x if x>80 else 80 for x in intensite_est]
         intensite_ouest = [x if x>80 else 80 for x in intensite_ouest]
+        intensite_est = [np.max(intensite_est) if x==np.min(intensite_est) else x for x in intensite_est]
+        intensite_est = [np.max(intensite_est) if i<50 else intensite_est[i] for i in range(len(intensite_est))]
+        intensite_est = [-x for x in intensite_est]
+
 
         peaks1, _ = find_peaks(intensite_est, prominence=1)
-        print(peaks1)
-
-        plt.figure()
-        plt.plot(longueur_deplacement,intensite_est)
         ordo1 = [intensite_est[peak1] for peak1 in peaks1]
-        plt.plot(peaks1, ordo1, "x")
-        print(np.mean(intensite_est))
-        print(np.median(intensite_est))
-        plt.title("Est")
-        plt.grid(True)
+        indx1 = np.max(ordo1)
+        indx1 = intensite_est.index(indx1)
 
-        peaks2, _ = find_peaks(intensite_ouest,prominence=1)
+        intensite_ouest = [np.min(intensite_ouest) if x<np.mean(intensite_ouest)+1 else np.max(intensite_ouest) for x in intensite_ouest]
+        peaks2, _ = find_peaks(intensite_ouest)
+        indx2 = [index for index, value in enumerate(intensite_ouest) if value == np.max(intensite_ouest)][-1]
+        ordo2 = [intensite_ouest[indx2]]
 
+
+        cv2.circle(imgNB,(int(pupille[0]),int(pupille[1])),170,(255,0,0),3)
+        cv2.circle(imgNB,(int(pupille[0]),int(pupille[1])),2,(255,0,0),3)
+        cv2.circle(imgNB,(int(pupille[0]-indx2),int(pupille[1])),2,(255,0,0),3)
+        cv2.circle(imgNB,(int(pupille[0]+indx1),int(pupille[1])),2,(255,0,0),3)
+
+        print()
         plt.figure()
-        plt.plot(longueur_deplacement,intensite_ouest)
-        ordo2 = [intensite_est[peak2] for peak2 in peaks2]
-        print(np.mean(intensite_ouest))
-        print(np.median(intensite_ouest))
-        plt.plot(peaks2, ordo2, "x")
-        plt.title("Ouest")
-        plt.grid(True)
-
-        # cv2.circle(imgNB,(int(pupille[0]),int(pupille[1])),180,(255,0,0),3)
-        # cv2.circle(imgNB,(int(pupille[0]),int(pupille[1])),2,(255,0,0),3)
-        # plt.figure()
-        # plt.imshow(imgNB)
+        plt.imshow(imgNB)
         plt.show()
 
     def points3_19(img):
