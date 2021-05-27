@@ -677,7 +677,7 @@ class Interface(tk.Tk):
         ''' Initialisation des points 3 et 19 par détection auto '''
         print("\n### Calcul des points 3 et 19 ###")
         try:
-            [pt3,pt19]=Placement.Points.points3_19(CV2_image_big)
+            [pt3,pt19]=Placement.Points.points3_19_independant(CV2_image_big)
             pt3 = [pt3[0],pt3[1]]
             pt19 = [pt19[0],pt19[1]]
         except:

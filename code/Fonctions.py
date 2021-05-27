@@ -457,6 +457,12 @@ class Externes():
         moy = np.mean(pixel)
         return moy
 
+    def averagePixelsValue(imgNB,listePoints):
+        import numpy as np
+        mean = np.median([imgNB[x[1]][x[0]] for x in listePoints])
+        return mean
+
+
     def diamondCV2():
         """!
         Methode pour avoir le patron de diamant
@@ -611,3 +617,66 @@ class Externes():
         # path_img_detoure = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\DATASETS_detoure\\Dataset1\\IMGP1862M.JPG"
 
         return img_detoure
+
+
+    def getRandomPointInCircle(r,xc,yc):
+        import random
+        import math
+
+        circle_r = r
+        circle_x = xc
+        circle_y = yc
+        alpha = 2 * math.pi * random.random()
+        r = circle_r * math.sqrt(random.random())
+        x = int(r * math.cos(alpha) + circle_x)
+        y = int(r * math.sin(alpha) + circle_y)
+        return x,y
+
+
+    def getRandomPointsInCircleOriented(r,xc,yc,orientation):
+        import random
+        import math
+        import numpy as np
+
+        circle_r = np.linspace(0,int(r),int(r)+1)
+        circle_x = int(xc)
+        circle_y = int(yc)
+        if(orientation=='nw'):
+            alpha = 1/0.93*math.pi
+
+        if(orientation=='nw1'):
+            alpha = 1/0.95*math.pi
+
+        if(orientation=='nw2'):
+            alpha = 1/0.97*math.pi
+
+        if(orientation=='sw'):
+            alpha = 0.93*math.pi
+
+        if(orientation=='sw1'):
+            alpha = 0.95*math.pi
+
+        if(orientation=='sw2'):
+            alpha = 0.97*math.pi
+
+        x = circle_r * math.cos(alpha) + circle_x
+        y = circle_r * math.sin(alpha) + circle_y
+        # x = np.round(x)
+        # y = np.round(y)
+        # x = list(dict.fromkeys(x))
+        # y = list(dict.fromkeys(y))
+
+
+        return x,y
+
+
+    def getRandomPointsInCircle(r,xc,yc,n):
+
+        listePoints = [Externes.getRandomPointInCircle(r,xc,yc) for _ in range(n)]
+        return listePoints
+
+    def lissage(signal_brut):
+        from scipy.signal import savgol_filter
+        signal_lisse = savgol_filter(signal_brut,51,6)
+        return signal_lisse
+

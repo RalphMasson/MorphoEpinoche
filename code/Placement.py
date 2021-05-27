@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 
-# img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\images_all\\gimp_cut\\male\\IMGP1152M.JPG"
+img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\images_all\\gimp_cut\\male\\IMGP1107M.JPG"
 # img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/1-1.JPG'
 # img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/2.JPG'
 # img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/3-3.JPG'
@@ -15,7 +15,9 @@ import math
 # # # male_img = os.listdir(male_path)
 # # # male_img = [male_path+x for x in male_img]
 ''' TESTE AVEC FEMALE 1220F.JPG '''
-img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\DATASETS_final\\Dataset1\\IMGP1868M.JPG"
+# img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\DATASETS_final\\Dataset1\\IMGP1909F.JPG"
+
+
 # img = cv2.imread(img_path)
 # img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
 
@@ -144,48 +146,182 @@ class Points():
         return circles1[0][0]
 
     def points3_19_independant(img):
+        """!
+        Routine pour détecter les points 3 et 19 en utilisant le moins possible des connaissances sur les longueurs (oeil)
+        @param image (type numpy.array)
+        @return pt3,pt19
+        """
         from scipy.signal import savgol_filter
         from scipy.signal import find_peaks
 
+        # # # Traitement de l'image # # #
         img = cv2.resize(img,(3500,2625))
-        pupille = Points.detect_eye(img)
         imgNB = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-        imgNB = cv2.erode(imgNB,(5,5),iterations=12)
+        imgNB = cv2.erode(imgNB,(5,5),iterations=6)
+
+        # # # Détection de la pupille # # #
+        pupille = Points.detect_eye(img)
+        x_pupille,y_pupille,r_pupille=pupille[0],pupille[1],pupille[2]
+        listePoints = Fonctions.Externes.getRandomPointsInCircle(r_pupille,x_pupille,y_pupille,30)
+        meanPixel = Fonctions.Externes.averagePixelsValue(imgNB,listePoints)
+        print("moyenne pupille "+str(meanPixel))
+
+        # # # Calculs # # #
+        nb_points = int(3.5*r_pupille)
+        longueur_deplacement = np.linspace(0,nb_points,nb_points+1)
+
         pt3 = [pupille[0]-2,pupille[1]]
         pt19 = [pupille[1]+2,pupille[1]]
-        longueur_deplacement = np.linspace(0,170,171)
-        #imgNB[y][x]
-        intensite_est = savgol_filter([imgNB[int(pt3[1])][int(pt3[0]+x)] for x in longueur_deplacement],51,6)
-        intensite_ouest = savgol_filter([imgNB[int(pt3[1])][int(pt3[0]-x)] for x in longueur_deplacement],51,6)
+        print(r_pupille)
+
+
+        xNW,yNW = Fonctions.Externes.getRandomPointsInCircleOriented(nb_points,x_pupille,y_pupille,'nw')
+        xNW1,yNW1 = Fonctions.Externes.getRandomPointsInCircleOriented(nb_points,x_pupille,y_pupille,'nw1')
+        xNW2,yNW2 = Fonctions.Externes.getRandomPointsInCircleOriented(nb_points,x_pupille,y_pupille,'nw2')
+
+        xSW,ySW = Fonctions.Externes.getRandomPointsInCircleOriented(nb_points,x_pupille,y_pupille,'sw')
+        xSW1,ySW1 = Fonctions.Externes.getRandomPointsInCircleOriented(nb_points,x_pupille,y_pupille,'sw1')
+        xSW2,ySW2 = Fonctions.Externes.getRandomPointsInCircleOriented(nb_points,x_pupille,y_pupille,'sw2')
+
+
+        # # # COTE OUEST # # #
+        intensite_nw = [imgNB[int(yNW[i])][int(xNW[i])] for i in range(len(xNW)) ]
+        intensite_nw1 = [imgNB[int(yNW1[i])][int(xNW1[i])] for i in range(len(xNW1)) ]
+        intensite_nw2 = [imgNB[int(yNW2[i])][int(xNW2[i])] for i in range(len(xNW2)) ]
+
+        intensite_sw = [imgNB[int(ySW[i])][int(xSW[i])] for i in range(len(xSW)) ]
+        intensite_sw1 = [imgNB[int(ySW1[i])][int(xSW1[i])] for i in range(len(xSW1)) ]
+        intensite_sw2 = [imgNB[int(ySW2[i])][int(xSW2[i])] for i in range(len(xSW2)) ]
+
+        intensite_ouest = [imgNB[int(pt3[1])][int(pt3[0]-x)] for x in longueur_deplacement]
+
+        # # # COTE EST # # #
+        intensite_est = [imgNB[int(pt3[1])][int(pt3[0]+x)] for x in longueur_deplacement]
+
+
+        plt.figure()
+        # plt.plot(longueur_deplacement,intensite_est)
+        plt.plot(longueur_deplacement,intensite_ouest)
+        plt.plot(longueur_deplacement,intensite_nw)
+        plt.plot(longueur_deplacement,intensite_nw1)
+        plt.plot(longueur_deplacement,intensite_nw2)
+        plt.plot(longueur_deplacement,intensite_sw)
+        plt.plot(longueur_deplacement,intensite_sw1)
+        plt.plot(longueur_deplacement,intensite_sw2)
+
+        plt.legend(['ouest','nw','nw1','nw2','sw','sw1','sw2'])
+        plt.title("déplacement brut")
+
+        intensite_est = Fonctions.Externes.lissage(intensite_est)
+        intensite_ouest = Fonctions.Externes.lissage(intensite_ouest)
+        intensite_nw = Fonctions.Externes.lissage(intensite_nw)
+        intensite_nw1 = Fonctions.Externes.lissage(intensite_nw1)
+        intensite_nw2 = Fonctions.Externes.lissage(intensite_nw2)
+
+        intensite_sw = Fonctions.Externes.lissage(intensite_sw)
+        intensite_sw1 = Fonctions.Externes.lissage(intensite_sw1)
+        intensite_sw2 = Fonctions.Externes.lissage(intensite_sw2)
+
+        plt.figure()
+        # plt.plot(longueur_deplacement,intensite_est)
+        plt.plot(longueur_deplacement,intensite_ouest*intensite_ouest*intensite_ouest)
+        # plt.plot(longueur_deplacement,intensite_nw)
+        # plt.plot(longueur_deplacement,intensite_sw)
+        # plt.plot(longueur_deplacement,intensite_nw1)
+        # plt.plot(longueur_deplacement,intensite_sw1)
+
+        # plt.plot(longueur_deplacement,intensite_ouest)
+        plt.plot(longueur_deplacement,intensite_nw*intensite_nw1*intensite_nw2)
+        plt.plot(longueur_deplacement,intensite_sw*intensite_sw1*intensite_sw2)
+
+
+        # plt.legend(['ouest','nw','sw','nw1','sw1'])
+        plt.title("déplacement lissé")
+
+        plt.figure()
+        # plt.plot(longueur_deplacement,intensite_est)
+        plt.plot(longueur_deplacement,intensite_ouest*intensite_nw*intensite_nw1*intensite_nw2)
+        # plt.plot(longueur_deplacement,intensite_nw)
+        # plt.plot(longueur_deplacement,intensite_sw)
+        # plt.plot(longueur_deplacement,intensite_nw1)
+        # plt.plot(longueur_deplacement,intensite_sw1)
+
+        # plt.plot(longueur_deplacement,intensite_ouest)
+        # plt.plot(longueur_deplacement,intensite_nw*intensite_nw1)
+        plt.plot(longueur_deplacement,intensite_ouest*intensite_sw*intensite_sw1*intensite_sw2)
+
+
+        # plt.legend(['ouest','nw','sw','nw1','sw1'])
+        plt.title("déplacement lissé2")
+
+
         intensite_est = [x if x<150 else 150 for x in intensite_est]
         intensite_ouest = [x if x<150 else 150 for x in intensite_ouest]
-        intensite_est = [x if x>80 else 80 for x in intensite_est]
-        intensite_ouest = [x if x>80 else 80 for x in intensite_ouest]
+        intensite_est = [meanPixel if i<r_pupille else intensite_est[i] for i in range(len(intensite_est))]
+        intensite_ouest = [x if x>1.5*meanPixel else meanPixel for x in intensite_ouest]
+        # # plt.figure()
+        # # plt.plot(longueur_deplacement,intensite_est)
+        # # plt.plot(longueur_deplacement,intensite_ouest)
+        # # plt.legend(['est','ouest'])
+        # #
+        # # plt.title("déplacement lissé applatissement <80")
+
+
         intensite_est = [np.max(intensite_est) if x==np.min(intensite_est) else x for x in intensite_est]
         intensite_est = [np.max(intensite_est) if i<50 else intensite_est[i] for i in range(len(intensite_est))]
         intensite_est = [-x for x in intensite_est]
+        # # plt.figure()
+        # # plt.plot(longueur_deplacement,intensite_ouest,'x')
+        # # plt.legend(['ouest'])
+        # # plt.title("déplacement lissé retournement EST")
 
 
-        peaks1, _ = find_peaks(intensite_est, prominence=1)
-        ordo1 = [intensite_est[peak1] for peak1 in peaks1]
-        indx1 = np.max(ordo1)
-        indx1 = intensite_est.index(indx1)
+        # from scipy import interpolate
+        import pwlf
+        # tck = interpolate.splrep(longueur_deplacement,intensite_ouest,k=2,s=0)
+        # plt.figure()
+        # plt.plot(longueur_deplacement,intensite_ouest,'x')
+        # plt.plot(longueur_deplacement,interpolate.splev(longueur_deplacement,tck,der=0),label='Fit')
+
+        my_pwlf = pwlf.PiecewiseLinFit(longueur_deplacement,intensite_ouest)
+        breaks = my_pwlf.fit(5,atol=0.4)
+        print(breaks)
+
+        a = breaks[3]
+        b = breaks[4]
+
+        indx3 = int(a+(0.95)*(b-a))
+        print(indx3)
+
+
+
+
+
+        # peaks1, _ = find_peaks(intensite_est, prominence=1)
+        # ordo1 = [intensite_est[peak1] for peak1 in peaks1]
+        # indx1 = np.max(ordo1)
+        # indx1 = intensite_est.index(indx1)
 
         intensite_ouest = [np.min(intensite_ouest) if x<np.mean(intensite_ouest)+1 else np.max(intensite_ouest) for x in intensite_ouest]
         peaks2, _ = find_peaks(intensite_ouest)
         indx2 = [index for index, value in enumerate(intensite_ouest) if value == np.max(intensite_ouest)][-1]
-        ordo2 = [intensite_ouest[indx2]]
+        ordo2 = [intensite_ouest[indx3]]
 
 
-        cv2.circle(imgNB,(int(pupille[0]),int(pupille[1])),170,(255,0,0),3)
+        cv2.circle(imgNB,(int(pupille[0]),int(pupille[1])),nb_points,(255,0,0),3)
         cv2.circle(imgNB,(int(pupille[0]),int(pupille[1])),2,(255,0,0),3)
-        cv2.circle(imgNB,(int(pupille[0]-indx2),int(pupille[1])),2,(255,0,0),3)
-        cv2.circle(imgNB,(int(pupille[0]+indx1),int(pupille[1])),2,(255,0,0),3)
+        cv2.circle(imgNB,(int(pupille[0]-indx3),int(pupille[1])),2,(255,0,0),3)
+        cv2.circle(imgNB,(int(pupille[0]+indx3),int(pupille[1])),2,(255,0,0),3)
 
-        print()
-        plt.figure()
-        plt.imshow(imgNB)
-        plt.show()
+        pt3 = (int(pupille[0]-indx3),int(pupille[1]))
+        pt19 = (int(pupille[0]+indx3),int(pupille[1]))
+
+        # print()
+        # plt.figure()
+        # plt.imshow(imgNB)
+        # plt.show()
+        return pt3,pt19
+
 
     def points3_19(img):
         """!
@@ -671,46 +807,46 @@ def test(path):
     # #
     print("toto")
     print(imagerot.shape)
-    [pt3,pt19]=Points.points3_19(imagerot)
-    Points.points3_19_independant(imagerot)
+    [pt3,pt19]=Points.points3_19_independant(imagerot)
+    # Points.points3_19_independant(imagerot)
 
-    print("pt3")
-    print(pt3)
-    print("pt19")
-    print(pt19)
-    # circles = Points.points3_19(imagerot)
-    print("pt9")
-    pt9 = Points.point9(c,pt19)
-    #
-    # #ne fonctionne pas pour l'instant
-    [pt15,pt13] =Points.points15_13(imagerot,pt19,left,right)
-    # pt13 = (1288, 1228)
-    # pt15 = (1308, 1098)
-    cv2.circle(imagerot, pt15, 15, (255, 255, 0), -1)
-    cv2.circle(imagerot, pt13, 15, (255, 255, 0), -1)
-    #
-    # pt5,pt7 = Points.points5_7(imagerot,pt9)
-    pt5,pt7= Points.points5_7(imagerot,pt9,left)
-    #
-    pt11,pt17 = Points.points11_17(imagerot,pt13,pt15)
-    pt11 = (pt11[0],pt11[1])
-    pt17 = (pt17[0],pt17[1])
-    cv2.circle(imagerot, left, 12, (0, 50, 255), -1)
-    cv2.circle(imagerot, right, 12, (0, 255, 255), -1)
-    # cv2.circle(imagerot, top, 12, (255, 50, 0), -1)
-    # cv2.circle(imagerot, bottom, 12, (255, 255, 0), -1)
-    cv2.circle(imagerot, pt3, 4, (255, 0, 0), -1)
-    cv2.circle(imagerot, pt19, 4, (255, 0, 0), -1)
-    cv2.circle(imagerot, pt9, 8, (255, 0, 0), -1)
-    cv2.circle(imagerot, pt5, 8, (0, 255, 0), -1)
-    cv2.circle(imagerot, pt7, 8, (0, 255, 0), -1)
-    # cv2.circle(imagerot, pt11, 8, (0, 255, 0), -1)
-    # cv2.circle(imagerot, pt17, 8, (0, 255, 0), -1)
-    # plt.figure()
-    # plt.imshow(imagerot)
+    # # # print("pt3")
+    # # # print(pt3)
+    # # # print("pt19")
+    # # # print(pt19)
+    # # # # circles = Points.points3_19(imagerot)
+    # # # print("pt9")
+    # # # pt9 = Points.point9(c,pt19)
+    # # # #
+    # # # # #ne fonctionne pas pour l'instant
+    # # # [pt15,pt13] =Points.points15_13(imagerot,pt19,left,right)
+    # # # # pt13 = (1288, 1228)
+    # # # # pt15 = (1308, 1098)
+    # # # cv2.circle(imagerot, pt15, 15, (255, 255, 0), -1)
+    # # # cv2.circle(imagerot, pt13, 15, (255, 255, 0), -1)
+    # # # #
+    # # # # pt5,pt7 = Points.points5_7(imagerot,pt9)
+    # # # pt5,pt7= Points.points5_7(imagerot,pt9,left)
+    # # # #
+    # # # # pt11,pt17 = Points.points11_17(imagerot,pt13,pt15)
+    # # # # pt11 = (pt11[0],pt11[1])
+    # # # # pt17 = (pt17[0],pt17[1])
+    # # # cv2.circle(imagerot, left, 12, (0, 50, 255), -1)
+    # # # cv2.circle(imagerot, right, 12, (0, 255, 255), -1)
+    # # # # cv2.circle(imagerot, top, 12, (255, 50, 0), -1)
+    # # # # cv2.circle(imagerot, bottom, 12, (255, 255, 0), -1)
+    # # # cv2.circle(imagerot, pt3, 4, (255, 0, 0), -1)
+    # # # cv2.circle(imagerot, pt19, 4, (255, 0, 0), -1)
+    # # # cv2.circle(imagerot, pt9, 8, (255, 0, 0), -1)
+    # # # cv2.circle(imagerot, pt5, 8, (0, 255, 0), -1)
+    # # # cv2.circle(imagerot, pt7, 8, (0, 255, 0), -1)
+    # # # # cv2.circle(imagerot, pt11, 8, (0, 255, 0), -1)
+    # # # # cv2.circle(imagerot, pt17, 8, (0, 255, 0), -1)
+    # # # # plt.figure()
+    # # # # plt.imshow(imagerot)
     # plt.title("Vérification du positionnement des points avant interface")
     # plt.grid(True)
-    # plt.show()
+    plt.show()
     return imagerot
 
 
