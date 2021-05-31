@@ -677,6 +677,24 @@ class Externes():
 
     def lissage(signal_brut):
         from scipy.signal import savgol_filter
-        signal_lisse = savgol_filter(signal_brut,51,6)
+        signal_lisse = savgol_filter(signal_brut,window_length=51,polyorder=6,deriv=0)
         return signal_lisse
 
+    def derive(signal_lisse):
+        from scipy.signal import savgol_filter
+        signal_derive = savgol_filter(signal_brut,window_length=51,polyorder=6,deriv=1)
+        return signal_derive
+
+    def removeOutliers(x, outlierConstant):
+        import numpy as np
+        a = np.array(x)
+        upper_quartile = np.percentile(a, 75)
+        lower_quartile = np.percentile(a, 25)
+        IQR = (upper_quartile - lower_quartile) * outlierConstant
+        quartileSet = (lower_quartile - IQR, upper_quartile + IQR)
+        resultList = []
+        # print(quartileSet)
+        for y in a.tolist():
+            if y >= quartileSet[0] and y <= quartileSet[1]:
+                resultList.append(y)
+        return resultList

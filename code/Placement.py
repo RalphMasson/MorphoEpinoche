@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 
-img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\images_all\\gimp_cut\\male\\IMGP1107M.JPG"
+# img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\images_all\\gimp_cut\\male\\IMGP1074M.JPG"
 # img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/1-1.JPG'
 # img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/2.JPG'
 # img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/3-3.JPG'
@@ -15,11 +15,12 @@ img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\images_all\\gimp_cut\\ma
 # # # male_img = os.listdir(male_path)
 # # # male_img = [male_path+x for x in male_img]
 ''' TESTE AVEC FEMALE 1220F.JPG '''
-# img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\DATASETS_final\\Dataset1\\IMGP1909F.JPG"
+img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\DATASETS_final\\Dataset1\\IMGP1881M.JPG"
 
 
 # img = cv2.imread(img_path)
 # img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
+from skimage.filters import *
 
 import sys,inspect
 sys.path.insert(0,'/'.join(inspect.stack()[0][1].split('\\')[:-1]))
@@ -153,10 +154,12 @@ class Points():
         """
         from scipy.signal import savgol_filter
         from scipy.signal import find_peaks
+        import pwlf
+        import warnings
 
-        # # # Traitement de l'image # # #
         img = cv2.resize(img,(3500,2625))
-        imgNB = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+        imgGray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+        imgNB = cv2.cvtColor(img,cv2.COLOR_RGB2HLS)[:,:,1]
         imgNB = cv2.erode(imgNB,(5,5),iterations=6)
 
         # # # Détection de la pupille # # #
@@ -165,94 +168,189 @@ class Points():
         listePoints = Fonctions.Externes.getRandomPointsInCircle(r_pupille,x_pupille,y_pupille,30)
         meanPixel = Fonctions.Externes.averagePixelsValue(imgNB,listePoints)
         print("moyenne pupille "+str(meanPixel))
-
-        # # # Calculs # # #
-        nb_points = int(3.5*r_pupille)
-        longueur_deplacement = np.linspace(0,nb_points,nb_points+1)
+        print("rayon pupille"+str(r_pupille))
 
         pt3 = [pupille[0]-2,pupille[1]]
         pt19 = [pupille[1]+2,pupille[1]]
         print(r_pupille)
 
 
+        # # # Calculs # # #
+        nb_points = int(3.5*r_pupille)
+        longueur_deplacement = np.linspace(0,nb_points,nb_points+1)
+
         xNW,yNW = Fonctions.Externes.getRandomPointsInCircleOriented(nb_points,x_pupille,y_pupille,'nw')
         xNW1,yNW1 = Fonctions.Externes.getRandomPointsInCircleOriented(nb_points,x_pupille,y_pupille,'nw1')
         xNW2,yNW2 = Fonctions.Externes.getRandomPointsInCircleOriented(nb_points,x_pupille,y_pupille,'nw2')
-
         xSW,ySW = Fonctions.Externes.getRandomPointsInCircleOriented(nb_points,x_pupille,y_pupille,'sw')
         xSW1,ySW1 = Fonctions.Externes.getRandomPointsInCircleOriented(nb_points,x_pupille,y_pupille,'sw1')
         xSW2,ySW2 = Fonctions.Externes.getRandomPointsInCircleOriented(nb_points,x_pupille,y_pupille,'sw2')
 
 
-        # # # COTE OUEST # # #
+        '''BINARISATION + PEAKS '''
+
+        height,width = imgGray.shape
+        mask = np.zeros((height,width))*255
+        cv2.circle(mask,( int(x_pupille),int(y_pupille)),int(4*r_pupille),1,thickness=-1)
+        ProcessedRegion = np.where(mask!=0,imgNB,mask)
+        _,test = cv2.threshold(ProcessedRegion.astype('uint8'),0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+        ProcessedRegion = np.where(mask!=0,test,imgNB)
+        # # plt.figure()
+        # # plt.imshow(ProcessedRegion)
+
+        intensite_nw = [ProcessedRegion[int(yNW[i])][int(xNW[i])] for i in range(len(xNW)) ]
+        intensite_nw1 = [ProcessedRegion[int(yNW1[i])][int(xNW1[i])] for i in range(len(xNW1)) ]
+        intensite_nw2 = [ProcessedRegion[int(yNW2[i])][int(xNW2[i])] for i in range(len(xNW2)) ]
+        intensite_sw = [ProcessedRegion[int(ySW[i])][int(xSW[i])] for i in range(len(xSW)) ]
+        intensite_sw1 = [ProcessedRegion[int(ySW1[i])][int(xSW1[i])] for i in range(len(xSW1)) ]
+        intensite_sw2 = [ProcessedRegion[int(ySW2[i])][int(xSW2[i])] for i in range(len(xSW2)) ]
+        intensite_ouest = [ProcessedRegion[int(pt3[1])][int(pt3[0]-x)] for x in longueur_deplacement]
+
+        liste = [intensite_nw,intensite_nw1,intensite_nw2,intensite_sw,intensite_sw1,intensite_sw2,intensite_ouest]
+        possiblesChoix = []
+        for x in liste:
+            with np.errstate(all='raise'):
+                try:
+                    my_pwlf1 = pwlf.PiecewiseLinFit(longueur_deplacement,x)
+                    breaks1 = my_pwlf1.fit(5,atol=0.4)
+                    possiblesChoix.append(0.5*(breaks1[3]+breaks1[4]))
+                except:
+                    None
+
+        print('peaks binarization')
+        # print(possibleChoix)
+        possibleChoix = np.median(possiblesChoix)
+        print(possibleChoix)
+
+        # # # COTE EST # # #
+        intensite_est = [ProcessedRegion[int(pt3[1])][int(pt3[0]+x)] for x in longueur_deplacement]
+
+        ''' LUMINOSITE + PEAKS '''
+
         intensite_nw = [imgNB[int(yNW[i])][int(xNW[i])] for i in range(len(xNW)) ]
         intensite_nw1 = [imgNB[int(yNW1[i])][int(xNW1[i])] for i in range(len(xNW1)) ]
         intensite_nw2 = [imgNB[int(yNW2[i])][int(xNW2[i])] for i in range(len(xNW2)) ]
-
         intensite_sw = [imgNB[int(ySW[i])][int(xSW[i])] for i in range(len(xSW)) ]
         intensite_sw1 = [imgNB[int(ySW1[i])][int(xSW1[i])] for i in range(len(xSW1)) ]
         intensite_sw2 = [imgNB[int(ySW2[i])][int(xSW2[i])] for i in range(len(xSW2)) ]
-
         intensite_ouest = [imgNB[int(pt3[1])][int(pt3[0]-x)] for x in longueur_deplacement]
-
-        # # # COTE EST # # #
         intensite_est = [imgNB[int(pt3[1])][int(pt3[0]+x)] for x in longueur_deplacement]
 
+        # plt.figure()
+        # # plt.plot(longueur_deplacement,intensite_est)
+        # plt.plot(longueur_deplacement,intensite_ouest)
+        # plt.plot(longueur_deplacement,intensite_nw)
+        # plt.plot(longueur_deplacement,intensite_nw1)
+        # plt.plot(longueur_deplacement,intensite_nw2)
+        # plt.plot(longueur_deplacement,intensite_sw)
+        # plt.plot(longueur_deplacement,intensite_sw1)
+        # plt.plot(longueur_deplacement,intensite_sw2)
 
-        plt.figure()
-        # plt.plot(longueur_deplacement,intensite_est)
-        plt.plot(longueur_deplacement,intensite_ouest)
-        plt.plot(longueur_deplacement,intensite_nw)
-        plt.plot(longueur_deplacement,intensite_nw1)
-        plt.plot(longueur_deplacement,intensite_nw2)
-        plt.plot(longueur_deplacement,intensite_sw)
-        plt.plot(longueur_deplacement,intensite_sw1)
-        plt.plot(longueur_deplacement,intensite_sw2)
-
-        plt.legend(['ouest','nw','nw1','nw2','sw','sw1','sw2'])
-        plt.title("déplacement brut")
+        # plt.legend(['ouest','nw','nw1','nw2','sw','sw1','sw2'])
+        # plt.title("déplacement brut")
 
         intensite_est = Fonctions.Externes.lissage(intensite_est)
         intensite_ouest = Fonctions.Externes.lissage(intensite_ouest)
         intensite_nw = Fonctions.Externes.lissage(intensite_nw)
         intensite_nw1 = Fonctions.Externes.lissage(intensite_nw1)
         intensite_nw2 = Fonctions.Externes.lissage(intensite_nw2)
-
         intensite_sw = Fonctions.Externes.lissage(intensite_sw)
         intensite_sw1 = Fonctions.Externes.lissage(intensite_sw1)
         intensite_sw2 = Fonctions.Externes.lissage(intensite_sw2)
 
-        plt.figure()
-        # plt.plot(longueur_deplacement,intensite_est)
-        plt.plot(longueur_deplacement,intensite_ouest*intensite_ouest*intensite_ouest)
-        # plt.plot(longueur_deplacement,intensite_nw)
-        # plt.plot(longueur_deplacement,intensite_sw)
-        # plt.plot(longueur_deplacement,intensite_nw1)
-        # plt.plot(longueur_deplacement,intensite_sw1)
+        intensite_ouest = [np.min(intensite_ouest) if i<r_pupille else intensite_ouest[i] for i in range(len(intensite_ouest))]
+        intensite_nw = [np.min(intensite_ouest) if i<r_pupille else intensite_nw[i] for i in range(len(intensite_nw))]
+        intensite_nw1 = [np.min(intensite_ouest) if i<r_pupille else intensite_nw1[i] for i in range(len(intensite_nw1))]
+        intensite_nw2 = [np.min(intensite_ouest) if i<r_pupille else intensite_nw2[i] for i in range(len(intensite_nw2))]
+        intensite_sw = [np.min(intensite_ouest) if i<r_pupille else intensite_sw[i] for i in range(len(intensite_sw))]
+        intensite_sw1 = [np.min(intensite_ouest) if i<r_pupille else intensite_sw1[i] for i in range(len(intensite_sw1))]
+        intensite_sw2 = [np.min(intensite_ouest) if i<r_pupille else intensite_sw2[i] for i in range(len(intensite_sw1))]
 
-        # plt.plot(longueur_deplacement,intensite_ouest)
-        plt.plot(longueur_deplacement,intensite_nw*intensite_nw1*intensite_nw2)
-        plt.plot(longueur_deplacement,intensite_sw*intensite_sw1*intensite_sw2)
-
-
-        # plt.legend(['ouest','nw','sw','nw1','sw1'])
-        plt.title("déplacement lissé")
-
-        plt.figure()
-        # plt.plot(longueur_deplacement,intensite_est)
-        plt.plot(longueur_deplacement,intensite_ouest*intensite_nw*intensite_nw1*intensite_nw2)
-        # plt.plot(longueur_deplacement,intensite_nw)
-        # plt.plot(longueur_deplacement,intensite_sw)
-        # plt.plot(longueur_deplacement,intensite_nw1)
-        # plt.plot(longueur_deplacement,intensite_sw1)
-
-        # plt.plot(longueur_deplacement,intensite_ouest)
-        # plt.plot(longueur_deplacement,intensite_nw*intensite_nw1)
-        plt.plot(longueur_deplacement,intensite_ouest*intensite_sw*intensite_sw1*intensite_sw2)
+        # # plt.figure()
+        # # plt.plot(longueur_deplacement,intensite_ouest)
+        # # plt.plot(longueur_deplacement,intensite_nw)
+        # # plt.plot(longueur_deplacement,intensite_nw1)
+        # # plt.plot(longueur_deplacement,intensite_nw2)
+        # #
+        # # plt.plot(longueur_deplacement,intensite_sw)
+        # # plt.plot(longueur_deplacement,intensite_sw1)
+        # # plt.plot(longueur_deplacement,intensite_sw2)
+        # #
+        # # plt.legend(['ouest','nw','nw1','nw2','sw','sw1','sw2'])
 
 
-        # plt.legend(['ouest','nw','sw','nw1','sw1'])
-        plt.title("déplacement lissé2")
+
+        liste = [intensite_nw,intensite_nw1,intensite_nw2,intensite_sw,intensite_sw1,intensite_sw2,intensite_ouest]
+        choices2 = []
+
+        for x in liste:
+
+            my_pwlf1 = pwlf.PiecewiseLinFit(longueur_deplacement,x)
+            breaks1 = my_pwlf1.fit(4,atol=10)
+            slopes1 = my_pwlf1.calc_slopes()
+            intercepts1 = my_pwlf1.intercepts
+            possiblesChoix.append(abs((intercepts1[3]-intercepts1[2])/(slopes1[3]-slopes1[2])))
+
+        finalChoix = np.median(possiblesChoix)
+        print(finalChoix)
+
+
+        # # # plt.figure()
+        # # # plt.plot(longueur_deplacement,intensite_ouest)
+        # # # # plt.plot(longueur_deplacement,intensite_ouest*intensite_ouest*intensite_ouest)
+        # # # plt.plot(longueur_deplacement,intensite_nw)
+        # # # plt.plot(longueur_deplacement,intensite_nw1)
+        # # # plt.plot(longueur_deplacement,intensite_nw2)
+        # # #
+        # # # plt.plot(longueur_deplacement,intensite_sw)
+        # # # plt.plot(longueur_deplacement,intensite_sw1)
+        # # # plt.plot(longueur_deplacement,intensite_sw2)
+        # # #
+        # # #
+        # # # # plt.plot(longueur_deplacement,intensite_ouest)
+        # # # # plt.plot(longueur_deplacement,intensite_nw*intensite_nw1*intensite_nw2)
+        # # # # plt.plot(longueur_deplacement,intensite_sw*intensite_sw1*intensite_sw2)
+        # # #
+        # # #
+        # # # plt.legend(['ouest','nw','nw1','nw2','sw','sw1','sw2'])
+        # # # plt.title("déplacement lissé")
+        # # #
+        # # # plt.figure()
+        # # # # plt.plot(longueur_deplacement,intensite_est)
+        # # # plt.plot(longueur_deplacement,intensite_ouest*intensite_nw*intensite_nw1*intensite_nw2)
+        # # # # plt.plot(longueur_deplacement,intensite_nw)
+        # # # # plt.plot(longueur_deplacement,intensite_sw)
+        # # # # plt.plot(longueur_deplacement,intensite_nw1)
+        # # # # plt.plot(longueur_deplacement,intensite_sw1)
+        # # #
+        # # # # plt.plot(longueur_deplacement,intensite_ouest)
+        # # # # plt.plot(longueur_deplacement,intensite_nw*intensite_nw1)
+        # # # plt.plot(longueur_deplacement,intensite_ouest*intensite_sw*intensite_sw1*intensite_sw2)
+        # # #
+        # # #
+        # # # # plt.legend(['ouest','nw','sw','nw1','sw1'])
+        # # # plt.title("déplacement lissé2")
+        # # #
+        # # # signal1 = intensite_ouest*intensite_nw*intensite_nw1*intensite_nw2
+        # # # signal2 = intensite_ouest*intensite_sw*intensite_sw1*intensite_sw2
+        # # # my_pwlf1 = pwlf.PiecewiseLinFit(longueur_deplacement,signal1)
+        # # # my_pwlf2 = pwlf.PiecewiseLinFit(longueur_deplacement,signal2)
+        # # # print("Coupures")
+        # # # breaks1 = my_pwlf1.fit(4,atol=0.4)
+        # # # print(breaks1)
+        # # # breaks2 = my_pwlf2.fit(4,atol=0.4)
+        # # # print(breaks2)
+        # # # print("Fin coupures")
+        # # #
+
+
+
+
+
+
+
+
+
 
 
         intensite_est = [x if x<150 else 150 for x in intensite_est]
@@ -267,6 +365,8 @@ class Points():
         # # plt.title("déplacement lissé applatissement <80")
 
 
+
+
         intensite_est = [np.max(intensite_est) if x==np.min(intensite_est) else x for x in intensite_est]
         intensite_est = [np.max(intensite_est) if i<50 else intensite_est[i] for i in range(len(intensite_est))]
         intensite_est = [-x for x in intensite_est]
@@ -277,21 +377,21 @@ class Points():
 
 
         # from scipy import interpolate
-        import pwlf
+
         # tck = interpolate.splrep(longueur_deplacement,intensite_ouest,k=2,s=0)
         # plt.figure()
         # plt.plot(longueur_deplacement,intensite_ouest,'x')
         # plt.plot(longueur_deplacement,interpolate.splev(longueur_deplacement,tck,der=0),label='Fit')
 
-        my_pwlf = pwlf.PiecewiseLinFit(longueur_deplacement,intensite_ouest)
-        breaks = my_pwlf.fit(5,atol=0.4)
-        print(breaks)
+        # my_pwlf = pwlf.PiecewiseLinFit(longueur_deplacement,intensite_ouest)
+        # breaks = my_pwlf.fit(5,atol=0.4)
+        # print(breaks)
 
-        a = breaks[3]
-        b = breaks[4]
+        # a = breaks[3]
+        # b = breaks[4]
 
-        indx3 = int(a+(0.95)*(b-a))
-        print(indx3)
+        # indx3 = int(a+(0.95)*(b-a))
+        # print(indx3)
 
 
 
@@ -305,20 +405,20 @@ class Points():
         intensite_ouest = [np.min(intensite_ouest) if x<np.mean(intensite_ouest)+1 else np.max(intensite_ouest) for x in intensite_ouest]
         peaks2, _ = find_peaks(intensite_ouest)
         indx2 = [index for index, value in enumerate(intensite_ouest) if value == np.max(intensite_ouest)][-1]
-        ordo2 = [intensite_ouest[indx3]]
+        # ordo2 = [intensite_ouest[indx3]]
 
 
-        cv2.circle(imgNB,(int(pupille[0]),int(pupille[1])),nb_points,(255,0,0),3)
-        cv2.circle(imgNB,(int(pupille[0]),int(pupille[1])),2,(255,0,0),3)
-        cv2.circle(imgNB,(int(pupille[0]-indx3),int(pupille[1])),2,(255,0,0),3)
-        cv2.circle(imgNB,(int(pupille[0]+indx3),int(pupille[1])),2,(255,0,0),3)
+        cv2.circle(imgGray,(int(pupille[0]),int(pupille[1])),nb_points,(255,0,0),3)
+        cv2.circle(imgGray,(int(pupille[0]),int(pupille[1])),2,(255,0,0),3)
+        cv2.circle(imgGray,(int(pupille[0]-finalChoix),int(pupille[1])),2,(255,0,0),3)
+        cv2.circle(imgGray,(int(pupille[0]+finalChoix),int(pupille[1])),2,(255,0,0),3)
 
-        pt3 = (int(pupille[0]-indx3),int(pupille[1]))
-        pt19 = (int(pupille[0]+indx3),int(pupille[1]))
+        pt3 = (int(pupille[0]-finalChoix),int(pupille[1]))
+        pt19 = (int(pupille[0]+finalChoix),int(pupille[1]))
 
         # print()
         # plt.figure()
-        # plt.imshow(imgNB)
+        # plt.imshow(imgGray)
         # plt.show()
         return pt3,pt19
 
