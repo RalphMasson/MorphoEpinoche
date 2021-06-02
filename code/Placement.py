@@ -15,7 +15,8 @@ import math
 # # # male_img = os.listdir(male_path)
 # # # male_img = [male_path+x for x in male_img]
 ''' TESTE AVEC FEMALE 1220F.JPG '''
-img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\DATASETS_final\\Dataset1\\IMGP1881M.JPG"
+img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\DATASETS_final\\Dataset1\\IMGP1875M.JPG"
+# img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\DATASETS_detoure\\Dataset2\\IMGP2063F.JPG"
 
 
 # img = cv2.imread(img_path)
@@ -167,12 +168,12 @@ class Points():
         x_pupille,y_pupille,r_pupille=pupille[0],pupille[1],pupille[2]
         listePoints = Fonctions.Externes.getRandomPointsInCircle(r_pupille,x_pupille,y_pupille,30)
         meanPixel = Fonctions.Externes.averagePixelsValue(imgNB,listePoints)
-        print("moyenne pupille "+str(meanPixel))
-        print("rayon pupille"+str(r_pupille))
+        # print("moyenne pupille "+str(meanPixel))
+        # print("rayon pupille"+str(r_pupille))
 
         pt3 = [pupille[0]-2,pupille[1]]
         pt19 = [pupille[1]+2,pupille[1]]
-        print(r_pupille)
+        # print(r_pupille)
 
 
         # # # Calculs # # #
@@ -195,8 +196,8 @@ class Points():
         ProcessedRegion = np.where(mask!=0,imgNB,mask)
         _,test = cv2.threshold(ProcessedRegion.astype('uint8'),0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
         ProcessedRegion = np.where(mask!=0,test,imgNB)
-        # # plt.figure()
-        # # plt.imshow(ProcessedRegion)
+        # plt.figure()
+        # plt.imshow(ProcessedRegion)
 
         intensite_nw = [ProcessedRegion[int(yNW[i])][int(xNW[i])] for i in range(len(xNW)) ]
         intensite_nw1 = [ProcessedRegion[int(yNW1[i])][int(xNW1[i])] for i in range(len(xNW1)) ]
@@ -206,13 +207,13 @@ class Points():
         intensite_sw2 = [ProcessedRegion[int(ySW2[i])][int(xSW2[i])] for i in range(len(xSW2)) ]
         intensite_ouest = [ProcessedRegion[int(pt3[1])][int(pt3[0]-x)] for x in longueur_deplacement]
 
-        liste = [intensite_nw,intensite_nw1,intensite_nw2,intensite_sw,intensite_sw1,intensite_sw2,intensite_ouest]
+        liste = [intensite_nw,intensite_nw1,intensite_sw,intensite_sw1,intensite_ouest]
         possiblesChoix = []
         for x in liste:
             with np.errstate(all='raise'):
                 try:
                     my_pwlf1 = pwlf.PiecewiseLinFit(longueur_deplacement,x)
-                    breaks1 = my_pwlf1.fit(5,atol=0.4)
+                    breaks1 = my_pwlf1.fit(5,atol=10)
                     possiblesChoix.append(0.5*(breaks1[3]+breaks1[4]))
                 except:
                     None
@@ -220,10 +221,12 @@ class Points():
         print('peaks binarization')
         # print(possibleChoix)
         possibleChoix = np.median(possiblesChoix)
-        print(possibleChoix)
+        # print(possibleChoix)
 
         # # # COTE EST # # #
         intensite_est = [ProcessedRegion[int(pt3[1])][int(pt3[0]+x)] for x in longueur_deplacement]
+        # plt.figure()
+        # plt.plot(longueur_deplacement,intensite_est)
 
         ''' LUMINOSITE + PEAKS '''
 
@@ -237,7 +240,7 @@ class Points():
         intensite_est = [imgNB[int(pt3[1])][int(pt3[0]+x)] for x in longueur_deplacement]
 
         # plt.figure()
-        # # plt.plot(longueur_deplacement,intensite_est)
+        # plt.plot(longueur_deplacement,intensite_est)
         # plt.plot(longueur_deplacement,intensite_ouest)
         # plt.plot(longueur_deplacement,intensite_nw)
         # plt.plot(longueur_deplacement,intensite_nw1)
@@ -266,7 +269,9 @@ class Points():
         intensite_sw1 = [np.min(intensite_ouest) if i<r_pupille else intensite_sw1[i] for i in range(len(intensite_sw1))]
         intensite_sw2 = [np.min(intensite_ouest) if i<r_pupille else intensite_sw2[i] for i in range(len(intensite_sw1))]
 
-        # # plt.figure()
+        # plt.figure()
+        # plt.plot(longueur_deplacement,intensite_est)
+
         # # plt.plot(longueur_deplacement,intensite_ouest)
         # # plt.plot(longueur_deplacement,intensite_nw)
         # # plt.plot(longueur_deplacement,intensite_nw1)
@@ -280,8 +285,7 @@ class Points():
 
 
 
-        liste = [intensite_nw,intensite_nw1,intensite_nw2,intensite_sw,intensite_sw1,intensite_sw2,intensite_ouest]
-        choices2 = []
+        liste = [intensite_nw,intensite_nw1,intensite_sw,intensite_sw1,intensite_ouest]
 
         for x in liste:
 
@@ -292,7 +296,7 @@ class Points():
             possiblesChoix.append(abs((intercepts1[3]-intercepts1[2])/(slopes1[3]-slopes1[2])))
 
         finalChoix = np.median(possiblesChoix)
-        print(finalChoix)
+        # print(finalChoix)
 
 
         # # # plt.figure()
@@ -370,10 +374,10 @@ class Points():
         intensite_est = [np.max(intensite_est) if x==np.min(intensite_est) else x for x in intensite_est]
         intensite_est = [np.max(intensite_est) if i<50 else intensite_est[i] for i in range(len(intensite_est))]
         intensite_est = [-x for x in intensite_est]
-        # # plt.figure()
-        # # plt.plot(longueur_deplacement,intensite_ouest,'x')
-        # # plt.legend(['ouest'])
-        # # plt.title("déplacement lissé retournement EST")
+        # plt.figure()
+        # plt.plot(longueur_deplacement,intensite_est,'x')
+        # plt.legend(['est'])
+        # plt.title("déplacement lissé retournement EST")
 
 
         # from scipy import interpolate
@@ -397,10 +401,11 @@ class Points():
 
 
 
-        # peaks1, _ = find_peaks(intensite_est, prominence=1)
-        # ordo1 = [intensite_est[peak1] for peak1 in peaks1]
-        # indx1 = np.max(ordo1)
-        # indx1 = intensite_est.index(indx1)
+        peaks1, _ = find_peaks(intensite_est, prominence=1)
+        print(peaks1)
+        ordo1 = [intensite_est[peak1] for peak1 in peaks1]
+        indx1 = np.max(ordo1)
+        indx1 = intensite_est.index(indx1)
 
         intensite_ouest = [np.min(intensite_ouest) if x<np.mean(intensite_ouest)+1 else np.max(intensite_ouest) for x in intensite_ouest]
         peaks2, _ = find_peaks(intensite_ouest)
@@ -408,13 +413,13 @@ class Points():
         # ordo2 = [intensite_ouest[indx3]]
 
 
-        cv2.circle(imgGray,(int(pupille[0]),int(pupille[1])),nb_points,(255,0,0),3)
-        cv2.circle(imgGray,(int(pupille[0]),int(pupille[1])),2,(255,0,0),3)
+        # cv2.circle(imgGray,(int(pupille[0]),int(pupille[1])),nb_points,(255,0,0),3)
+        # cv2.circle(imgGray,(int(pupille[0]),int(pupille[1])),2,(255,0,0),3)
         cv2.circle(imgGray,(int(pupille[0]-finalChoix),int(pupille[1])),2,(255,0,0),3)
-        cv2.circle(imgGray,(int(pupille[0]+finalChoix),int(pupille[1])),2,(255,0,0),3)
+        cv2.circle(imgGray,(int(pupille[0]+indx1),int(pupille[1])),2,(255,0,0),3)
 
         pt3 = (int(pupille[0]-finalChoix),int(pupille[1]))
-        pt19 = (int(pupille[0]+finalChoix),int(pupille[1]))
+        pt19 = (int(pupille[0]+indx1),int(pupille[1]))
 
         # print()
         # plt.figure()
@@ -916,36 +921,36 @@ def test(path):
     # # # print(pt19)
     # # # # circles = Points.points3_19(imagerot)
     # # # print("pt9")
-    # # # pt9 = Points.point9(c,pt19)
+    pt9 = Points.point9(c,pt19)
     # # # #
     # # # # #ne fonctionne pas pour l'instant
-    # # # [pt15,pt13] =Points.points15_13(imagerot,pt19,left,right)
+    [pt15,pt13] =Points.points15_13(imagerot,pt19,left,right)
     # # # # pt13 = (1288, 1228)
     # # # # pt15 = (1308, 1098)
-    # # # cv2.circle(imagerot, pt15, 15, (255, 255, 0), -1)
-    # # # cv2.circle(imagerot, pt13, 15, (255, 255, 0), -1)
+    cv2.circle(imagerot, pt15, 15, (255, 255, 0), -1)
+    cv2.circle(imagerot, pt13, 15, (255, 255, 0), -1)
     # # # #
     # # # # pt5,pt7 = Points.points5_7(imagerot,pt9)
-    # # # pt5,pt7= Points.points5_7(imagerot,pt9,left)
+    pt5,pt7= Points.points5_7(imagerot,pt9,left)
     # # # #
-    # # # # pt11,pt17 = Points.points11_17(imagerot,pt13,pt15)
-    # # # # pt11 = (pt11[0],pt11[1])
-    # # # # pt17 = (pt17[0],pt17[1])
-    # # # cv2.circle(imagerot, left, 12, (0, 50, 255), -1)
-    # # # cv2.circle(imagerot, right, 12, (0, 255, 255), -1)
-    # # # # cv2.circle(imagerot, top, 12, (255, 50, 0), -1)
-    # # # # cv2.circle(imagerot, bottom, 12, (255, 255, 0), -1)
-    # # # cv2.circle(imagerot, pt3, 4, (255, 0, 0), -1)
-    # # # cv2.circle(imagerot, pt19, 4, (255, 0, 0), -1)
-    # # # cv2.circle(imagerot, pt9, 8, (255, 0, 0), -1)
-    # # # cv2.circle(imagerot, pt5, 8, (0, 255, 0), -1)
-    # # # cv2.circle(imagerot, pt7, 8, (0, 255, 0), -1)
-    # # # # cv2.circle(imagerot, pt11, 8, (0, 255, 0), -1)
-    # # # # cv2.circle(imagerot, pt17, 8, (0, 255, 0), -1)
-    # # # # plt.figure()
-    # # # # plt.imshow(imagerot)
-    # plt.title("Vérification du positionnement des points avant interface")
-    # plt.grid(True)
+    pt11,pt17 = Points.points11_17(imagerot,pt13,pt15)
+    pt11 = (pt11[0],pt11[1])
+    pt17 = (pt17[0],pt17[1])
+    cv2.circle(imagerot, left, 12, (0, 50, 255), -1)
+    cv2.circle(imagerot, right, 12, (0, 255, 255), -1)
+    cv2.circle(imagerot, top, 12, (255, 50, 0), -1)
+    cv2.circle(imagerot, bottom, 12, (255, 255, 0), -1)
+    cv2.circle(imagerot, pt3, 4, (255, 0, 0), -1)
+    cv2.circle(imagerot, pt19, 4, (255, 0, 0), -1)
+    cv2.circle(imagerot, pt9, 8, (255, 0, 0), -1)
+    cv2.circle(imagerot, pt5, 8, (0, 255, 0), -1)
+    cv2.circle(imagerot, pt7, 8, (0, 255, 0), -1)
+    cv2.circle(imagerot, pt11, 8, (0, 255, 0), -1)
+    cv2.circle(imagerot, pt17, 8, (0, 255, 0), -1)
+    plt.figure()
+    plt.imshow(imagerot)
+    plt.title("Vérification du positionnement des points avant interface")
+    plt.grid(True)
     plt.show()
     return imagerot
 
