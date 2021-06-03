@@ -239,18 +239,18 @@ class Points():
         intensite_ouest = [imgNB[int(pt3[1])][int(pt3[0]-x)] for x in longueur_deplacement]
         intensite_est = [imgNB[int(pt3[1])][int(pt3[0]+x)] for x in longueur_deplacement]
 
-        # plt.figure()
-        # plt.plot(longueur_deplacement,intensite_est)
-        # plt.plot(longueur_deplacement,intensite_ouest)
-        # plt.plot(longueur_deplacement,intensite_nw)
-        # plt.plot(longueur_deplacement,intensite_nw1)
-        # plt.plot(longueur_deplacement,intensite_nw2)
-        # plt.plot(longueur_deplacement,intensite_sw)
-        # plt.plot(longueur_deplacement,intensite_sw1)
-        # plt.plot(longueur_deplacement,intensite_sw2)
+        plt.figure()
+        plt.plot(longueur_deplacement,intensite_est)
+        plt.plot(longueur_deplacement,intensite_ouest)
+        plt.plot(longueur_deplacement,intensite_nw)
+        plt.plot(longueur_deplacement,intensite_nw1)
+        plt.plot(longueur_deplacement,intensite_nw2)
+        plt.plot(longueur_deplacement,intensite_sw)
+        plt.plot(longueur_deplacement,intensite_sw1)
+        plt.plot(longueur_deplacement,intensite_sw2)
 
-        # plt.legend(['ouest','nw','nw1','nw2','sw','sw1','sw2'])
-        # plt.title("déplacement brut")
+        plt.legend(['est','ouest','nw','nw1','nw2','sw','sw1','sw2'])
+        plt.title("déplacement brut")
 
         intensite_est = Fonctions.Externes.lissage(intensite_est)
         intensite_ouest = Fonctions.Externes.lissage(intensite_ouest)
@@ -269,19 +269,19 @@ class Points():
         intensite_sw1 = [np.min(intensite_ouest) if i<r_pupille else intensite_sw1[i] for i in range(len(intensite_sw1))]
         intensite_sw2 = [np.min(intensite_ouest) if i<r_pupille else intensite_sw2[i] for i in range(len(intensite_sw1))]
 
-        # plt.figure()
-        # plt.plot(longueur_deplacement,intensite_est)
+        plt.figure()
+        plt.plot(longueur_deplacement,intensite_est)
 
-        # # plt.plot(longueur_deplacement,intensite_ouest)
-        # # plt.plot(longueur_deplacement,intensite_nw)
-        # # plt.plot(longueur_deplacement,intensite_nw1)
-        # # plt.plot(longueur_deplacement,intensite_nw2)
-        # #
-        # # plt.plot(longueur_deplacement,intensite_sw)
-        # # plt.plot(longueur_deplacement,intensite_sw1)
-        # # plt.plot(longueur_deplacement,intensite_sw2)
-        # #
-        # # plt.legend(['ouest','nw','nw1','nw2','sw','sw1','sw2'])
+        plt.plot(longueur_deplacement,intensite_ouest)
+        plt.plot(longueur_deplacement,intensite_nw)
+        plt.plot(longueur_deplacement,intensite_nw1)
+        plt.plot(longueur_deplacement,intensite_nw2)
+
+        plt.plot(longueur_deplacement,intensite_sw)
+        plt.plot(longueur_deplacement,intensite_sw1)
+        plt.plot(longueur_deplacement,intensite_sw2)
+
+        plt.legend(['est','ouest','nw','nw1','nw2','sw','sw1','sw2'])
 
 
 
