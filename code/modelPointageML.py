@@ -1,0 +1,71 @@
+import utils
+
+
+class ML_pointage():
+
+    """!
+
+        Classe de placement de points par Machine Learning
+        Nécessite d'avoir pointé au préalable les images avec tpsDig
+
+    """
+
+    def preprocess_folder(imagefolder_path,tpsfile_path):
+        """!
+        Séparation des images en image de train et de test (80% 20%)
+        @param imagefolder_path : dossier où se trouvent toutes les images pointées
+        @param tpsfile_path : fichier tps avec les coordonnées des points
+        @return None deux fichiers xml Train et Test
+        """
+        file_sizes=utils.split_train_test(imagefolder_path)
+        dict_tps=utils.read_tps(tpsfile_path)
+        utils.generate_dlib_xml(dict_tps,file_sizes['train'],folder='train',out_file='train.xml')
+        utils.generate_dlib_xml(dict_tps,file_sizes['test'],folder='test',out_file='test.xml')
+        utils.dlib_xml_to_tps('train.xml')
+        utils.dlib_xml_to_tps('test.xml')
+
+    def parameter_model(num_trees,nu,threads,tree_depth,cascade_depth,feature_pool_size,test_splits,oversampling):
+        """!
+        Réglage du modèle
+        --num-trees      number of regression trees (default = 500)
+        --threads       number of threads to be used (default = 1)
+        --tree-depth    choice of tree depth (default = 4)
+        --cascade-depth  choice of cascade depth (default = 15)
+        --nu            regularization parameter (default = 0.1)
+        --feature-pool-size choice of feature pool size (default = 500)
+        --test-splits    number of test splits (default = 20)
+        --oversampling oversampling amount (default = 10)
+        """
+        options = dlib.shape_predictor_training_options()
+        options.num_trees_per_cascade_level=num_trees
+        options.nu = nu
+        options.num_threads = threads
+        options.tree_depth = tree_depth
+        options.cascade_depth = cascade_depth
+        options.feature_pool_size = feature_pool_size
+        options.num_test_splits = test_splits
+        options.oversampling_amount = oversampling
+        options.be_verbose = True
+
+        return options
+
+    def train_model(trainfolder_path,options):
+        """!
+        Lance l'apprentissage du modèle
+        """
+        dlib.train_shape_predictor(trainfolder_path,"predictor.dat",options)
+        print("Training error (average pixel deviation): {}".format(dlib.test_shape_predictor(trainfolder_path, "predictor.dat")))
+
+    def test_model(testfolder_path,options):
+        """!
+        Teste le modèle obtenu
+        """
+        print("Testing error (average pixel deviation): {}".format(dlib.test_shape_predictor(testfolder_path,"predictor.dat")))
+
+    def predict(foldernewimage):
+        """!
+        Prédit les points d'une image
+        """
+        utils.predictions_to_xml("predictor.dat", dir=foldernewimage,ignore=None,out_file="output.xml")
+        utils.dlib_xml_to_tps("output.xml")
+
