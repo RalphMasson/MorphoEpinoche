@@ -49,3 +49,16 @@ for file in glob.glob("*.png"):
         last_version = max(liste_version)
         new_version = str(int(last_version)+1)
         os.replace(chemin2+file,chemin3+"class_diagram_v"+new_version+".png")
+
+    if('ml' in file):
+        chemin3 = chemin+"class_diagram\\ml_points\\"
+        liste_fichiers = os.listdir(chemin3)
+        try:
+            liste_version = [liste_fichiers[i][-5] for i in range(len(liste_fichiers))]
+            last_version = max(liste_version)
+            new_version = str(int(last_version)+1)
+            os.replace(chemin2+file,chemin3+"class_diagram_v"+new_version+".png")
+        except:
+            last_version = 1
+            new_version = str(int(last_version)+1)
+            os.replace(chemin2+file,chemin3+"class_diagram_v"+new_version+".png")

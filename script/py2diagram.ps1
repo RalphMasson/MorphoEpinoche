@@ -6,6 +6,7 @@ Pyreverse -o dot -p Interface_Little Interface_Sexage_Little.py
 Pyreverse -o dot -p Placement Placement.py
 Pyreverse -o dot -p Classification Classification.py
 Pyreverse -o dot -p Fonctions Fonctions.py
+Pyreverse -o dot -p ml_points modelPointageML.py
 cd ..
 cd script
 echo "Conversion du graphe en image"
