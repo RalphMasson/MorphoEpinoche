@@ -23,9 +23,10 @@ class ML_pointage():
         Nécessite d'avoir pointé au préalable les images avec tpsDig
 
         Adapted from :
-            Kazemi,Sullivan, "One millisecond face alignment with an ensemble of regression trees," doi: 10.1109/CVPR.2014.241.
-            Perrot,Bourdon,Helbert "Implementing cascaded regression tree-based face landmarking" doi: 10.1016/j.imavis.2020.103976
-            Porto, Voje "ML-morph: [...] automated [...] landmarking of biological structures in images" 10.1111/2041-210X.13373
+            Kazemi,Sullivan, "One millisecond face alignment with an ensemble of regression trees," doi: 10.1109/CVPR.2014.241.       2014
+            Perrot,Bourdon,Helbert "Implementing cascaded regression tree-based face landmarking" doi: 10.1016/j.imavis.2020.103976   2020
+            Porto, Voje "ML-morph: [...] automated [...] landmarking of biological structures in images" 10.1111/2041-210X.13373      2020
+            Irani, Allada.. "Highly versatile facial landmarks detection models using ensemble of regression trees with application"  2019
 
 
 
@@ -112,7 +113,7 @@ class ML_pointage():
         Lance l'apprentissage du modèle avec les valeurs par défaut
         @param trainfolder : path+"train.xml"
         """
-        ML_pointage.parameter_model(500,0.1,1,4,15,500,20,200)
+        ML_pointage.parameter_model(500,0.1,1,4,15,500,20,10)
         dlib.train_shape_predictor(trainfolder_path,ML_pointage.path+"predictor.dat",ML_pointage.options)
         print("Training error (average pixel deviation): {}".format(dlib.test_shape_predictor(trainfolder_path, "predictor.dat")))
 
