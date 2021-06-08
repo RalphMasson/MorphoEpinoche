@@ -9,3 +9,14 @@ LM=8
 1110.0 1709.0
 IMAGE=C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\test_pointage_ML\img\train\P5050097.jpg
 ID=0
+LM=8
+919.0 1382.0
+1073.0 1256.0
+1400.0 1278.0
+1396.0 1356.0
+1396.0 1569.0
+1382.0 1706.0
+1314.0 1506.0
+1087.0 1474.0
+IMAGE=C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\test_pointage_ML\img\train\P5050091.jpg
+ID=1

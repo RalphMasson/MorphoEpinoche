@@ -266,13 +266,14 @@ def image_prep(file, name, dir_path):
         print('File {} was ignored'.format(file))
     else:
         file_sz= [img.shape[0],img.shape[1]]
+        img = cv2.resize(img,(1200,900))
         cv2.imwrite(os.path.join(dir_path,name), img)
     return file_sz
 
 
 # Tools for predicting objects and shapes in new images
 
-def predictions_to_xml(predictor_name:str,dir=str,ignore= None, out_file='output.xml'):
+def predictions_to_xml(predictor_name,dir,ignore, out_file):
     '''
     Generates a dlib format xml file for model predictions. It uses previously trained models to
     identify objects in images and to predict their shape. 
@@ -288,26 +289,32 @@ def predictions_to_xml(predictor_name:str,dir=str,ignore= None, out_file='output
     '''
     extensions = {'.jpg', '.JPG', '.jpeg', '.JPEG', '.tif','.TIF'}
     predictor = dlib.shape_predictor(predictor_name)
+    # print(predictor)
     root = ET.Element('dataset')
     root.append(ET.Element('name'))
     root.append(ET.Element('comment'))
     images_e = ET.Element('images')
     root.append(images_e)
-    for f in glob.glob(f'./{dir}/*'):
-        ext = ntpath.splitext(f)[1]
+    # print(os.listdir(dir))
+    for f in os.listdir(dir):
+        ff = dir+f
+        # print(dir+f)
+        ext = ntpath.splitext(ff)[1]
         if ext in extensions:
-            path, file = os.path.split(f)
-            img = cv2.imread(f)
+            path, file = os.path.split(ff)
+            img = cv2.imread(ff)
             image_e = ET.Element('image')
-            image_e.set('file', str(f))
+            image_e.set('file', str(ff))
             e = (dlib.rectangle(left=1, top=1, right=img.shape[1]-1, bottom=img.shape[0]-1))
             shape = predictor(img, e)
+            # print(shape)
             box = ET.Element('box')
             box.set('top', str(int(1)))
             box.set('left', str(int(1)))
             box.set('width', str(int(img.shape[1]-2)))
             box.set('height', str(int(img.shape[0]-2)))
             part_length = range(0,shape.num_parts) 
+            # print(part_length)
             for item, i in enumerate(sorted(part_length, key=str)):
                 if ignore is not None:
                     if i not in ignore:
@@ -328,8 +335,8 @@ def predictions_to_xml(predictor_name:str,dir=str,ignore= None, out_file='output
             images_e.append(image_e)
     et = ET.ElementTree(root)
     xmlstr = minidom.parseString(ET.tostring(et.getroot())).toprettyxml(indent="   ")
-    with open(out_file, "w") as f:
-        f.write(xmlstr)
+    with open(out_file, "w") as ff:
+        ff.write(xmlstr)
 
 #Importing to pandas tools
 
