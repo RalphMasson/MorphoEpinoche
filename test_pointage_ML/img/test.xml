@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<dataset>
+   <name/>
+   <comment/>
+   <images>
+      <image file="C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\test_pointage_ML\img\test\P5050090.jpg">
+         <box top="1" left="1" width="4606" height="3454">
+            <part name="0" x="919" y="2074"/>
+            <part name="1" x="1073" y="2200"/>
+            <part name="2" x="1400" y="2178"/>
+            <part name="3" x="1396" y="2100"/>
+            <part name="4" x="1396" y="1887"/>
+            <part name="5" x="1382" y="1750"/>
+            <part name="6" x="1314" y="1950"/>
+            <part name="7" x="1087" y="1982"/>
+         </box>
+      </image>
+   </images>
+</dataset>

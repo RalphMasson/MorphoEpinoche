@@ -1,10 +1,20 @@
-import utils
+import sys,inspect
+pypath = inspect.stack()[0][1]
+pypath = pypath.split('\\')
+pypath1 = '/'.join(pypath[:-1])
+pypath3 = '/'.join(pypath[:-2])+"/executable"
+pypath2 = '/'.join(pypath[:-2])
+sys.path.insert(0,pypath1)
+
+import utilsML as utils
 import dlib
 
 # à incorporer à l'interface
 # et aux dossiers utilisateurs
 
 class ML_pointage():
+
+    path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\test_pointage_ML\\img\\"
 
     """!
 
@@ -28,20 +38,22 @@ class ML_pointage():
         @return None deux fichiers xml Train et Test
         """
         file_sizes=utils.split_train_test(imagefolder_path)
+        print(file_sizes)
         dict_tps=utils.read_tps(tpsfile_path)
-        utils.generate_dlib_xml(dict_tps,file_sizes['train'],folder='train',out_file='train.xml')
-        utils.generate_dlib_xml(dict_tps,file_sizes['test'],folder='test',out_file='test.xml')
-        utils.dlib_xml_to_tps('train.xml')
-        utils.dlib_xml_to_tps('test.xml')
+
+        utils.generate_dlib_xml(dict_tps,file_sizes['train'],folder=ML_pointage.path+"train",out_file=ML_pointage.path +"train.xml")
+        utils.generate_dlib_xml(dict_tps,file_sizes['test'],folder=ML_pointage.path+"test",out_file=ML_pointage.path+"test.xml")
+        utils.dlib_xml_to_tps(ML_pointage.path+"train.xml")
+        utils.dlib_xml_to_tps(ML_pointage.path+"test.xml")
 
     def parameter_model(num_trees,nu,threads,tree_depth,cascade_depth,feature_pool_size,test_splits,oversampling):
         """!
         Réglage du modèle
         --num-trees      number of regression trees (default = 500)
+        --nu            regularization parameter (default = 0.1)
         --threads       number of threads to be used (default = 1)
         --tree-depth    choice of tree depth (default = 4)
         --cascade-depth  choice of cascade depth (default = 15)
-        --nu            regularization parameter (default = 0.1)
         --feature-pool-size choice of feature pool size (default = 500)
         --test-splits    number of test splits (default = 20)
         --oversampling oversampling amount (default = 10)
@@ -56,26 +68,27 @@ class ML_pointage():
         options.num_test_splits = test_splits
         options.oversampling_amount = oversampling
         options.be_verbose = True
+        ML_pointage.options = options
 
-        return options
-
-    def train_model(trainfolder_path,options):
+    def train_model(trainfolder_path):
         """!
         Lance l'apprentissage du modèle
+        trainfolder : path+"train.xml"
         """
-        dlib.train_shape_predictor(trainfolder_path,"predictor.dat",options)
+        ML_pointage.parameter_model(500,0.1,1,4,15,500,20,10)
+        dlib.train_shape_predictor(trainfolder_path,ML_pointage.path+"predictor.dat",ML_pointage.options)
         print("Training error (average pixel deviation): {}".format(dlib.test_shape_predictor(trainfolder_path, "predictor.dat")))
 
-    def test_model(testfolder_path,options):
+    def test_model(testfolder_path):
         """!
         Teste le modèle obtenu
         """
-        print("Testing error (average pixel deviation): {}".format(dlib.test_shape_predictor(testfolder_path,"predictor.dat")))
+        print("Testing error (average pixel deviation): {}".format(dlib.test_shape_predictor(testfolder_path,ML_pointage.path+"predictor.dat")))
 
     def predict(foldernewimage):
         """!
         Prédit les points d'une image
         """
-        utils.predictions_to_xml("predictor.dat", dir=foldernewimage,ignore=None,out_file="output.xml")
+        utils.predictions_to_xml(ML_pointage.path+"predictor.dat", dir=foldernewimage,ignore=None,out_file="output.xml")
         utils.dlib_xml_to_tps("output.xml")
 

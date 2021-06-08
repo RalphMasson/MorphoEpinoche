@@ -1,0 +1,11 @@
+LM=8
+1033.0 1609.0
+1215.0 1496.0
+1506.0 1518.0
+1506.0 1587.0
+1510.0 1814.0
+1501.0 1946.0
+1406.0 1705.0
+1110.0 1709.0
+IMAGE=C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\test_pointage_ML\img\train\P5050097.jpg
+ID=0
