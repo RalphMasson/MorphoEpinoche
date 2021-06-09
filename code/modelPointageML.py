@@ -135,13 +135,20 @@ class ML_pointage():
 
         return ML_pointage.base_points
 
-    def listePoints(n):
+    def listePoints():
         """!
-        @param n nombre de points sur l'image attendus
+        Affiche les coordonnées des points prédits
         """
-        df = ML_pointage.base_points
-        for i in range(n):
-            print(df['X'+str(i)][0],' ',df['Y'+str(i)][0])
+        try:
+            ML_pointage.predict(ML_pointage.path+"test\\",ML_pointage.path+"predictor.dat")
+            df = ML_pointage.base_points
+            col = list(df.columns)
+            for i in range(0,df.shape[1]-4,2):
+                print(df[col[i+4]][0],' ',df[col[i+5]][0])
+        except (AttributeError,RuntimeError):
+            print("Fichier predictor.dat introuvable - Entrainez le modèle ou vérifier le chemin du modèle")
+        except KeyError:
+            print("Image à prédire introuvable - Selectionner une image ou vérifier le chemin de l'image'")
 
 
 
