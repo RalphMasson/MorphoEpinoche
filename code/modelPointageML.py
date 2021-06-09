@@ -113,7 +113,7 @@ class ML_pointage():
         Lance l'apprentissage du modèle avec les valeurs par défaut
         @param trainfolder : path+"train.xml"
         """
-        ML_pointage.parameter_model(500,0.1,1,4,15,500,20,10)
+        ML_pointage.parameter_model(500,0.6,1,6,18,700,40,500)
         dlib.train_shape_predictor(trainfolder_path,ML_pointage.path+"predictor.dat",ML_pointage.options)
         print("Training error (average pixel deviation): {}".format(dlib.test_shape_predictor(trainfolder_path, "predictor.dat")))
 
@@ -132,5 +132,16 @@ class ML_pointage():
         """
         utils.predictions_to_xml(ML_pointage.path+"predictor.dat", dir=foldernewimage,ignore=None,out_file=ML_pointage.path+"test\\output.xml")
         ML_pointage.base_points = utils.dlib_xml_to_pandas(ML_pointage.path + "test\\output.xml")
+
+        return ML_pointage.base_points
+
+    def listePoints(n):
+        """!
+        @param n nombre de points sur l'image attendus
+        """
+        df = ML_pointage.base_points
+        for i in range(n):
+            print(df['X'+str(i)][0],' ',df['Y'+str(i)][0])
+
 
 
