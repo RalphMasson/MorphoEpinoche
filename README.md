@@ -20,7 +20,7 @@ Then, they are detected with regression trees according to [1],[2],[3] :
 
 
 <p align="center">
-<img src="https://github.com/RalphMasson/MorphoEpinoche/blob/master/images/test.jpg" width="200">
+<img src="https://github.com/RalphMasson/MorphoEpinoche/blob/master/images/test.jpg" width="400">
 </p>
 
 
