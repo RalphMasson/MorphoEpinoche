@@ -34,6 +34,7 @@ from tkinter import messagebox
 from PIL import Image, ImageTk
 import math,functools,itertools,os,cv2,webbrowser
 import Placement,Fonctions,Classification
+import modelPointageML as ML
 import numpy as np
 
 # Classe pour les points de la tête
@@ -854,13 +855,20 @@ class Interface(tk.Frame):
         """!
         Méthode permettant d'afficher des informations
         """
-        message = "PROCEDURE DE SEXAGE DE L'EPINOCHE v1.2"
+        message = "PROCEDURE DE SEXAGE DE L'EPINOCHE v1.5"
         message += "\n\n- Modèle de placement de points par traitement d'image et par Machine Learning (learning : 150 individus)"
         message += "\n\n- Modèle de classification Male/Femelle par Machine Learning (learning : 300 individus)"
         message += "\n\n\n Interface développée par R. Masson pour l'INERIS"
         tk.messagebox.showinfo(title="Informations",message=message)
 
-#
+class ML_pointage():
+    def getXY(path_image):
+        """!
+        Récupère les coordonnées par machine learning
+        @param path_image (default = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\test_pointage_ML\\img\\test\\")
+        """
+        return ML.ML_pointage("C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\test_pointage_ML\\img\\",path_image).listePoints()
+
 # root = tk.Tk()
 # app = Interface(root)
 # app.pack(side="top", fill="both", expand=True)

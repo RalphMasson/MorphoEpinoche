@@ -1,15 +1,42 @@
 ''' Bibliothèque de fonctions de placement '''
 
-import cv2
+import cv2,math
 import matplotlib.pyplot as plt
 import numpy as np
-import math
+from skimage.filters import *
+import sys,inspect
+
+sys.path.insert(0,'/'.join(inspect.stack()[0][1].split('\\')[:-1]))
+import Fonctions
+
+
+"""!
+
+    Classe de placement de points par Traitement
+    Nécessite d'avoir des images de bonne qualité et régulière
+
+    Adapted from :
+        Soltany,Zadeh : "Fast and Accurate Pupil Positioning Algorithm using Circular Hough Transform and Gray Projection" 2011
+        Puri, Gupta, Sikri : "CONTOUR, SHAPE, AND COLOR DETECTION USING OPEN CV – PYTHON" 2018"
+        file:///C:/Users/MASSON/Downloads/Admixture_mapping_of_male_nuptial_color_and_body_s.pdf
+        https://condor.depaul.edu/~waguirre/Aguirre_et_al_08_RS.pdf
+        https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3183875/
+        file:///C:/Users/MASSON/Downloads/KitanoetalCopeia.pdf
+        https://jeb.biologists.org/content/216/5/835
+        file:///C:/Users/MASSON/Downloads/Environ.Biol.Fish.2005.pdf
+        file:///C:/Users/MASSON/Downloads/_journals_njz_28_3-4_article-p524_5-preview.pdf
+        https://www.researchgate.net/figure/Morphological-characters-measured-from-the-left-side-of-each-fish-1-fork-length-2-jaw_fig2_233726301
+        https://www.researchgate.net/figure/Morphometric-analysis-of-body-shape-and-its-association-with-colour-a-The-20-numbered_fig3_225288970
+        https://journals.plos.org/plosone/article/figure?id=10.1371/journal.pone.0021060.g001
+        https://docs.google.com/presentation/d/1HZcpJerbqx9Z-llRNlb6E30YXBvOnMuJ/edit#slide=id.p12
+
+"""
+
 
 # img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\images_all\\gimp_cut\\male\\IMGP1074M.JPG"
 # img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/1-1.JPG'
 # img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/2.JPG'
 # img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/3-3.JPG'
-# # #
 # # # male_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\images_all\\gimp_cut\\male\\"
 # # # import sys,os
 # # # male_img = os.listdir(male_path)
@@ -17,15 +44,9 @@ import math
 ''' TESTE AVEC FEMALE 1220F.JPG '''
 img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\DATASETS_final\\Dataset1\\IMGP1875M.JPG"
 # img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\DATASETS_detoure\\Dataset2\\IMGP2063F.JPG"
-
-
 # img = cv2.imread(img_path)
 # img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
-from skimage.filters import *
 
-import sys,inspect
-sys.path.insert(0,'/'.join(inspect.stack()[0][1].split('\\')[:-1]))
-import Fonctions
 
 class Points():
 
@@ -955,7 +976,7 @@ def test(path):
     return imagerot
 
 
-test(img_path)
+# test(img_path)
 
 # # #
 # # # test_male = [test(path) for path in male_img]

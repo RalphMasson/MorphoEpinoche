@@ -9,30 +9,35 @@ sys.path.insert(0,pypath1)
 import utilsML as utils
 import dlib
 
+"""!
+
+    Classe de placement de points par Machine Learning
+    Nécessite d'avoir pointé au préalable les images avec tpsDig
+
+    Adapted from :
+        Kazemi,Sullivan, "One millisecond face alignment with an ensemble of regression trees," doi: 10.1109/CVPR.2014.241.       2014
+        Perrot,Bourdon,Helbert "Implementing cascaded regression tree-based face landmarking" doi: 10.1016/j.imavis.2020.103976   2020
+        Porto, Voje "ML-morph: [...] automated [...] landmarking of biological structures in images" 10.1111/2041-210X.13373      2020
+        Irani, Allada.. "Highly versatile facial landmarks detection models using ensemble of regression trees with application"  2019
+"""
+
 # à incorporer à l'interface
 # et aux dossiers utilisateurs
 
 class ML_pointage():
 
-    path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\test_pointage_ML\\img\\"
+    def __init__(self,dossier_modele,fichier_image):
+        """!
+        Instanciation du modèle de detection des points
+        @param dossier_modele:str chemin menant au fichier predictor.dat s'il existe
+        @param fichier_image:str chemin menant à l'image à pointer
+        """
+        self.path_create_model = dossier_modele
+        self.path_predict_image = fichier_image
+        self.options = None
+        self.base_points = None
 
-
-    """!
-
-        Classe de placement de points par Machine Learning
-        Nécessite d'avoir pointé au préalable les images avec tpsDig
-
-        Adapted from :
-            Kazemi,Sullivan, "One millisecond face alignment with an ensemble of regression trees," doi: 10.1109/CVPR.2014.241.       2014
-            Perrot,Bourdon,Helbert "Implementing cascaded regression tree-based face landmarking" doi: 10.1016/j.imavis.2020.103976   2020
-            Porto, Voje "ML-morph: [...] automated [...] landmarking of biological structures in images" 10.1111/2041-210X.13373      2020
-            Irani, Allada.. "Highly versatile facial landmarks detection models using ensemble of regression trees with application"  2019
-
-
-
-    """
-
-    def preprocess_folder(imagefolder_path,tpsfile_path):
+    def preprocess_folder(self,imagefolder_path,tpsfile_path):
         """!
         Séparation des images en image de train et de test (80% 20%)
         @param imagefolder_path : dossier où se trouvent toutes les images pointées
@@ -42,15 +47,25 @@ class ML_pointage():
         file_sizes=utils.split_train_test(imagefolder_path)
         dict_tps=utils.read_tps(tpsfile_path)
 
-        utils.generate_dlib_xml(dict_tps,file_sizes['train'],folder=ML_pointage.path+"train",out_file=ML_pointage.path +"train.xml")
-        utils.generate_dlib_xml(dict_tps,file_sizes['test'],folder=ML_pointage.path+"test",out_file=ML_pointage.path+"test.xml")
-        utils.dlib_xml_to_tps(ML_pointage.path+"train.xml")
-        utils.dlib_xml_to_tps(ML_pointage.path+"test.xml")
+        utils.generate_dlib_xml(dict_tps,file_sizes['train'],folder=self.path_create_model+"train",out_file=self.path_create_model +"train.xml")
+        utils.generate_dlib_xml(dict_tps,file_sizes['test'],folder=self.path_create_model+"test",out_file=self.path_create_model+"test.xml")
+        utils.dlib_xml_to_tps(self.path_create_model+"train.xml")
+        utils.dlib_xml_to_tps(self.path_create_model+"test.xml")
 
-    def parameter_model(num_trees,nu,threads,tree_depth,cascade_depth,feature_pool_size,test_splits,oversampling):
+    def parameter_model(self,tree,nu,threads,cascade_depth,feature_pool_size,test_splits,os):
         """!
         Réglage du modèle
-        @param --num-trees      number of regression trees (default = 500)
+        @param tree = [num_trees,tree_depth]
+            @param --num-trees      number of regression trees (default = 500)
+            @param --tree-depth    choice of tree depth (default = 4)
+                # define the depth of each regression tree -- there will be a total
+                # of 2^tree_depth leaves in each tree; small values of tree_depth
+                # will be *faster* but *less accurate* while larger values will
+                # generate trees that are *deeper*, *more accurate*, but will run
+                # *far slower* when making predictions
+                # Typical values for tree_depth are in the range [2, 8].
+
+
 
         @param --nu            regularization parameter (default = 0.1)
             Values closer to 1 will make our model fit the training data closer,
@@ -62,13 +77,6 @@ class ML_pointage():
 
         @param --threads       number of threads to be used (default = 1)
 
-        @param --tree-depth    choice of tree depth (default = 4)
-            # define the depth of each regression tree -- there will be a total
-            # of 2^tree_depth leaves in each tree; small values of tree_depth
-            # will be *faster* but *less accurate* while larger values will
-            # generate trees that are *deeper*, *more accurate*, but will run
-            # *far slower* when making predictions
-            # Typical values for tree_depth are in the range [2, 8].
 
 
         @param --cascade-depth  choice of cascade depth (default = 15)
@@ -96,6 +104,7 @@ class ML_pointage():
             # in range (0,50) : 50 means nb_image * 50
             # !!!! can increase a lot training time !!!!
         """
+        num_trees,tree_depth = tree[0],tree[1]
         options = dlib.shape_predictor_training_options()
         options.num_trees_per_cascade_level=num_trees
         options.nu = nu
@@ -104,51 +113,50 @@ class ML_pointage():
         options.cascade_depth = cascade_depth
         options.feature_pool_size = feature_pool_size
         options.num_test_splits = test_splits
-        options.oversampling_amount = oversampling
+        options.oversampling_amount = os
         options.be_verbose = True
-        ML_pointage.options = options
+        self.options = options
 
     def train_model(trainfolder_path):
         """!
         Lance l'apprentissage du modèle avec les valeurs par défaut
         @param trainfolder : path+"train.xml"
         """
-        ML_pointage.parameter_model(500,0.6,1,6,18,700,40,500)
-        dlib.train_shape_predictor(trainfolder_path,ML_pointage.path+"predictor.dat",ML_pointage.options)
+        self.parameter_model([500,6],0.6,1,18,700,40,500)
+        dlib.train_shape_predictor(trainfolder_path,self.path_create_model+"predictor.dat",self.options)
         print("Training error (average pixel deviation): {}".format(dlib.test_shape_predictor(trainfolder_path, "predictor.dat")))
 
-    def test_model(testfolder_path):
+    def test_model(self,testfolder_path):
         """!
         Teste le modèle obtenu
         @param testfolder_path path+"test.xml"
         """
-        print("Testing error (average pixel deviation): {}".format(dlib.test_shape_predictor(testfolder_path,ML_pointage.path+"predictor.dat")))
+        print("Testing error (average pixel deviation): {}".format(dlib.test_shape_predictor(testfolder_path,self.path_create_model+"predictor.dat")))
 
-    def predict(foldernewimage,predictor_path):
+    def predict(self,foldernewimage,predictor_path):
         """!
         Prédit les points d'une image
         @param foldernewimage : dossier avec l'image à prédire
         @param predictor_path : "C:\\.....\\predictor.dat"
         """
-        utils.predictions_to_xml(ML_pointage.path+"predictor.dat", dir=foldernewimage,ignore=None,out_file=ML_pointage.path+"test\\output.xml")
-        ML_pointage.base_points = utils.dlib_xml_to_pandas(ML_pointage.path + "test\\output.xml")
+        utils.predictions_to_xml(self.path_create_model+"predictor.dat", dir=foldernewimage,ignore=None,out_file=self.path_create_model+"test\\output.xml")
+        self.base_points = utils.dlib_xml_to_pandas(self.path_create_model + "test\\output.xml")
 
-        return ML_pointage.base_points
+        return self.base_points
 
-    def listePoints():
+    def listePoints(self):
         """!
         Affiche les coordonnées des points prédits
         """
         try:
-            ML_pointage.predict(ML_pointage.path+"test\\",ML_pointage.path+"predictor.dat")
-            df = ML_pointage.base_points
+            self.predict(self.path_predict_image,self.path_create_model+"predictor.dat")
+            df = self.base_points
             col = list(df.columns)
-            for i in range(0,df.shape[1]-4,2):
-                print(df[col[i+4]][0],' ',df[col[i+5]][0])
+
+            return [[df[col[i+4]][0],df[col[i+5]][0]] for i in range(0,df.shape[1]-4,2)]
         except (AttributeError,RuntimeError):
             print("Fichier predictor.dat introuvable - Entrainez le modèle ou vérifier le chemin du modèle")
         except KeyError:
             print("Image à prédire introuvable - Selectionner une image ou vérifier le chemin de l'image'")
-
 
 
