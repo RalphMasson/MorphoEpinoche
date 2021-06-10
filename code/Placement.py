@@ -5,13 +5,27 @@ import matplotlib.pyplot as plt
 import numpy as np
 from skimage.filters import *
 import sys,inspect
-
 sys.path.insert(0,'/'.join(inspect.stack()[0][1].split('\\')[:-1]))
 import Fonctions
 import modelPointageML as ML
 
+# img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\images_all\\gimp_cut\\male\\IMGP1074M.JPG"
+# img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/1-1.JPG'
+# img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/2.JPG'
+# img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/3-3.JPG'
+# # # male_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\images_all\\gimp_cut\\male\\"
+# # # import sys,os
+# # # male_img = os.listdir(male_path)
+# # # male_img = [male_path+x for x in male_img]
+''' TESTE AVEC FEMALE 1220F.JPG '''
+img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\DATASETS_final\\Dataset1\\IMGP1875M.JPG"
+# img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\DATASETS_detoure\\Dataset2\\IMGP2063F.JPG"
+# img = cv2.imread(img_path)
+# img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
 
-"""!
+
+class Points():
+    """!
 
     Classe de placement de points par Traitement
     Nécessite d'avoir des images de bonne qualité et régulière
@@ -31,26 +45,7 @@ import modelPointageML as ML
         https://journals.plos.org/plosone/article/figure?id=10.1371/journal.pone.0021060.g001
         https://docs.google.com/presentation/d/1HZcpJerbqx9Z-llRNlb6E30YXBvOnMuJ/edit#slide=id.p12
 
-"""
-
-
-# img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\images_all\\gimp_cut\\male\\IMGP1074M.JPG"
-# img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/1-1.JPG'
-# img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/2.JPG'
-# img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/3-3.JPG'
-# # # male_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\images_all\\gimp_cut\\male\\"
-# # # import sys,os
-# # # male_img = os.listdir(male_path)
-# # # male_img = [male_path+x for x in male_img]
-''' TESTE AVEC FEMALE 1220F.JPG '''
-img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\DATASETS_final\\Dataset1\\IMGP1875M.JPG"
-# img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\DATASETS_detoure\\Dataset2\\IMGP2063F.JPG"
-# img = cv2.imread(img_path)
-# img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
-
-
-class Points():
-
+    """
     def contoursCorps(img,param):
         """!
         Méthode pour obtenir le contours du poisson
@@ -855,6 +850,58 @@ class Points():
         print("\n### Chargement de l'image de la tête' ###")
         PIL_image_big = Image.fromarray(CV2_image_big)
         return PIL_image_big,CV2_image_big,left1,right1
+
+
+class PointsML():
+    """!
+
+        Classe de placement de points par Machine Learning
+        Nécessite d'avoir pointé au préalable les images avec tpsDig et de disposer d'un modèle
+        (default : predictor.dat)
+
+        Adapted from :
+            Kazemi,Sullivan, "One millisecond face alignment with an ensemble of regression trees," doi: 10.1109/CVPR.2014.241.       2014
+            Perrot,Bourdon,Helbert "Implementing cascaded regression tree-based face landmarking" doi: 10.1016/j.imavis.2020.103976   2020
+            Porto, Voje "ML-morph: [...] automated [...] landmarking of biological structures in images" 10.1111/2041-210X.13373      2020
+            Irani, Allada.. "Highly versatile facial landmarks detection models using ensemble of regression trees with application"  2019
+    """
+
+    def __init__(self):
+        self.pointsML = [[0,0]]*10
+
+    def getXY(self,path_image):
+        """!
+        Récupère les coordonnées par machine learning
+        @param path_image (default = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\test_pointage_ML\\img\\test\\")
+        The list is expected to be ordered
+        """
+        self.pointsML = ML.ML_pointage("C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\test_pointage_ML\\img\\",path_image).listePoints()
+        print(self.pointsML)
+
+
+detector = PointsML()
+detector.getXY("C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\test_pointage_ML\\img\\test\\")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 '''
 *
 * Main function
@@ -975,36 +1022,6 @@ def test(path):
     plt.grid(True)
     plt.show()
     return imagerot
-
-class PointsML():
-    """!
-
-        Classe de placement de points par Machine Learning
-        Nécessite d'avoir pointé au préalable les images avec tpsDig
-
-        Adapted from :
-            Kazemi,Sullivan, "One millisecond face alignment with an ensemble of regression trees," doi: 10.1109/CVPR.2014.241.       2014
-            Perrot,Bourdon,Helbert "Implementing cascaded regression tree-based face landmarking" doi: 10.1016/j.imavis.2020.103976   2020
-            Porto, Voje "ML-morph: [...] automated [...] landmarking of biological structures in images" 10.1111/2041-210X.13373      2020
-            Irani, Allada.. "Highly versatile facial landmarks detection models using ensemble of regression trees with application"  2019
-    """
-
-    def __init__(self):
-        self.pointsML = [[0,0]]*10
-
-    def getXY(self,path_image):
-        """!
-        Récupère les coordonnées par machine learning
-        @param path_image (default = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\test_pointage_ML\\img\\test\\")
-        The list is expected to be ordered
-        """
-        self.pointsML = ML.ML_pointage("C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\test_pointage_ML\\img\\",path_image).listePoints()
-        print(self.pointsML)
-
-
-detector = PointsML()
-detector.getXY("C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\test_pointage_ML\\img\\test\\")
-
 
 # test(img_path)
 
