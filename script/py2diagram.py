@@ -8,57 +8,39 @@ for file in glob.glob("*.dot"):
     render('dot','png',chemin+"code\\"+file)
     os.remove(chemin2+file)
 
+
+def getNewVersion(chemin3):
+    return str(max([int(os.listdir(chemin3)[i].split('v')[1].split('.')[0]) for i in range(len(os.listdir(chemin3)))])+1)
+
+
 for file in glob.glob("*.png"):
+
     if('Classification' in file):
         chemin3 = chemin+"class_diagram\\classification\\"
-        liste_fichiers = os.listdir(chemin3)
-        liste_version = [liste_fichiers[i][-5] for i in range(len(liste_fichiers))]
-        last_version = max(liste_version)
-        new_version = str(int(last_version)+1)
+        new_version = getNewVersion(chemin3)
         os.replace(chemin2+file,chemin3+"class_diagram_v"+new_version+".png")
+
     if('Fonctions' in file):
         chemin3 = chemin+"class_diagram\\fonctions\\"
-        liste_fichiers = os.listdir(chemin3)
-        liste_version = [liste_fichiers[i][-5] for i in range(len(liste_fichiers))]
-        last_version = max(liste_version)
-        new_version = str(int(last_version)+1)
+        new_version = getNewVersion(chemin3)
         os.replace(chemin2+file,chemin3+"class_diagram_v"+new_version+".png")
+
     if('Normal' in file):
         chemin3 = chemin+"class_diagram\\interface\\"
-        liste_fichiers = os.listdir(chemin3)
-        liste_version = [liste_fichiers[i][-5] for i in range(len(liste_fichiers))]
-        last_version = max(liste_version)
-        new_version = str(int(last_version)+1)
+        new_version = getNewVersion(chemin3)
         os.replace(chemin2+file,chemin3+"class_diagram_v"+new_version+".png")
+
     if('Little' in file):
         chemin3 = chemin+"class_diagram\\interface_mini\\"
-        liste_fichiers = os.listdir(chemin3)
-        try:
-            liste_version = [liste_fichiers[i][-5] for i in range(len(liste_fichiers))]
-            last_version = max(liste_version)
-            new_version = str(int(last_version)+1)
-            os.replace(chemin2+file,chemin3+"class_diagram_v"+new_version+".png")
-        except:
-            last_version = 1
-            new_version = str(int(last_version)+1)
-            os.replace(chemin2+file,chemin3+"class_diagram_v"+new_version+".png")
+        new_version = getNewVersion(chemin3)
+        os.replace(chemin2+file,chemin3+"class_diagram_v"+new_version+".png")
+
     if('Placement' in file):
         chemin3 = chemin+"class_diagram\\placement\\"
-        liste_fichiers = os.listdir(chemin3)
-        liste_version = [liste_fichiers[i][-5] for i in range(len(liste_fichiers))]
-        last_version = max(liste_version)
-        new_version = str(int(last_version)+1)
+        new_version = getNewVersion(chemin3)
         os.replace(chemin2+file,chemin3+"class_diagram_v"+new_version+".png")
 
     if('ml' in file):
         chemin3 = chemin+"class_diagram\\ml_points\\"
-        liste_fichiers = os.listdir(chemin3)
-        try:
-            liste_version = [liste_fichiers[i][-5] for i in range(len(liste_fichiers))]
-            last_version = max(liste_version)
-            new_version = str(int(last_version)+1)
-            os.replace(chemin2+file,chemin3+"class_diagram_v"+new_version+".png")
-        except:
-            last_version = 1
-            new_version = str(int(last_version)+1)
-            os.replace(chemin2+file,chemin3+"class_diagram_v"+new_version+".png")
+        new_version = getNewVersion(chemin3)
+        os.replace(chemin2+file,chemin3+"class_diagram_v"+new_version+".png")
