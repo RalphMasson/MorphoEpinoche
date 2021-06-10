@@ -9,7 +9,7 @@ sys.path.insert(0,'/'.join(inspect.stack()[0][1].split('\\')[:-1]))
 import Fonctions
 import modelPointageML as ML
 
-# img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\images_all\\gimp_cut\\male\\IMGP1074M.JPG"
+img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\images_all\\gimp_cut\\male\\IMGP1149M.JPG"
 # img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/1-1.JPG'
 # img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/2.JPG'
 # img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/3-3.JPG'
@@ -18,7 +18,7 @@ import modelPointageML as ML
 # # # male_img = os.listdir(male_path)
 # # # male_img = [male_path+x for x in male_img]
 ''' TESTE AVEC FEMALE 1220F.JPG '''
-img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\DATASETS_final\\Dataset1\\IMGP1875M.JPG"
+# # # # # # # img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\DATASETS_final\\Dataset1\\IMGP1875M.JPG"
 # img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\DATASETS_detoure\\Dataset2\\IMGP2063F.JPG"
 # img = cv2.imread(img_path)
 # img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
@@ -106,7 +106,10 @@ class Points():
         out_mask = np.zeros_like(img)
         contours3 = sorted(contours3, key=cv2.contourArea)
         out=img.copy()
-        # cv2.drawContours(out, [contours3[-1]], -1, (255,0,0), 3)
+        outt = np.ones_like(out)*255
+        cv2.drawContours(outt, [contours3[-1]], -1, (255,0,0), 3)
+        plt.imshow(outt)
+        plt.show()
         # out[out_mask == 0] = 255
         c=max(contours3, key=cv2.contourArea)
         return out,c
@@ -1019,11 +1022,11 @@ def test(path):
     plt.figure()
     plt.imshow(imagerot)
     plt.title("Vérification du positionnement des points avant interface")
-    plt.grid(True)
+    plt.grid(False)
     plt.show()
     return imagerot
 
-# test(img_path)
+test(img_path)
 
 # # #
 # # # test_male = [test(path) for path in male_img]

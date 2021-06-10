@@ -10,7 +10,6 @@ import utilsML as utils
 import dlib
 
 """!
-
     Classe de placement de points par Machine Learning
     Nécessite d'avoir pointé au préalable les images avec tpsDig
 

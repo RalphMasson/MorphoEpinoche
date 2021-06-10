@@ -818,8 +818,8 @@ class Interface(tk.Tk):
 
 
 
-# app = Interface()
-# app.mainloop()
+app = Interface()
+app.mainloop()
 
 
 
