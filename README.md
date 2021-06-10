@@ -1,4 +1,4 @@
-# MorphoEpinoche
+# MorphoEpinoche (ongoing project - ETA : mid-september)
 
 The purpose of this project is to classify the gender of a Three Spined Stickleback based on automatic landmarks detection and maching learning classification
 
