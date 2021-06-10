@@ -8,6 +8,7 @@ import sys,inspect
 
 sys.path.insert(0,'/'.join(inspect.stack()[0][1].split('\\')[:-1]))
 import Fonctions
+import modelPointageML as ML
 
 
 """!
@@ -974,6 +975,35 @@ def test(path):
     plt.grid(True)
     plt.show()
     return imagerot
+
+class PointsML():
+    """!
+
+        Classe de placement de points par Machine Learning
+        Nécessite d'avoir pointé au préalable les images avec tpsDig
+
+        Adapted from :
+            Kazemi,Sullivan, "One millisecond face alignment with an ensemble of regression trees," doi: 10.1109/CVPR.2014.241.       2014
+            Perrot,Bourdon,Helbert "Implementing cascaded regression tree-based face landmarking" doi: 10.1016/j.imavis.2020.103976   2020
+            Porto, Voje "ML-morph: [...] automated [...] landmarking of biological structures in images" 10.1111/2041-210X.13373      2020
+            Irani, Allada.. "Highly versatile facial landmarks detection models using ensemble of regression trees with application"  2019
+    """
+
+    def __init__(self):
+        self.pointsML = [[0,0]]*10
+
+    def getXY(self,path_image):
+        """!
+        Récupère les coordonnées par machine learning
+        @param path_image (default = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\test_pointage_ML\\img\\test\\")
+        The list is expected to be ordered
+        """
+        self.pointsML = ML.ML_pointage("C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\test_pointage_ML\\img\\",path_image).listePoints()
+        print(self.pointsML)
+
+
+detector = PointsML()
+detector.getXY("C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\test_pointage_ML\\img\\test\\")
 
 
 # test(img_path)

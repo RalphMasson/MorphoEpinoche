@@ -16,7 +16,6 @@ from tkinter import messagebox
 from PIL import Image, ImageTk
 import math,functools,itertools,os,cv2,webbrowser
 import Placement,Fonctions,Classification,Interface_Sexage_Little
-import modelPointageML as ML
 import numpy as np
 
 # Classe pour les points de la tête
@@ -817,13 +816,6 @@ class Interface(tk.Tk):
         tk.messagebox.showinfo(title="Informations",message=message)
 
 
-class ML_pointage():
-    def getXY(path_image):
-        """!
-        Récupère les coordonnées par machine learning
-        @param path_image (default = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\test_pointage_ML\\img\\test\\")
-        """
-        return ML.ML_pointage("C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\test_pointage_ML\\img\\",path_image).listePoints()
 
 
 # app = Interface()
