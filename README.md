@@ -19,7 +19,9 @@ Then, they are detected with regression trees according to [1],[2],[3] :
 - *Irani, Allada.. "Highly versatile facial landmarks detection models using ensemble of regression trees with application"  2019*  
 
 
-
+<p align="center">
+<img src="https://github.com/RalphMasson/MorphoEpinoche/blob/master/images/test.jpg" width="200">
+</p>
 
 
 # Distances calculation #
