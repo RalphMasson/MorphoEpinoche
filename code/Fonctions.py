@@ -661,13 +661,8 @@ class Externes():
 
         x = circle_r * math.cos(alpha) + circle_x
         y = circle_r * math.sin(alpha) + circle_y
-        # x = np.round(x)
-        # y = np.round(y)
-        # x = list(dict.fromkeys(x))
-        # y = list(dict.fromkeys(y))
 
-
-        return x,y
+        return [x,y]
 
 
     def getRandomPointsInCircle(r,xc,yc,n):
@@ -698,3 +693,11 @@ class Externes():
             if y >= quartileSet[0] and y <= quartileSet[1]:
                 resultList.append(y)
         return resultList
+
+    def displayGraph(longueur_deplacement,liste,intensite_est):
+        plt.figure()
+        for x in liste:
+            plt.plot(longueur_deplacement,x)
+        plt.plot(longueur_deplacement,intensite_est)
+
+        plt.legend('intensite_nw','intensite_nw1','intensite_sw','intensite_sw1','intensite_ouest','intensite_est')

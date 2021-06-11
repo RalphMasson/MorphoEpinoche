@@ -403,7 +403,7 @@ class BodyFish():
 
 class Interface(tk.Tk):
     sexModele = None
-    version = 1.5
+    version = 1.6
     canvasTete = None
     def __init__(self):
         """!
@@ -809,7 +809,7 @@ class Interface(tk.Tk):
         """!
         Méthode permettant d'afficher des informations
         """
-        message = "PROCEDURE DE SEXAGE DE L'EPINOCHE v1.5"
+        message = "PROCEDURE DE SEXAGE DE L'EPINOCHE v1.6"
         message += "\n\n- Modèle de placement de points par traitement d'image et par Machine Learning (learning : 150 individus)"
         message += "\n\n- Modèle de classification Male/Femelle par Machine Learning (learning : 300 individus)"
         message += "\n\n\n Interface développée par R. Masson pour l'INERIS"
