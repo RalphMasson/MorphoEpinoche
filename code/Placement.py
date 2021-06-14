@@ -8,19 +8,37 @@ sys.path.insert(0,'/'.join(inspect.stack()[0][1].split('\\')[:-1]))
 import Fonctions
 import modelPointageML as ML
 
-img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\images_all\\gimp_cut\\male\\IMGP1149M.JPG"
-# img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/1-1.JPG'
-# img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/2.JPG'
-# img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/3-3.JPG'
-# # # male_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\images_all\\gimp_cut\\male\\"
-# # # import sys,os
-# # # male_img = os.listdir(male_path)
-# # # male_img = [male_path+x for x in male_img]
-''' TESTE AVEC FEMALE 1220F.JPG '''
-# # # # # # # img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\DATASETS_final\\Dataset1\\IMGP1875M.JPG"
-# img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\DATASETS_detoure\\Dataset2\\IMGP2063F.JPG"
-# img = cv2.imread(img_path)
-# img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
+
+
+
+class PointsML():
+    """!
+
+        Classe de placement de points par Machine Learning
+        Nécessite d'avoir pointé au préalable les images avec tpsDig et de disposer d'un modèle
+        (default : predictor.dat)
+
+        Adapted from :
+            Kazemi,Sullivan, "One millisecond face alignment with an ensemble of regression trees," doi: 10.1109/CVPR.2014.241.       2014
+            Perrot,Bourdon,Helbert "Implementing cascaded regression tree-based face landmarking" doi: 10.1016/j.imavis.2020.103976   2020
+            Porto, Voje "ML-morph: [...] automated [...] landmarking of biological structures in images" 10.1111/2041-210X.13373      2020
+            Irani, Allada.. "Highly versatile facial landmarks detection models using ensemble of regression trees with application"  2019
+    """
+
+    def __init__(self):
+        self.pointsML = [[0,0]]*10
+
+    def getXY(self,path_image):
+        """!
+        Récupère les coordonnées par machine learning
+        @param path_image (default = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\test_pointage_ML\\img\\test\\")
+        The list is expected to be ordered
+        """
+        self.pointsML = ML.ML_pointage("C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\test_pointage_ML\\img\\",path_image).listePoints()
+        print(self.pointsML)
+
+
+
 
 
 class Points():
@@ -56,9 +74,6 @@ class Points():
         if param=='body':size=(1300,975)
         diamond = Fonctions.Externes.diamondCV2()
         img = cv2.resize(img,size)
-        # dst = cv2.addWeighted(img, 2, img, 0, 2)
-        # plt.figure()
-        # plt.imshow(dst)
         dst=img
         dst = cv2.resize(dst,size)
         dst = cv2.cvtColor(dst,cv2.COLOR_RGB2GRAY)
@@ -66,11 +81,6 @@ class Points():
         dilated = cv2.dilate(closing,diamond,iterations=1)
         blured = cv2.medianBlur(dilated,ksize=1)
         binarized = cv2.threshold(blured,253,255,cv2.THRESH_BINARY)[1]
-        # print(binarized)
-        # binarized = blured
-        # plt.figure()
-        # plt.imshow(binarized,cmap='gray')
-        # plt.show()
         contours, hierarchy = cv2.findContours(binarized,cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
         list_area = [cv2.contourArea(c) for c in contours]
         for c in contours:
@@ -81,22 +91,13 @@ class Points():
         binarized = cv2.morphologyEx(binarized, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (4,4)));
         imgcopy = img.copy()
         imgcopy2 = np.copy(img)
-        # plt.imshow(binarized,cmap='gray')
         contours2, hierarchy2 = cv2.findContours(binarized,cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-        # plt.figure()
-        # plt.imshow(imgcopy2,cmap="gray")
         cv2.drawContours(imgcopy2,contours2,-1,(255,0,0),4)
-        # plt.figure()
-        # plt.imshow(imgcopy2,cmap="gray")
         list_area2 = [cv2.contourArea(c) for c in contours2]
         drawing = np.ones((img.shape[0], img.shape[1], 3), np.uint8)*255
         cv2.fillPoly(drawing,pts=contours2,color=(0,0,0))
         drawing = cv2.dilate(drawing,diamond,iterations=1)
-        # plt.figure()
-        # plt.imshow(drawing)
         drawing = cv2.morphologyEx(drawing, cv2.MORPH_CLOSE, diamond,iterations=5)
-        # plt.figure()
-        # plt.imshow(drawing,cmap="gray")
         contours3, hierarchy3 = cv2.findContours(cv2.cvtColor(drawing,cv2.COLOR_BGR2GRAY),cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
         # Affichage du plus grand contours
         # cv2.drawContours(img, max(contours3, key = cv2.contourArea), -1, (0,255,0), 3)
@@ -132,7 +133,6 @@ class Points():
         @param points left et right (type tuple) issu de l'image 1300x975
         @return angle (type float en degrés) et centre (type tuple of float)
         """
-        # rotate with angle to properly have top and bottom
         x1,y1 = left
         x2,y2 = right
         m=(y2-y1)/(x2-x1)
@@ -278,7 +278,6 @@ class Points():
         img = cv2.resize(img,(3500,2625))
         print(img[:,:,0][1000][1500])
         pupille = Points.detect_eye(img)
-        # # print("toto")
         print(pupille)
         imgNB = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
         # imgNB = cv2.GaussianBlur(imgNB,(15,15),0)
@@ -290,23 +289,13 @@ class Points():
         #95 et minRAdius 30
         # 40 et minRadius 20
         circles = cv2.HoughCircles(imgNB, cv2.HOUGH_GRADIENT, 2.8, 300,minRadius=60,maxRadius=90)
-        print(circles)
-
         # circles = cv2.HoughCircles(imgNB, cv2.HOUGH_GRADIENT, 2.8, 300,minRadius=60,maxRadius=90)
 
         if circles is not None:
             circles = np.round(circles[0, :]).astype("int")
         listPotentiels = [x[0] for x in circles]
-        # # print(circles)
         i,dist = Fonctions.Externes.findNearestValueFromArray(listPotentiels,pupille[0])
-        print("titi")
-        # # print(i)
-        # print(circles[i][0])
-        # points 3 et 19
-        # cv2.line(out,(circles[0][0],circles[0][1]),(circles[0][0]+circles[0][2],circles[0][1]),(255, 0, 0), 1)
-        # cv2.line(out,(circles[0][0],circles[0][1]),(circles[0][0]-circles[0][2],circles[0][1]),(255, 0, 0), 1)
-        # plt.imshow(out)
-        # plt.show()
+
         if(dist>100):
             pt3 = (int(pupille[0]-120),int(pupille[1]))
             pt19 = (int(pupille[0]+120),int(pupille[1]))
@@ -314,10 +303,9 @@ class Points():
         else:
             pt3 = (circles[i][0]-circles[i][2],circles[i][1])
             pt19 = (circles[i][0]+circles[i][2],circles[i][1])
-        # # print(pt3)
-        # # print(pt19)
+
         return [pt3,pt19]
-        # return circles
+
 
     def point9(c,pt19):
         """!
@@ -663,35 +651,6 @@ class Points():
         return PIL_image_big,CV2_image_big,left1,right1
 
 
-class PointsML():
-    """!
-
-        Classe de placement de points par Machine Learning
-        Nécessite d'avoir pointé au préalable les images avec tpsDig et de disposer d'un modèle
-        (default : predictor.dat)
-
-        Adapted from :
-            Kazemi,Sullivan, "One millisecond face alignment with an ensemble of regression trees," doi: 10.1109/CVPR.2014.241.       2014
-            Perrot,Bourdon,Helbert "Implementing cascaded regression tree-based face landmarking" doi: 10.1016/j.imavis.2020.103976   2020
-            Porto, Voje "ML-morph: [...] automated [...] landmarking of biological structures in images" 10.1111/2041-210X.13373      2020
-            Irani, Allada.. "Highly versatile facial landmarks detection models using ensemble of regression trees with application"  2019
-    """
-
-    def __init__(self):
-        self.pointsML = [[0,0]]*10
-
-    def getXY(self,path_image):
-        """!
-        Récupère les coordonnées par machine learning
-        @param path_image (default = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\test_pointage_ML\\img\\test\\")
-        The list is expected to be ordered
-        """
-        self.pointsML = ML.ML_pointage("C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\test_pointage_ML\\img\\",path_image).listePoints()
-        print(self.pointsML)
-
-
-# detector = PointsML()
-# detector.getXY("C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\test_pointage_ML\\img\\test\\")
 
 
 
@@ -762,6 +721,24 @@ def test(path):
     # plt.grid(False)
     # plt.show()
     return imagerot
+
+
+
+img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\images_all\\gimp_cut\\male\\IMGP1149M.JPG"
+# img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/1-1.JPG'
+# img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/2.JPG'
+# img_path = 'C:/Users/MASSON/Desktop/STAGE_EPINOCHE/images_all/IA_fond_blanc/3-3.JPG'
+# # # male_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\images_all\\gimp_cut\\male\\"
+# # # import sys,os
+# # # male_img = os.listdir(male_path)
+# # # male_img = [male_path+x for x in male_img]
+''' TESTE AVEC FEMALE 1220F.JPG '''
+# # # # # # # img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\DATASETS_final\\Dataset1\\IMGP1875M.JPG"
+# img_path = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\DATASETS_detoure\\Dataset2\\IMGP2063F.JPG"
+# img = cv2.imread(img_path)
+# img = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
+
+
 
 # test(img_path)
 
