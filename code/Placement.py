@@ -28,13 +28,16 @@ class PointsML():
     def __init__(self):
         self.pointsML = [[0,0]]*10
 
-    def getXY(self,path_image):
+    def getXY(self,path_model,path_image):
         """!
         Récupère les coordonnées par machine learning
-        @param path_image (default = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\test_pointage_ML\\img\\test\\")
+        @param path_model dossier où se trouve le modele regression trees
+            (default = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\test_pointage_ML\\img\\")
+        @param path_image dossier où se trouve le dossier de l'image à pointer
+            (default = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\test_pointage_ML\\img\\test\\")
         The list is expected to be ordered
         """
-        self.pointsML = ML.ML_pointage("C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\test_pointage_ML\\img\\",path_image).listePoints()
+        self.pointsML = ML.ML_pointage(path_model,path_image).listePoints()
         print(self.pointsML)
 
 
