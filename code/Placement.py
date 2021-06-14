@@ -763,7 +763,7 @@ def test(path):
     # plt.show()
     return imagerot
 
-test(img_path)
+# test(img_path)
 
 # # #
 # # # test_male = [test(path) for path in male_img]

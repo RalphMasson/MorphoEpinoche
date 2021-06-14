@@ -701,3 +701,6 @@ class Externes():
         plt.plot(longueur_deplacement,intensite_est)
 
         plt.legend('intensite_nw','intensite_nw1','intensite_sw','intensite_sw1','intensite_ouest','intensite_est')
+
+    def cheminAvant(aaa):
+        return "\\".join(aaa.split("\\")[:-1])+"\\"

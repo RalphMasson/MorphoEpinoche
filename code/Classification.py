@@ -4,8 +4,18 @@ from sklearn.datasets import make_classification
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
-
 import pandas as pd
+from joblib import dump, load
+
+import sys,inspect,os
+pypath = inspect.stack()[0][1]
+pypath = pypath.split('\\')
+pypath1 = '/'.join(pypath[:-1])
+pypath3 = '/'.join(pypath[:-2])+"/executable"
+pypath2 = '/'.join(pypath[:-2])
+sys.path.insert(0,pypath1)
+
+import Fonctions
 
 class Prediction():
     """!
@@ -25,6 +35,7 @@ class Prediction():
             Constructeur du prédicteur de sexe
             @param bdd chemin du fichier csv (default = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\rapports\\"
         """
+        self.path = Fonctions.Externes.cheminAvant(bdd)
         self.bdd = pd.read_csv(bdd,delimiter=";")
 
 
@@ -42,22 +53,38 @@ class Prediction():
 
     def train(self):
         """!
-            Train with RF & SVC
-        """
+            Train with RF & SVC and exports models in path
+            @param None
+            @return None
 
-        self.clf=RandomForestClassifier(n_estimators=200)
+        """
+        self.preprocess()
+        self.clf=RandomForestClassifier(n_estimators=2000)
         self.clf.fit(self.X_train,self.y_train)
         print(self.clf.score(self.X_train,self.y_train))
         print(self.clf.score(self.X_test,self.y_test))
+        dump(self.clf, self.path+"modelRF.joblib")
 
-        self.clf1 = make_pipeline(StandardScaler(), SVC(gamma='auto'))
+        self.clf1 = make_pipeline(StandardScaler(), SVC(C=100,gamma=0.01,kernel='poly',))
         self.clf1.fit(self.X_train,self.y_train)
         print(self.clf1.score(self.X_train,self.y_train))
         print(self.clf1.score(self.X_test,self.y_test))
+        dump(self.clf1, self.path+"modelSVC.joblib")
 
 
 
-    def predict():
+    def predict(xPredict,modelRF,modelSVC):
+        """!
+            Load the 2 models of classification and makes the prediction
+            @param distances of unknown fish
+            @param modelRF : random forest classifier
+            @param modelSVC : support vector machine classifier
+            @return sex, color, probability
+        """
+
+        if(len(modelRF)!=0):
+            clfRF = load(modelRF)
+            clfSVC = load(modelSVC)
         from random import randrange,uniform
         labels = ('Male','Female')
         # choice = randrange(2)

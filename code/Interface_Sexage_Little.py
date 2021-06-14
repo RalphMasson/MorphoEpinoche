@@ -765,7 +765,7 @@ class Interface(tk.Frame):
         """!
         Méthode permettant d'afficher la prédiction du sexe
         """
-        choix,couleur,p = Classification.Prediction.predict()
+        choix,couleur,p = Classification.Prediction.predict(None,"","")
         app.labelSex.config(text="")
         app.labelSex.config(text=choix+" avec p="+str(round(p,2)),font=("Purisa",16),fg=couleur)
 
