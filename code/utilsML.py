@@ -2,19 +2,12 @@
 #Part of the standard library 
 import xml.etree.ElementTree as ET
 from xml.dom import minidom
-import os
-import csv
-import re
-import random
-import shutil
-import glob
-import ntpath
+import os,csv,re,random,shutil,glob,npath
 
 #Not part of the standard library
 import numpy as np 
 import pandas as pd
-import cv2
-import dlib
+import cv2,dlib
 
 #Tools for using previously annotated datasets
 
