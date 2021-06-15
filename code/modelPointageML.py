@@ -125,7 +125,7 @@ class ML_pointage():
         Lance l'apprentissage du modèle avec les valeurs par défaut
         @param trainfolder : path+"train.xml"
         """
-        self.parameter_model([500,6],0.6,1,18,700,40,500)
+        # self.parameter_model([500,6],0.6,1,18,700,40,500)
 
         dlib.train_shape_predictor(trainfolder_path,self.path_create_model+"predictor.dat",self.options)
 

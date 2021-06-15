@@ -239,7 +239,9 @@ class utils():
         else:
             
             file_sz= [img.shape[0],img.shape[1]]
-            img = cv2.resize(img,(1200,900))
+            # img = cv2.resize(img,(1200,900))
+            img = cv2.resize(img,(4608,3456))
+
             cv2.imwrite(os.path.join(dir_path,name), img)
             # print(os.path.join(dir_path,name))
             return file_sz
