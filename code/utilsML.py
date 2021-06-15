@@ -2,7 +2,7 @@
 #Part of the standard library 
 import xml.etree.ElementTree as ET
 from xml.dom import minidom
-import os,csv,re,random,shutil,glob,npath
+import os,csv,re,random,shutil,glob,ntpath
 
 #Not part of the standard library
 import numpy as np 
@@ -200,7 +200,11 @@ class utils():
         for split in ['train','test']:
             sizes[split]={}
             if not os.path.exists(input_dir+split):
-                os.mkdir("\\".join(input_dir.split("\\")[:-2])+"\\"+split)
+                print(input_dir+split)
+                try:
+                    os.mkdir("\\".join(input_dir.split("\\")[:-2])+"\\"+split)
+                except:
+                    os.mkdir("/".join(input_dir.split("/")[:-2])+"/"+split)
             else:
                 # print("Warning: the folder {} already exists. It's being replaced".format(split))
                 shutil.rmtree(input_dir+split)
@@ -211,7 +215,7 @@ class utils():
                 picname = basename.split("\\")[-1]
                 file = input_dir+picname
                 name = os.path.splitext(basename)[0]+'.jpg'
-                dir_path = "\\".join(input_dir.split("\\")[:-2])+"\\"+split
+                dir_path = "/".join(input_dir.split("/")[:-2])+"/"+split
                 sizes[split][name]=utils.image_prep(file,name,dir_path)
         return sizes
     
@@ -228,15 +232,17 @@ class utils():
         Returns:
             file_sz(array): original image dimensions
         '''
-    
+        # print(os.path.splitext(file))
         img = cv2.imread(file)
         if img is None:
             print('File {} was ignored'.format(file))
         else:
+            
             file_sz= [img.shape[0],img.shape[1]]
             img = cv2.resize(img,(1200,900))
             cv2.imwrite(os.path.join(dir_path,name), img)
-        return file_sz
+            # print(os.path.join(dir_path,name))
+            return file_sz
     
     
     # Tools for predicting objects and shapes in new images

@@ -15,7 +15,7 @@ import tkinter as tk
 from tkinter import messagebox
 from PIL import Image, ImageTk
 import math,functools,itertools,os,cv2,webbrowser
-import Placement,Fonctions,Classification,Interface_Sexage_Little
+import Placement,Fonctions,Classification,Interface_Sexage_Little,updateModels
 import numpy as np
 
 # Classe pour les points de la tête
@@ -523,6 +523,15 @@ class Interface(tk.Tk):
         self.bind_all("<Control-h>",lambda e : self.openDataBase())
         menubar.add_cascade(label="Outils",menu=menuOutils)
 
+        menuModeles = tk.Menu(menubar,tearoff=0)
+        menuModeles.add_command(label="Prépare MaJ Pointage",command=Interface.improveLandmarksModel,accelerator="(Ctrl+P)")
+        self.bind_all("<Control-p>",lambda e : Interface.improveLandmarksModel())
+        menuModeles.add_command(label="MaJ Pointage",command=self.updatePointModel,accelerator="(Ctrl+Entrée)")
+        self.bind_all("<Control-Return>",lambda e : self.updatePointModel())
+        menuModeles.add_command(label="Image précédente",command=self.previousImage,accelerator="(Ctrl+Backspace)")
+        self.bind_all("<Control-BackSpace>",lambda e : self.previousImage())
+        menubar.add_cascade(label="Modèles",menu=menuModeles)
+
         menuAffichage = tk.Menu(menubar,tearoff=0)
         menuAffichage.add_command(label="Vue pour petit écran",command=self.changeView,accelerator="(Ctrl+N)")
         self.bind_all("<Control-n>",lambda e : self.changeView())
@@ -535,6 +544,17 @@ class Interface(tk.Tk):
         menubar.add_cascade(label="Aide", menu=menuAide)
         self.config(menu=menubar)
 
+    def improveLandmarksModel():
+        message = "Pour ajouter des données au modèle v1 de placement de points :"
+        message += "\n\n1) Ajouter les photos nouvelles dans un dossier tmp"
+        message += "\n2) Créer un fichier temp.tps grâce à tpsUtils (build tps)"
+        message += "\n3) Créer un fichier v2.tps grâce à tpsUtils (append temp+v1) sans inclure path"
+        message += "\n4) Pointer les images avec tpsDig"
+        message += "\n5) Sauvegarder (overwrite) v2.tps"
+        message += "\n6) Déplacer les images novelles dans le même dossier que les anciennes"
+
+        tk.messagebox.showinfo(title="Informations",message=message)
+
     def changeView(self):
         Interface_Sexage_Little.Temp.chemin = pypath3
         self.destroy()
@@ -544,6 +564,9 @@ class Interface(tk.Tk):
         Interface_Sexage_Little.app.pack(side="top", fill="both", expand=True)
         Interface_Sexage_Little.app.mainloop()
 
+    def updatePointModel(self):
+        self.destroy()
+        updateModels.Interface()
 
     def afficheLongueur():
         """!

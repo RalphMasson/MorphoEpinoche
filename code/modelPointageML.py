@@ -44,7 +44,10 @@ class ML_pointage():
         @return None deux fichiers xml Train et Test
         """
         file_sizes=utils.utils.split_train_test(imagefolder_path)
+
+
         dict_tps=utils.utils.read_tps(tpsfile_path)
+
 
         utils.utils.generate_dlib_xml(dict_tps,file_sizes['train'],folder=self.path_create_model+"train",out_file=self.path_create_model +"train.xml")
         utils.utils.generate_dlib_xml(dict_tps,file_sizes['test'],folder=self.path_create_model+"test",out_file=self.path_create_model+"test.xml")
@@ -115,15 +118,18 @@ class ML_pointage():
         options.oversampling_amount = os
         options.be_verbose = True
         self.options = options
+        return self.options
 
-    def train_model(trainfolder_path):
+    def train_model(self,trainfolder_path):
         """!
         Lance l'apprentissage du modèle avec les valeurs par défaut
         @param trainfolder : path+"train.xml"
         """
         self.parameter_model([500,6],0.6,1,18,700,40,500)
+
         dlib.train_shape_predictor(trainfolder_path,self.path_create_model+"predictor.dat",self.options)
-        print("Training error (average pixel deviation): {}".format(dlib.test_shape_predictor(trainfolder_path, "predictor.dat")))
+
+        return "Training error (average pixel deviation): {}".format(dlib.test_shape_predictor(trainfolder_path, "predictor.dat"))
 
     def test_model(self,testfolder_path):
         """!

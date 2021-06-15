@@ -9,25 +9,6 @@ pypath3 = '/'.join(pypath[:-2])+"/executable"
 pypath2 = '/'.join(pypath[:-2])
 sys.path.insert(0,pypath1)
 
-# Documentation
-
-"""generate diagramm class : script.ps1"""
-"""use ml-morph : ..."""
-"""articles :
-* file:///C:/Users/MASSON/Downloads/Admixture_mapping_of_male_nuptial_color_and_body_s.pdf
-* https://condor.depaul.edu/~waguirre/Aguirre_et_al_08_RS.pdf
-* https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3183875/
-* file:///C:/Users/MASSON/Downloads/KitanoetalCopeia.pdf
-* https://jeb.biologists.org/content/216/5/835
-* file:///C:/Users/MASSON/Downloads/Environ.Biol.Fish.2005.pdf
-* file:///C:/Users/MASSON/Downloads/_journals_njz_28_3-4_article-p524_5-preview.pdf
-* https://www.researchgate.net/figure/Morphological-characters-measured-from-the-left-side-of-each-fish-1-fork-length-2-jaw_fig2_233726301
-* https://www.researchgate.net/figure/Morphometric-analysis-of-body-shape-and-its-association-with-colour-a-The-20-numbered_fig3_225288970
-* https://journals.plos.org/plosone/article/figure?id=10.1371/journal.pone.0021060.g001
-* https://docs.google.com/presentation/d/1HZcpJerbqx9Z-llRNlb6E30YXBvOnMuJ/edit#slide=id.p12
-"""
-
-
 # Import des bibliothèques (s'assurer qu'elles soient installées)
 import tkinter as tk
 from tkinter import messagebox

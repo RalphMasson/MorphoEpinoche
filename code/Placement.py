@@ -370,8 +370,8 @@ class Points():
             pente = abs(Fonctions.Externes.isContoursLineLike(x)[0])>5
             top = tuple(x[x[:, :, 1].argmin()][0])
             bottom = tuple(x[x[:, :, 1].argmax()][0])
-            distance = Fonctions.Externes.euclideDist(top,bottom)>80
-            if(longueur and pente and distance):
+            distanceBool = Fonctions.Externes.euclide(top,bottom)>80
+            if(longueur and pente and distanceBool):
                 pixelValue = np.vstack([pixelValue,np.array([[Fonctions.Externes.averagePixelValue(img,x,5),int(indx)]])])
 
         for x in pixelValue.T[1]:
@@ -448,7 +448,7 @@ class Points():
         # # plt.plot(xxx,yyy,'g')
 
         ''' calcul de la distance '''
-        erreur3 = [Fonctions.Externes.euclideDist([xx[i],yy[i]],[xxx[i],yyy[i]]) for i in range(len(yyy))]
+        erreur3 = [Fonctions.Externes.euclide([xx[i],yy[i]],[xxx[i],yyy[i]]) for i in range(len(yyy))]
         erreur3 = [erreur3[i]-statistics.mean(erreur3) for i in range(len(erreur3))]
         peaks,_=find_peaks(erreur3,height=(0, None),distance=5,prominence=1)
 

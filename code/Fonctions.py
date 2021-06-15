@@ -8,17 +8,17 @@ pypath3 = '/'.join(pypath[:-2])+"/executable"
 pypath2 = '/'.join(pypath[:-2])
 
 class Externes():
-
-    def euclideDist(a,b):
+    def euclide(X,Y):
         """!
-        Methode pour calculer la distance euclidienne entre deux points
-        @param a tuple : coordonnees du point a : [x1,y1]
-        @param b tuple : coordonnees du point b : [x2,y2]
-        @return norme float : distance entre a et b
+        Efficiently calculates the euclidean distance
+        between two vectors using Numpys einsum function.
+        @param X : array, (n_samples x d_dimensions)
+        @param Y : array, (n_samples x d_dimensions)
+        @return D : array, (n_samples, n_samples)
         """
         import numpy as np
-        norme = np.sqrt((b[0]-a[0])**2+(b[1]-a[1])**2)
-        return norme
+        XY = np.array(X)-np.array(Y)
+        return np.sqrt(np.einsum('i,i->', XY, XY))
 
     def calculAngle(pt1,pt2,pt3):
         """!
@@ -29,9 +29,9 @@ class Externes():
         @return listeAngle list of float : liste des 3 angles
         """
         from math import acos,pi
-        b = Externes.euclideDist(pt1,pt2)
-        a = Externes.euclideDist(pt2,pt3)
-        c = Externes.euclideDist(pt1,pt3)
+        b = Externes.euclide(pt1,pt2)
+        a = Externes.euclide(pt2,pt3)
+        c = Externes.euclide(pt1,pt3)
         Apt1 = acos((b**2+c**2-a**2)/(2*b*c))*180/pi
         Apt2 = acos((b**2+a**2-c**2)/(2*b*a))*180/pi
         Apt3 = acos((a**2+c**2-b**2)/(2*a*c))*180/pi
@@ -46,9 +46,9 @@ class Externes():
         @param pt3 tuple : coordonnees du point3 : [x3,y3]
         @return Apt2 float : angle du point2
         """
-        b = Externes.euclideDist(pt1,pt2)
-        a = Externes.euclideDist(pt2,pt3)
-        c = Externes.euclideDist(pt1,pt3)
+        b = Externes.euclide(pt1,pt2)
+        a = Externes.euclide(pt2,pt3)
+        c = Externes.euclide(pt1,pt3)
         from math import acos,pi
         Apt2 = acos((b**2+a**2-c**2)/(2*b*a))*180/pi
         return Apt2
@@ -161,9 +161,9 @@ class Externes():
             if(sex=='M'):sex=1
 
             distances_all.append(sex)
-            echelle3mm_px = Externes.euclideDist(pt22,pt24)
+            echelle3mm_px = Externes.euclide(pt22,pt24)
             for x in listeCombinaisonsDistance:
-                distpx = Externes.euclideDist(ptsFish[x[0]],ptsFish[x[1]])
+                distpx = Externes.euclide(ptsFish[x[0]],ptsFish[x[1]])
                 distmm = round(3*distpx/echelle3mm_px,4)
                 distances_all.append(distmm)
             for x in listeCombinaisonsAngle:
@@ -249,14 +249,14 @@ class Externes():
         @param ptsFish list of tuple : liste des points de la tête
         @return distances_check list of float : liste des distances en mm
         """
-        echelle3mm = Externes.euclideDist(ptsEchelle[0],ptsEchelle[1])
-        snout_eye = Externes.euclideDist(ptsFish[0],ptsFish[1])
-        snout_length = Externes.euclideDist(ptsFish[1],ptsFish[2])
-        eye_diameter = Externes.euclideDist(ptsFish[0],ptsFish[8])
-        head_length = Externes.euclideDist(ptsFish[1],ptsFish[7])
-        head_depth = Externes.euclideDist(ptsFish[4],ptsFish[7])
-        jaw_length = Externes.euclideDist(ptsFish[2],ptsFish[3])
-        jaw_length2 = Externes.euclideDist(ptsFish[1],ptsFish[3])
+        echelle3mm = Externes.euclide(ptsEchelle[0],ptsEchelle[1])
+        snout_eye = Externes.euclide(ptsFish[0],ptsFish[1])
+        snout_length = Externes.euclide(ptsFish[1],ptsFish[2])
+        eye_diameter = Externes.euclide(ptsFish[0],ptsFish[8])
+        head_length = Externes.euclide(ptsFish[1],ptsFish[7])
+        head_depth = Externes.euclide(ptsFish[4],ptsFish[7])
+        jaw_length = Externes.euclide(ptsFish[2],ptsFish[3])
+        jaw_length2 = Externes.euclide(ptsFish[1],ptsFish[3])
         distances_check = [snout_eye,snout_length,eye_diameter,head_length,head_depth,jaw_length,jaw_length2]
         distances_check = Externes.px3mmListe(distances_check,echelle3mm)
         return distances_check
@@ -268,9 +268,9 @@ class Externes():
         @param ptsFish list of tuple : liste des points du corps
         @return distances_check list of float : liste des distances en mm
         """
-        echelle10mm = Externes.euclideDist(ptsEchelle[0],ptsEchelle[1])
-        body_size = Externes.euclideDist(ptsFish[0],ptsFish[2])
-        body_depth = Externes.euclideDist(ptsFish[1],ptsFish[3])
+        echelle10mm = Externes.euclide(ptsEchelle[0],ptsEchelle[1])
+        body_size = Externes.euclide(ptsFish[0],ptsFish[2])
+        body_depth = Externes.euclide(ptsFish[1],ptsFish[3])
         distances_check = [body_size,body_depth]
         distances_check = Externes.px10mmListe(distances_check,echelle10mm)
         return distances_check
@@ -295,6 +295,30 @@ class Externes():
         """
         import tkinter.filedialog,tkinter as tk
         filepath = tk.filedialog.askopenfilenames(title="Ouvrir une image",filetypes=[('jpg files','.jpg'),('jpeg files','.jpeg')])
+        return filepath
+
+    def opentps():
+        """!
+        Methode pour sélectionner les images dans la fenetre
+        """
+        import tkinter.filedialog,tkinter as tk
+        filepath = tk.filedialog.askopenfilename(title="Ouvrir le fichier tps",filetypes=[('tps files','.tps')])
+        return filepath
+
+    def openxml():
+        """!
+        Methode pour sélectionner les images dans la fenetre
+        """
+        import tkinter.filedialog,tkinter as tk
+        filepath = tk.filedialog.askopenfilename(title="Ouvrir le fichier xml",filetypes=[('xml files','.xml')])
+        return filepath
+
+    def openfolder():
+        """!
+        Methode pour sélectionner les images dans la fenetre
+        """
+        import tkinter.filedialog,tkinter as tk
+        filepath = tk.filedialog.askdirectory()
         return filepath
 
     def Longueur(distance):
@@ -379,11 +403,11 @@ class Externes():
         import numpy as np
         #liste = [[x,y],[x,y]...]
         #point = [x,y]
-        listeDistances = [Externes.euclideDist(pointA,x) for x in listeOfPoints]
+        listeDistances = [Externes.euclide(pointA,x) for x in listeOfPoints]
         indexMin = np.argmin(listeDistances)
         pointB = listeOfPoints[indexMin]
-        distance = listeDistances[indexMin]
-        return indexMin,pointB,distance
+        distanceMin = listeDistances[indexMin]
+        return indexMin,pointB,distanceMin
 
 
     def checkIfProcessRunning(processName):
