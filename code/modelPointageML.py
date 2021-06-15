@@ -43,13 +43,13 @@ class ML_pointage():
         @param tpsfile_path : fichier tps avec les coordonnées des points
         @return None deux fichiers xml Train et Test
         """
-        file_sizes=utils.split_train_test(imagefolder_path)
-        dict_tps=utils.read_tps(tpsfile_path)
+        file_sizes=utils.utils.split_train_test(imagefolder_path)
+        dict_tps=utils.utils.read_tps(tpsfile_path)
 
-        utils.generate_dlib_xml(dict_tps,file_sizes['train'],folder=self.path_create_model+"train",out_file=self.path_create_model +"train.xml")
-        utils.generate_dlib_xml(dict_tps,file_sizes['test'],folder=self.path_create_model+"test",out_file=self.path_create_model+"test.xml")
-        utils.dlib_xml_to_tps(self.path_create_model+"train.xml")
-        utils.dlib_xml_to_tps(self.path_create_model+"test.xml")
+        utils.utils.generate_dlib_xml(dict_tps,file_sizes['train'],folder=self.path_create_model+"train",out_file=self.path_create_model +"train.xml")
+        utils.utils.generate_dlib_xml(dict_tps,file_sizes['test'],folder=self.path_create_model+"test",out_file=self.path_create_model+"test.xml")
+        utils.utils.dlib_xml_to_tps(self.path_create_model+"train.xml")
+        utils.utils.dlib_xml_to_tps(self.path_create_model+"test.xml")
 
     def parameter_model(self,tree,nu,threads,cascade_depth,feature_pool_size,test_splits,os):
         """!
@@ -138,8 +138,8 @@ class ML_pointage():
         @param foldernewimage : dossier avec l'image à prédire
         @param predictor_path : "C:\\.....\\predictor.dat"
         """
-        utils.predictions_to_xml(self.path_create_model+"predictor.dat", dir=foldernewimage,ignore=None,out_file=self.path_create_model+"test\\output.xml")
-        self.base_points = utils.dlib_xml_to_pandas(self.path_create_model + "test\\output.xml")
+        utils.utils.predictions_to_xml(self.path_create_model+"predictor.dat", dir=foldernewimage,ignore=None,out_file=self.path_create_model+"test\\output.xml")
+        self.base_points = utils.utils.dlib_xml_to_pandas(self.path_create_model + "test\\output.xml")
 
         return self.base_points
 

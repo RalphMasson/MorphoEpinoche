@@ -44,3 +44,14 @@ for file in glob.glob("*.png"):
         chemin3 = chemin+"class_diagram\\ml_points\\"
         new_version = getNewVersion(chemin3)
         os.replace(chemin2+file,chemin3+"class_diagram_v"+new_version+".png")
+
+    if('utils' in file):
+        chemin3 = chemin+"class_diagram\\utils\\"
+        try:
+            new_version = getNewVersion(chemin3)
+            os.replace(chemin2+file,chemin3+"class_diagram_v"+new_version+".png")
+
+        except:
+            last_version = 0
+            new_version = str(int(last_version)+1)
+            os.replace(chemin2+file,chemin3+"class_diagram_v"+new_version+".png")
