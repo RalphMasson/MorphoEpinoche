@@ -528,6 +528,8 @@ class Interface(tk.Tk):
         self.bind_all("<Control-p>",lambda e : Interface.improveLandmarksModel())
         menuModeles.add_command(label="MaJ Pointage",command=self.updatePointModel,accelerator="(Ctrl+Entrée)")
         self.bind_all("<Control-Return>",lambda e : self.updatePointModel())
+        menuModeles.add_command(label="MaJ Sexage",command=self.updatePointModel1,accelerator="(Ctrl+Entrée)")
+        self.bind_all("<Control-Return>",lambda e : self.updatePointModel1())
         menuModeles.add_command(label="Image précédente",command=self.previousImage,accelerator="(Ctrl+Backspace)")
         self.bind_all("<Control-BackSpace>",lambda e : self.previousImage())
         menubar.add_cascade(label="Modèles",menu=menuModeles)
@@ -566,7 +568,11 @@ class Interface(tk.Tk):
 
     def updatePointModel(self):
         self.destroy()
-        GUI_update.Interface()
+        GUI_update.InterfacePoint()
+
+    def updatePointModel1(self):
+        self.destroy()
+        GUI_update.InterfaceGender()
 
     def afficheLongueur():
         """!
