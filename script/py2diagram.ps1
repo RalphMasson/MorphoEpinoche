@@ -3,6 +3,7 @@ cd code
 echo "Conversion du code en graphe"
 Pyreverse -o dot -p Interface_Normal GUI_normal.py
 Pyreverse -o dot -p Interface_Little GUI_little.py
+Pyreverse -o dot -p Interface_Update GUI_update.py
 Pyreverse -o dot -p Placement XY_compute.py
 Pyreverse -o dot -p Fonctions XY_tools.py
 Pyreverse -o dot -p Classification IA_sexage.py
