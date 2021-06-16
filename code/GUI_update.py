@@ -70,9 +70,11 @@ class Interface(tk.Tk):
         Constructeur de l'interface
         """
         super().__init__()
-        self.add_menu()
+        self.state('zoomed')
+        self.title("Sex Determination for Three Spined Stickleback")
         self.add_labels()
         self.add_buttons()
+        self.add_entrys()
 
     def add_labels(self):
         tk.Label(self,text="Mise à jour du modèle Pointage \n",font=("Andalus",16,"bold")).pack(padx=5,pady=5)
@@ -99,7 +101,6 @@ class Interface(tk.Tk):
         message += "\n2) Avec tpsUtils, faites un append dans un nouveau fichier .tps"
         message += "\n3) Déplacer les images nouvelles dans le même dossier que les anciennes"
         tk.Label(self,text=message,justify=tk.LEFT,borderwidth=2,highlightthickness=1,bd=0,highlightbackground="black", highlightcolor="black").place(relx = 0.05,rely = 0.1)
-
         tk.Label(self,text="cascade_depth (6-18)").place(relx=0.001,rely = 0.4)
         tk.Label(self,text="tree_depth (2-8)").place(relx=0.001,rely = 0.44)
         tk.Label(self,text="tree per cascade (500)").place(relx=0.001,rely = 0.48)
@@ -108,6 +109,8 @@ class Interface(tk.Tk):
         tk.Label(self,text="feature pool size (300-700)").place(relx=0.001,rely = 0.6)
         tk.Label(self,text="split tests (10-30)").place(relx=0.001,rely = 0.64)
 
+
+    def add_entrys(self):
         self.EntryCascade = tk.StringVar(self)
         self.CascadeDepth = tk.Entry(self,textvariable = self.EntryCascade).place(relx=0.12,rely=0.4,width = 60)
         self.EntryTree= tk.StringVar(self)
@@ -126,26 +129,12 @@ class Interface(tk.Tk):
 
     def add_buttons(self):
         self.boutonImageAll = tk.Button(self,text="1) Selectionner le dossier version2",command=self.getDirectoryModel).place(relx=0.05,rely=0.22)
-        print(Interface.modele_path)
-        # self.boutonModele = tk.Button(self,text="2) Selectionner le dossier où sera le modèle (juste avant 'all')",command=self.getDirectoryModel).place(relx=0.05,rely=0.17)
-        # self.boutonTPS = tk.Button(self,text="3) Selectionner le fichier tps contenant le pointage (juste avant 2)",command=self.getFileTps).place(relx=0.05,rely=0.22)
         self.buttonTrain = tk.Button(self,text="2) Mettre à jour le modele",command=self.prepareModel).place(relx=0.05,rely=0.26)
         self.text = tk.Text(self,height=35, width=150)
         self.text.place(relx=0.18,rely=0.3)
         self.text.configure(state='disabled')
-
         self.buttonOptions = tk.Button(self,text="Modifier options (leave blank to default)").place(relx = 0.02,rely = 0.35)
 
-
-
-    def getDirectoryTrain(self):
-        Interface.trainfolder_path = Fonctions.Externes.openxml()
-        print(Interface.trainfolder_path)
-
-    def getDirectoryAll(self):
-        Interface.imagefolder_path = Fonctions.Externes.openfolder()+"/"
-        # self.labelpathall.config(text=Interface.imagefolder_path)
-        print(Interface.imagefolder_path)
     def getDirectoryModel(self):
         Interface.modele_path = Fonctions.Externes.openfolder()+"/"
         Interface.imagefolder_path = Interface.modele_path + "all/"
@@ -175,43 +164,18 @@ class Interface(tk.Tk):
         self.text.insert("insert","\n\t"+str(len(os.listdir(Interface.modele_path+"test")))+" images Test")
         self.text.update()
         optionSet = a.options()
-        print(type(optionSet))
-        print(optionSet)
         self.text.insert("insert","\n\nOptions set :")
-        # self.getDirectoryTrain()
         message = "\n\tTraining with cascade depth : "+str(optionSet.cascade_depth)
-        self.text.insert("insert",message)
-        self.text.update()
         message = "\n\tTraining with tree depth :"+str(optionSet.tree_depth)
-        self.text.insert("insert",message)
-        self.text.update()
         message = "\n\tTraining with "+str(optionSet.num_trees_per_cascade_level)+" trees per cascade level."
-        self.text.insert("insert",message)
-        self.text.update()
         message = "\n\tTraining with nu : "+str(optionSet.nu)
-        self.text.insert("insert",message)
-        self.text.update()
         message = "\n\tTraining with oversampling amount : "+str(optionSet.oversampling_amount)
-        self.text.insert("insert",message)
-        self.text.update()
         message = "\n\tTraining with oversampling translation jitter : "+str(optionSet.oversampling_translation_jitter)
-        self.text.insert("insert",message)
-        self.text.update()
         message = "\n\tTraining with feature pool size : "+str(optionSet.feature_pool_size)
-        self.text.insert("insert",message)
-        self.text.update()
         message = "\n\tTraining with "+str(optionSet.num_threads)+" threads"
-        self.text.insert("insert",message)
-        self.text.update()
         message = "\n\tTraining with lambda_param: "+str(optionSet.lambda_param)
-        self.text.insert("insert",message)
-        self.text.update()
         message = "\n\tTraining with "+str(optionSet.num_test_splits)+" split tests."
-        self.text.insert("insert",message)
-        self.text.update()
         message = "\nFitting trees..."
-        self.text.insert("insert",message)
-        self.text.update()
         message = "\n\n\t\t\tPLEASE WAIT UNTIL FINISHED !"
         self.text.insert("insert",message)
         self.text.update()
@@ -229,14 +193,6 @@ class Interface(tk.Tk):
         self.text.insert("insert","\n\n\t\t\tModèle finalisé : "+str(date.today())+" "+str(datetime.now().time()))
         self.text.update()
         self.text.configure(state='disabled')
-
-
-    def onFrameConfigure(self, event):
-        '''Reset the scroll region to encompass the inner frame'''
-        self.canvasGeneral.configure(scrollregion=self.canvasGeneral.bbox("all"))
-    def add_menu(self):
-        self.state('zoomed')
-        self.title("Sex Determination for Three Spined Stickleback")
 
 
     def resource_path(relative_path):
