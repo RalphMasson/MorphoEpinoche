@@ -15,7 +15,7 @@ import tkinter as tk
 from tkinter import messagebox
 from PIL import Image, ImageTk
 import math,functools,itertools,os,cv2,webbrowser
-import Placement,Fonctions,Classification,Interface_Sexage_Little,updateModels
+import XY_compute,XY_tools,IA_sexage,GUI_little,GUI_update
 import numpy as np
 
 # Classe pour les points de la tête
@@ -130,12 +130,12 @@ class HeadClass():
                         id17 = id15+2
                     pt13_image = [canvas.coords(id13)[0]+3,canvas.coords(id13)[1]+3]
                     pt15_image = [canvas.coords(id15)[0]+3,canvas.coords(id15)[1]+3]
-                    pt13_calcul = Placement.Points.decenterPoint(pt13_image,HeadFish.centreOeil)
-                    pt15_calcul = Placement.Points.decenterPoint(pt15_image,HeadFish.centreOeil)
-                    pt17,pt11 = Placement.Points.points11_17(HeadFish.CV2_image_big,pt13_calcul,pt15_calcul)
+                    pt13_calcul = XY_tools.Externes.decenterPoint(pt13_image,HeadFish.centreOeil)
+                    pt15_calcul = XY_tools.Externes.decenterPoint(pt15_image,HeadFish.centreOeil)
+                    pt17,pt11 = XY_compute.Points.points11_17(HeadFish.CV2_image_big,pt13_calcul,pt15_calcul)
                     pt11_old = [canvas.coords(id11)[0]+3,canvas.coords(id11)[1]+3]
                     pt17_old = [canvas.coords(id17)[0]+3,canvas.coords(id17)[1]+3]
-                    pt11,pt17 = Placement.Points.centerPoints([pt11,pt17],HeadFish.centreOeil)
+                    pt11,pt17 = XY_tools.Externes.centerPoints([pt11,pt17],HeadFish.centreOeil)
                     canvas.move(id11,pt11[0]-pt11_old[0],pt11[1]-pt11_old[1])
                     canvas.move(id17,pt17[0]-pt17_old[0],pt17[1]-pt17_old[1])
                     canvas.update()
@@ -173,13 +173,13 @@ class HeadClass():
         """!
         Methode pour calculer toutes les distances de la tete
         """
-        Fonctions.Externes.genererAllDistancesHead(HeadClass.pointsEchelle,HeadClass.pointsFish,Interface.sexModele.get(),pypath3)
+        XY_tools.Externes.genererAllDistancesHead(HeadClass.pointsEchelle,HeadClass.pointsFish,Interface.sexModele.get(),pypath3)
 
     def calculDistances():
         """!
         Methode pour calculer certaines distances caractéristiques
         """
-        HeadClass.distances_check = Fonctions.Externes.calculDistances(HeadClass.pointsEchelle,HeadClass.pointsFish)
+        HeadClass.distances_check = XY_tools.Externes.calculDistances(HeadClass.pointsEchelle,HeadClass.pointsFish)
         return HeadClass.distances_check
 
 
@@ -316,7 +316,7 @@ class BodyClass():
         """!
         Methode pour calculer certaines distances caractéristiques
         """
-        BodyClass.distances_check = Fonctions.Externes.calculDistances2(BodyClass.pointsEchelle,BodyClass.pointsFish)
+        BodyClass.distances_check = XY_tools.Externes.calculDistances2(BodyClass.pointsEchelle,BodyClass.pointsFish)
         return BodyClass.distances_check
 
 class HeadFish():
@@ -339,7 +339,7 @@ class HeadFish():
         @param size list : dimension souhaitée de l'image
         """
         self.img = ImageTk.PhotoImage(PIL_image.resize(size, Image.ANTIALIAS))
-        self.circle = Placement.Points.detect_eye(cv2.resize(CV2_image,size,Image.ANTIALIAS))
+        self.circle = XY_compute.Points.detect_eye(cv2.resize(CV2_image,size,Image.ANTIALIAS))
         HeadFish.centreOeil = [self.circle[0],self.circle[1]]
         HeadFish.poisson = canvas.create_image(0, 0, anchor=tk.NW,image=self.img)
         HeadFish.CV2_image_big = CV2_image
@@ -436,7 +436,7 @@ class Interface(tk.Tk):
         self.canvasCorps.grid(column=1,row=8)
 
         """Canvas pour logo"""
-        pathLogo = Fonctions.Externes.resource_path("logo2.png")
+        pathLogo = XY_tools.Externes.resource_path("logo2.png")
         self.canvasLogo = tk.Canvas(self,bg='#f0f0f0')
         self.canvasLogo.config(width=157,height=84)
         self.canvasLogo.place(x=0,y=0)
@@ -444,7 +444,7 @@ class Interface(tk.Tk):
         self.canvasLogo.create_image(0, 0, anchor=tk.NW,image=self.imgLogo)
 
         ''' Canvas pour le schema '''
-        pathSchema = Fonctions.Externes.resource_path("schema.png")
+        pathSchema = XY_tools.Externes.resource_path("schema.png")
         self.canvasSchema = tk.Canvas(self,bg='#f0f0f0')
         self.canvasSchema.config(width = 288,height=192)
         self.canvasSchema.place(x=1250,y=0)
@@ -556,29 +556,29 @@ class Interface(tk.Tk):
         tk.messagebox.showinfo(title="Informations",message=message)
 
     def changeView(self):
-        Interface_Sexage_Little.Temp.chemin = pypath3
+        GUI_little.Temp.chemin = pypath3
         self.destroy()
         root = tk.Tk()
 
-        Interface_Sexage_Little.app = Interface_Sexage_Little.Interface(root)
-        Interface_Sexage_Little.app.pack(side="top", fill="both", expand=True)
-        Interface_Sexage_Little.app.mainloop()
+        GUI_little.app = GUI_little.Interface(root)
+        GUI_little.app.pack(side="top", fill="both", expand=True)
+        GUI_little.app.mainloop()
 
     def updatePointModel(self):
         self.destroy()
-        updateModels.Interface()
+        GUI_update.Interface()
 
     def afficheLongueur():
         """!
         Méthode permettant de mettre à jour l'affichage des longueurs dans l'interface
         """
-        app.labelLongueur.config(text=Fonctions.Externes.Longueur(HeadClass.calculDistances()))
+        app.labelLongueur.config(text=XY_tools.Externes.Longueur(HeadClass.calculDistances()))
 
     def afficheLongueurBody():
         """!
         Méthode permettant de mettre à jour l'affichage des longueurs du corps dans l'interface
         """
-        app.labelLongueurBody.config(text=Fonctions.Externes.LongueurBody(BodyClass.calculDistances()))
+        app.labelLongueurBody.config(text=XY_tools.Externes.LongueurBody(BodyClass.calculDistances()))
 
     def clearAllCanvas(self):
         """!
@@ -610,7 +610,7 @@ class Interface(tk.Tk):
     def getVersion():
 
         try:
-            version = Fonctions.Externes.getVersion()
+            version = XY_tools.Externes.getVersion()
         except:
             version = "-- No internet connection --"
 
@@ -636,7 +636,7 @@ class Interface(tk.Tk):
         """
         self.choice = 0
         self.resetListeImages()
-        self.listeImages = Fonctions.Externes.openfn()
+        self.listeImages = XY_tools.Externes.openfn()
         self.calculPoints()
 
 
@@ -646,7 +646,7 @@ class Interface(tk.Tk):
         """
         nbPointNonDetectes = 0
         print("### Initialisation ###")
-        tete,echelle10mm,echelle3mm = Placement.Points.randomPointsBis()
+        tete,echelle10mm,echelle3mm = XY_compute.Points.randomPointsBis()
         pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19 = tete
         self.clearAllCanvas()
 
@@ -658,7 +658,7 @@ class Interface(tk.Tk):
 
         ''' Resize pour le corps '''
         print("\n### Traitement du corps ###")
-        corpsStandard,newPIL_image,left = Placement.Points.ImageCorps(ImagePIL)
+        corpsStandard,newPIL_image,left = XY_compute.Points.ImageCorps(ImagePIL)
         BodyFish(self.canvasCorps,newPIL_image,(1300,975))
         self.canvasCorps.move(BodyFish.poisson,-(left[0]-50),-(left[1]-280))
         self.canvasCorps.update()
@@ -666,7 +666,7 @@ class Interface(tk.Tk):
 
         ''' Resize pour la tête '''
         print("\n### Traitement de la tête 1/3 ### ")
-        PIL_image_big,CV2_image_big,left1,right1 = Placement.Points.ImageTete(self.listeImages,self.numImageActuelle)
+        PIL_image_big,CV2_image_big,left1,right1 = XY_compute.Points.ImageTete(self.listeImages,self.numImageActuelle)
         HeadFish(self.canvasTete,PIL_image_big,CV2_image_big,(3500,2625))
         self.canvasTete.update()
         print("### OK ###")
@@ -682,23 +682,23 @@ class Interface(tk.Tk):
         ''' Initialisation des points 3 et 19 par détection auto '''
         print("\n### Calcul des points 3 et 19 ###")
         try:
-            [pt3,pt19]=Placement.Points.points3_19_independant(CV2_image_big)
+            [pt3,pt19]=XY_compute.Points.points3_19_independant(CV2_image_big)
             pt3 = [pt3[0],pt3[1]]
             pt19 = [pt19[0],pt19[1]]
         except:
             print("Impossible de déterminer les points 3 et 19")
             nbPointNonDetectes+=2
-        # [pt3,pt19]=Placement.Points.points3_19(CV2_image_big)
+        # [pt3,pt19]=XY_compute.Points.points3_19(CV2_image_big)
         # pt3 = [pt3[0],pt3[1]]
         # pt19 = [pt19[0],pt19[1]]
         print("### OK ###")
 
         '''Initialisation du point 9 par détection auto '''
         print("\n### Calcul du point 9 ###")
-        _,c = Placement.Points.contoursCorps(CV2_image_big,'head')
+        _,c = XY_compute.Points.contoursCorps(CV2_image_big,'head')
         print(CV2_image_big.shape)
         try:
-            pt9=Placement.Points.point9(c,pt19)
+            pt9=XY_compute.Points.point9(c,pt19)
             pt9 = [pt9[0],pt9[1]]
             print("pt9")
             print(pt9)
@@ -711,9 +711,9 @@ class Interface(tk.Tk):
 
         '''Initialisation du point 15 et 13 par détection auto '''
         print("\n### Calcul des points 15 et 13 ###")
-        pt15,pt13=Placement.Points.points15_13(CV2_image_big,pt19,left1,right1)
+        pt15,pt13=XY_compute.Points.points15_13(CV2_image_big,pt19,left1,right1)
         # try:
-        #     pt15,pt13=Placement.Points.points15_13(CV2_image_big,pt19,left1,right1)
+        #     pt15,pt13=XY_compute.Points.points15_13(CV2_image_big,pt19,left1,right1)
         #     pt15 = [pt15[0],pt15[1]]
         #     pt13 = [pt13[0],pt13[1]]
         # except:
@@ -727,7 +727,7 @@ class Interface(tk.Tk):
         '''Initialisation des points 5 et 7 par détection auto '''
         print("\n### Calcul des points 5 et 7  ###")
         try:
-            pt7,pt5 = Placement.Points.points5_7(CV2_image_big,pt9,left1)
+            pt7,pt5 = XY_compute.Points.points5_7(CV2_image_big,pt9,left1)
             pt5 = [pt5[0],pt5[1]]
             pt7 = [pt7[0],pt7[1]]
         except:
@@ -736,12 +736,12 @@ class Interface(tk.Tk):
 
         """Initialisation des points 11 et 17 par détection auto """
         try:
-            pt17,pt11 = Placement.Points.points11_17(CV2_image_big,pt13,pt15)
+            pt17,pt11 = XY_compute.Points.points11_17(CV2_image_big,pt13,pt15)
         except:
             print("Impossible de détecter les points 11 et 17")
             nbPointNonDetectes+=2
 
-        tete = Fonctions.Externes.centerPoints([pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19],HeadFish.centreOeil)
+        tete = XY_tools.Externes.centerPoints([pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19],HeadFish.centreOeil)
 
         print("\n### Placement des points de la tête ###")
         HeadClass(self.canvasTete, tete,'#ff00f2')
@@ -753,7 +753,7 @@ class Interface(tk.Tk):
         """!
         Méthode permettant d'afficher la prédiction du sexe
         """
-        choix,couleur,p = Classification.Prediction.predict(None,"","")
+        choix,couleur,p = IA_sexage.Prediction.predict(None,"","")
         app.labelSex.config(text="")
         app.labelSex.config(text=choix+" avec p="+str(round(p,2)),font=("Purisa",16),fg=couleur)
 

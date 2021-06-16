@@ -15,7 +15,7 @@ pypath3 = '/'.join(pypath[:-2])+"/executable"
 pypath2 = '/'.join(pypath[:-2])
 sys.path.insert(0,pypath1)
 
-import Fonctions
+import XY_tools
 
 class Prediction():
     """!

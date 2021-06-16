@@ -13,8 +13,8 @@ sys.path.insert(0,pypath1)
 import tkinter as tk
 from tkinter import messagebox
 from datetime import timedelta,datetime,date
-import Fonctions
-import modelPointageML as ML
+import XY_tools
+import IA_morph as ML
 import io,os,time,dlib
 from contextlib import redirect_stdout
 
@@ -136,13 +136,13 @@ class Interface(tk.Tk):
         self.buttonOptions = tk.Button(self,text="Modifier options (leave blank to default)").place(relx = 0.02,rely = 0.35)
 
     def getDirectoryModel(self):
-        Interface.modele_path = Fonctions.Externes.openfolder()+"/"
+        Interface.modele_path = XY_tools.Externes.openfolder()+"/"
         Interface.imagefolder_path = Interface.modele_path + "all/"
         Interface.trainfolder_path = Interface.modele_path + "train.xml"
         Interface.tpsfile_path = Interface.modele_path + "v2.tps"
         print(Interface.modele_path)
     def getFileTps(self):
-        Interface.tpsfile_path = Fonctions.Externes.opentps()
+        Interface.tpsfile_path = XY_tools.Externes.opentps()
         # self.labelpathtps.config(text=Interface.tpsfile_path)
 
         print(Interface.tpsfile_path)

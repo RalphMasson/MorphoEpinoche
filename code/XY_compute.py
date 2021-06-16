@@ -5,8 +5,8 @@ import cv2,math
 import numpy as np
 import sys,inspect
 sys.path.insert(0,'/'.join(inspect.stack()[0][1].split('\\')[:-1]))
-import Fonctions
-import modelPointageML as ML
+import XY_tools
+import IA_morph as ML
 
 
 
@@ -75,7 +75,7 @@ class Points():
         """
         if param=='head':size=(3500,2625)
         if param=='body':size=(1300,975)
-        diamond = Fonctions.Externes.diamondCV2()
+        diamond = XY_tools.Externes.diamondCV2()
         img = cv2.resize(img,size)
         dst=img
         dst = cv2.resize(dst,size)
@@ -186,15 +186,15 @@ class Points():
         '''' Détection de la pupille '''
         pupille = Points.detect_eye(img)
         x_pupille,y_pupille,r_pupille=pupille[0],pupille[1],pupille[2]
-        listePoints = Fonctions.Externes.getRandomPointsInCircle(r_pupille,x_pupille,y_pupille,30)
-        meanPixel = Fonctions.Externes.averagePixelsValue(imgNB,listePoints)
+        listePoints = XY_tools.Externes.getRandomPointsInCircle(r_pupille,x_pupille,y_pupille,30)
+        meanPixel = XY_tools.Externes.averagePixelsValue(imgNB,listePoints)
         pt3 = [pupille[0]-2,pupille[1]]
         pt19 = [pupille[1]+2,pupille[1]]
 
         ''' Initialisation '''
         nb_points = int(3.5*r_pupille)
         longueur_deplacement = np.linspace(0,nb_points,nb_points+1)
-        listeXY = [Fonctions.Externes.getRandomPointsInCircleOriented(nb_points,x_pupille,y_pupille,orientation) for orientation in ['nw','nw1','sw','sw1']]
+        listeXY = [XY_tools.Externes.getRandomPointsInCircleOriented(nb_points,x_pupille,y_pupille,orientation) for orientation in ['nw','nw1','sw','sw1']]
 
 
         ''' Binarisation BW '''
@@ -234,7 +234,7 @@ class Points():
 
         ''' Analyse de l'oeil à l'ouest '''
         for x in liste:
-            x = Fonctions.Externes.lissage(x)
+            x = XY_tools.Externes.lissage(x)
             x = [np.min(x) if i<r_pupille else x[i] for i in range(len(x))]
             my_pwlf1 = pwlf.PiecewiseLinFit(longueur_deplacement,x)
             breaks1 = my_pwlf1.fit(4,atol=10)
@@ -246,7 +246,7 @@ class Points():
 
         ''' Analyse de l'oeil à l'est '''
         intensite_est = [imgNB[int(pt3[1])][int(pt3[0]+x)] for x in longueur_deplacement]
-        intensite_est = Fonctions.Externes.lissage(intensite_est)
+        intensite_est = XY_tools.Externes.lissage(intensite_est)
         intensite_est = [x if x<150 else 150 for x in intensite_est]
         intensite_est = [meanPixel if i<r_pupille else intensite_est[i] for i in range(len(intensite_est))]
         intensite_est = [np.max(intensite_est) if x==np.min(intensite_est) else x for x in intensite_est]
@@ -297,7 +297,7 @@ class Points():
         if circles is not None:
             circles = np.round(circles[0, :]).astype("int")
         listPotentiels = [x[0] for x in circles]
-        i,dist = Fonctions.Externes.findNearestValueFromArray(listPotentiels,pupille[0])
+        i,dist = XY_tools.Externes.findNearestValueFromArray(listPotentiels,pupille[0])
 
         if(dist>100):
             pt3 = (int(pupille[0]-120),int(pupille[1]))
@@ -333,7 +333,7 @@ class Points():
             listPointsPotentiels2.append(list(approx[index][0]))
             listPointsPotentiels2_aug.append([list(approx[index-1][0]),list(approx[index][0]),list(approx[(index+1)%(len(approx))][0])])
         for triplet in listPointsPotentiels2_aug:
-            theta = Fonctions.Externes.calculAngleBis(triplet[0],triplet[1],triplet[2])
+            theta = XY_tools.Externes.calculAngleBis(triplet[0],triplet[1],triplet[2])
             anglePointsPotentiels.append(theta)
         [x9,y9] = listPointsPotentiels2[np.argmax(anglePointsPotentiels)]
         pt9 = (x9,y9)
@@ -367,19 +367,19 @@ class Points():
 
         for indx,x in enumerate(contours):
             longueur = cv2.arcLength(x,True)>100 and cv2.arcLength(x,True)<500
-            pente = abs(Fonctions.Externes.isContoursLineLike(x)[0])>5
+            pente = abs(XY_tools.Externes.isContoursLineLike(x)[0])>5
             top = tuple(x[x[:, :, 1].argmin()][0])
             bottom = tuple(x[x[:, :, 1].argmax()][0])
-            distanceBool = Fonctions.Externes.euclide(top,bottom)>80
+            distanceBool = XY_tools.Externes.euclide(top,bottom)>80
             if(longueur and pente and distanceBool):
-                pixelValue = np.vstack([pixelValue,np.array([[Fonctions.Externes.averagePixelValue(img,x,5),int(indx)]])])
+                pixelValue = np.vstack([pixelValue,np.array([[XY_tools.Externes.averagePixelValue(img,x,5),int(indx)]])])
 
         for x in pixelValue.T[1]:
             if(len(pixelValue)==1):
-                distances.append([Fonctions.Externes.isContoursLineLike(contours[int(x)])[0],Fonctions.Externes.isContoursLineLike(contours[int(x)])[1],x])
+                distances.append([XY_tools.Externes.isContoursLineLike(contours[int(x)])[0],XY_tools.Externes.isContoursLineLike(contours[int(x)])[1],x])
             if(len(pixelValue)>1):
-                if(Fonctions.Externes.averagePixelValue(img,contours[int(x)],5)<np.percentile(pixelValue,40)):
-                    distances.append([Fonctions.Externes.isContoursLineLike(contours[int(x)])[0],Fonctions.Externes.isContoursLineLike(contours[int(x)])[1],x])
+                if(XY_tools.Externes.averagePixelValue(img,contours[int(x)],5)<np.percentile(pixelValue,40)):
+                    distances.append([XY_tools.Externes.isContoursLineLike(contours[int(x)])[0],XY_tools.Externes.isContoursLineLike(contours[int(x)])[1],x])
 
 
         distances.sort(key=lambda x:x[1])
@@ -428,12 +428,12 @@ class Points():
 
         ''' distance to line'''
 
-        pente,intercept = Fonctions.Externes.penteIntercept(left,approxBouche2[0])
+        pente,intercept = XY_tools.Externes.penteIntercept(left,approxBouche2[0])
         xx = np.linspace(max(approxBouche2[0][0],left[0]),min(approxBouche2[0][0],left[0]),len(abscisses))
         yy = np.round(pente*xx+intercept)
 
         ''' calcul du projete '''
-        projete = [np.round(Fonctions.Externes.projeteOrtho(pente,intercept,xx[i],ordonnees[i])) for i in range(len(xx))]
+        projete = [np.round(XY_tools.Externes.projeteOrtho(pente,intercept,xx[i],ordonnees[i])) for i in range(len(xx))]
         projete = [x.flatten().tolist() for x in projete]
         xxx=np.array(projete).T[0]
         yyy = np.array(projete).T[1]
@@ -448,7 +448,7 @@ class Points():
         # # plt.plot(xxx,yyy,'g')
 
         ''' calcul de la distance '''
-        erreur3 = [Fonctions.Externes.euclide([xx[i],yy[i]],[xxx[i],yyy[i]]) for i in range(len(yyy))]
+        erreur3 = [XY_tools.Externes.euclide([xx[i],yy[i]],[xxx[i],yyy[i]]) for i in range(len(yyy))]
         erreur3 = [erreur3[i]-statistics.mean(erreur3) for i in range(len(erreur3))]
         peaks,_=find_peaks(erreur3,height=(0, None),distance=5,prominence=1)
 
@@ -459,7 +459,7 @@ class Points():
         ''' choix du pic le plus proche de la lèvre inférieure '''
         if(len(peaks)>1):
             pointsPotentiels = [[xx[peaks[i]],ordonnees[peaks[i]]] for i in range(len(peaks))]
-            indxx,_,_ = Fonctions.Externes.findNearestPointFromListOfPoints(left,pointsPotentiels)
+            indxx,_,_ = XY_tools.Externes.findNearestPointFromListOfPoints(left,pointsPotentiels)
             indxx = peaks[indxx]
         else:
             indxx = peaks
@@ -467,7 +467,7 @@ class Points():
 
         pt5 = (left[0],left[1])
         pt7 = (int(xx[indxx]),int(ordonnees[indxx]))
-        _,pointB,_ = Fonctions.Externes.findNearestPointFromListOfPoints(pt7,cList)
+        _,pointB,_ = XY_tools.Externes.findNearestPointFromListOfPoints(pt7,cList)
         pt7 = (pointB[0],pointB[1])
         print("pt5")
         print(pt5)
