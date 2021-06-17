@@ -524,14 +524,9 @@ class Interface(tk.Tk):
         menubar.add_cascade(label="Outils",menu=menuOutils)
 
         menuModeles = tk.Menu(menubar,tearoff=0)
-        menuModeles.add_command(label="Prépare MaJ Pointage",command=Interface.improveLandmarksModel,accelerator="(Ctrl+P)")
-        self.bind_all("<Control-p>",lambda e : Interface.improveLandmarksModel())
-        menuModeles.add_command(label="MaJ Pointage",command=self.updatePointModel,accelerator="(Ctrl+Entrée)")
-        self.bind_all("<Control-Return>",lambda e : self.updatePointModel())
-        menuModeles.add_command(label="MaJ Sexage",command=self.updatePointModel1,accelerator="(Ctrl+Entrée)")
-        self.bind_all("<Control-Return>",lambda e : self.updatePointModel1())
-        menuModeles.add_command(label="Image précédente",command=self.previousImage,accelerator="(Ctrl+Backspace)")
-        self.bind_all("<Control-BackSpace>",lambda e : self.previousImage())
+        menuModeles.add_command(label="Prépare MaJ Pointage",command=Interface.improveLandmarksModel)
+        menuModeles.add_command(label="MaJ Pointage",command=self.updatePointModel)
+        menuModeles.add_command(label="MaJ Sexage",command=self.updatePointModel1)
         menubar.add_cascade(label="Modèles",menu=menuModeles)
 
         menuAffichage = tk.Menu(menubar,tearoff=0)
