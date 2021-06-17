@@ -24,46 +24,105 @@ class Temp():
     chemin = ""
 
 class ModelPoints():
+    """!
+        Classe de préparation du modèle Regression Trees pour la détection des
+        points par Machine Learning
+    """
 
     def __init__(self):
+        """!
+            Constructeur de la classe
+                Example : a = ModelPoints()
+        """
         self.pointsML = [[0,0]]*10
 
     def instantiate(self):
         """!
-        Récupère les coordonnées par machine learning
-        @param path_model dossier où se trouve le modele regression trees
-            (default = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\test_pointage_ML\\img\\")
-        @param path_image dossier où se trouve le dossier de l'image à pointer
-            (default = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\test_pointage_ML\\img\\test\\")
-        The list is expected to be ordered
+            Créer le modèle
         """
         ModelPoints.pointsML = ML.ML_pointage(InterfacePoint.modele_path,"")
 
     def split(self):
+        """!
+            Sépare les données en train / test
+        """
         ModelPoints.pointsML.preprocess_folder(InterfacePoint.imagefolder_path,InterfacePoint.tpsfile_path)
 
     def options(self):
+        """!
+            Règle les paramètres d'entrainement
+            @return a : liste des options choisies
+        """
         a = ModelPoints.pointsML.parameter_model([500,3],1,2,6,700,20,500)
         return a
 
     def train(self):
-        print(InterfacePoint.trainfolder_path)
+        """!
+            Entraine le modèle
+        """
+        ModelPoints.pointsML.train_model(InterfacePoint.trainfolder_path)
+
+class ModelSexage():
+    """!
+        Classe de préparation du modèle Regression Trees pour la classification des
+        poissons par Machine Learning
+    """
+
+    def __init__(self):
+        """!
+            Constructeur de la classe
+                Example : a = ModelSexage()
+        """
+        self.pointsML = [[0,0]]*10
+
+    def instantiate(self):
+        """!
+            Créer le modèle
+        """
+        ModelSexage.sexage = IA_sexage.Prediction(InterfaceGender.csv_path)
 
 
-        with io.StringIO() as buf, redirect_stdout(buf):
+    def split(self):
+        """!
+            Sépare les données en train / test
+        """
+        ModelSexage.sexage.preprocess()
 
-            ModelPoints.pointsML.train_model(InterfacePoint.trainfolder_path)
-            output = buf.getvalue()
-            return output
+    def options(self):
+        """!
+            Règle les paramètres d'entrainement
+        """
+        ModelSexage.sexage.parameters()
+        ModelSexage.list1 = list(ModelSexage.sexage.clf.get_params().keys())
+        ModelSexage.list2 = list(ModelSexage.sexage.clf.get_params().values())
+
+    def train(self):
+        """!
+            Entraine le modèle
+        """
+        ModelSexage.sexage.train()
+
+    def accuracyTrain(self):
+        """!
+            Calcule le score d'entrainement des modèles
+            @return acc1 : float (0<acc1<1)
+            @return acc2 : float (0<acc2<2)
+        """
+        acc1 = ModelSexage.sexage.clf.score(ModelSexage.sexage.X_train,ModelSexage.sexage.y_train)
+        acc2 = ModelSexage.sexage.clf1.score(ModelSexage.sexage.X_train,ModelSexage.sexage.y_train)
+        return acc1,acc2
+
+    def accuracyTest(self):
+        """!
+            Calcule le score de test des modèles
+            @return acc1 : float (0<acc1<1)
+            @return acc2 : float (0<acc2<2)
+        """
+        acc1 = ModelSexage.sexage.clf.score(ModelSexage.sexage.X_test,ModelSexage.sexage.y_test)
+        acc2 = ModelSexage.sexage.clf1.score(ModelSexage.sexage.X_test,ModelSexage.sexage.y_test)
+        return acc1,acc2
 
 class InterfacePoint(tk.Tk):
-    sexModele = None
-    app = None
-    chemin = ""
-    version = 1.6
-    modele_path = ""
-    imagefolder_path = ""
-    tpsfile_path = ""
 
     def __init__(self, **kwargs):
         """!
@@ -125,7 +184,6 @@ class InterfacePoint(tk.Tk):
         self.FeaturePoolSize = tk.Entry(self,textvariable = self.EntryFeaturePoolSize).place(relx=0.12,rely=0.6,width = 60)
         self.EntrySplitTests = tk.StringVar(self)
         self.SplitTests = tk.Entry(self,textvariable = self.EntrySplitTests).place(relx=0.12,rely=0.64,width = 60)
-
 
     def add_buttons(self):
         self.boutonImageAll = tk.Button(self,text="1) Selectionner le dossier version2",command=self.getDirectoryModel).place(relx=0.05,rely=0.22)
@@ -210,54 +268,7 @@ class InterfacePoint(tk.Tk):
 
 
 
-
-class ModelSexage():
-
-
-    def __init__(self):
-        self.pointsML = [[0,0]]*10
-
-    def instantiate(self):
-        """!
-        Récupère les coordonnées par machine learning
-        @param path_model dossier où se trouve le modele regression trees
-            (default = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\test_pointage_ML\\img\\")
-        @param path_image dossier où se trouve le dossier de l'image à pointer
-            (default = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\test_pointage_ML\\img\\test\\")
-        The list is expected to be ordered
-        """
-        ModelSexage.sexage = IA_sexage.Prediction(InterfaceGender.csv_path)
-
-
-    def split(self):
-        ModelSexage.sexage.preprocess()
-
-    def options(self):
-        ModelSexage.sexage.parameters()
-        ModelSexage.list1 = list(ModelSexage.sexage.clf.get_params().keys())
-        ModelSexage.list2 = list(ModelSexage.sexage.clf.get_params().values())
-
-    def train(self):
-        ModelSexage.sexage.train()
-
-    def accuracyTrain(self):
-        acc1 = ModelSexage.sexage.clf.score(ModelSexage.sexage.X_train,ModelSexage.sexage.y_train)
-        acc2 = ModelSexage.sexage.clf1.score(ModelSexage.sexage.X_train,ModelSexage.sexage.y_train)
-        return acc1,acc2
-
-    def accuracyTest(self):
-        acc1 = ModelSexage.sexage.clf.score(ModelSexage.sexage.X_test,ModelSexage.sexage.y_test)
-        acc2 = ModelSexage.sexage.clf1.score(ModelSexage.sexage.X_test,ModelSexage.sexage.y_test)
-        return acc1,acc2
-
 class InterfaceGender(tk.Tk):
-    sexModele = None
-    app = None
-    chemin = ""
-    version = 1.6
-    modele_path = ""
-    imagefolder_path = ""
-    tpsfile_path = ""
 
     def __init__(self, **kwargs):
         """!
@@ -268,24 +279,10 @@ class InterfaceGender(tk.Tk):
         self.title("Sex Determination for Three Spined Stickleback")
         self.add_labels()
         self.add_buttons()
-        # self.add_entrys()
+
 
     def add_labels(self):
         tk.Label(self,text="Mise à jour du modèle Sexage (Random Forest & SVM) \n",font=("Andalus",16,"bold")).pack(padx=5,pady=5)
-        message = "Importer le fichier csv des distances "
-
-
-        tk.Label(self,text=message,justify=tk.LEFT).place(relx = 0.35,rely = 0.1)
-        self.labelpathall = tk.Label(self,text="")
-        self.labelpathall.place(relx = 0.3,rely = 0.12)
-        self.labelpathmodel = tk.Label(self,text="")
-        self.labelpathmodel.place(relx= 0.3,rely= 0.17)
-
-        self.labelpathtps = tk.Label(self,text="")
-        self.labelpathtps.place(relx=0.3,rely=0.22)
-
-
-
 
     def add_buttons(self):
         self.boutonImageAll = tk.Button(self,text="1) Import le fichier csv",command=self.getDirectoryModel).place(relx=0.05,rely=0.22)
@@ -302,7 +299,6 @@ class InterfaceGender(tk.Tk):
         self.text.insert("1.0","Vérification du path : "+str(InterfaceGender.csv_path)+"\n")
         self.text.update()
         self.text.configure(state='disabled')
-
 
     def prepareModel(self):
 

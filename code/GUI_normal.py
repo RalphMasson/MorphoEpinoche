@@ -186,8 +186,8 @@ class HeadClass():
 class BodyClass():
     """Variables globales pour export
     id_polygons : liste des id des polygons (le corps et l'echelle)
-    pointsTete : liste des points du corps [(x1,y1),(x2,y2)...]
-    pointsEchelle3mm : liste des points de l'echelle [(x1,y1),(x2,y2)]
+    pointsFish : liste des points du corps [(x1,y1),(x2,y2)...]
+    pointsEchelle : liste des points de l'echelle [(x1,y1),(x2,y2)]
     distances_check : liste des distances caractéristiques affichées
     distances_all : liste de toutes les distances sauvegardés pour le modèle
     """
@@ -232,7 +232,7 @@ class BodyClass():
     def update_points(canvas1):
         """!
         Methode de mise à jour de la position des points
-        @param canvas tk.Canvas : cadre de l'image
+        @param canvas1 tk.Canvas : cadre de l'image
         """
         for id in BodyClass.id_polygons:
             liste = canvas1.coords(id)
