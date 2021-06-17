@@ -313,6 +313,14 @@ class Externes():
         filepath = tk.filedialog.askopenfilename(title="Ouvrir le fichier xml",filetypes=[('xml files','.xml')])
         return filepath
 
+    def opencsv():
+        """!
+        Methode pour sélectionner les images dans la fenetre
+        """
+        import tkinter.filedialog,tkinter as tk
+        filepath = tk.filedialog.askopenfilename(title="Ouvrir le fichier csv",filetypes=[('csv files','.csv')])
+        return filepath
+
     def openfolder():
         """!
         Methode pour sélectionner les images dans la fenetre
@@ -728,3 +736,8 @@ class Externes():
 
     def cheminAvant(aaa):
         return "\\".join(aaa.split("\\")[:-1])+"\\"
+    def cheminAvant2(aaa):
+        return "/".join(aaa.split("/")[:-1])+"/"
+
+    def sizeKoParent(path_et_nom_fichier_extension):
+        return str(round(int(os.path.getsize(path_et_nom_fichier_extension)/1048)))+" Ko"

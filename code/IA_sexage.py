@@ -35,7 +35,8 @@ class Prediction():
             Constructeur du prédicteur de sexe
             @param bdd chemin du fichier csv (default = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\rapports\\"
         """
-        self.path = Fonctions.Externes.cheminAvant(bdd)
+        self.path = XY_tools.Externes.cheminAvant2(bdd)
+        # print(bdd)
         self.bdd = pd.read_csv(bdd,delimiter=";")
 
 
@@ -51,6 +52,10 @@ class Prediction():
         self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.X, self.y, test_size=0.3)
 
 
+    def parameters(self):
+        self.clf=RandomForestClassifier(n_estimators=2000)
+        self.clf1 = make_pipeline(StandardScaler(), SVC(C=100,gamma=0.01,kernel='poly'))
+
     def train(self):
         """!
             Train with RF & SVC and exports models in path
@@ -58,14 +63,14 @@ class Prediction():
             @return None
 
         """
-        self.preprocess()
-        self.clf=RandomForestClassifier(n_estimators=2000)
+
         self.clf.fit(self.X_train,self.y_train)
+        print(self.path)
         print(self.clf.score(self.X_train,self.y_train))
         print(self.clf.score(self.X_test,self.y_test))
         dump(self.clf, self.path+"modelRF.joblib")
 
-        self.clf1 = make_pipeline(StandardScaler(), SVC(C=100,gamma=0.01,kernel='poly',))
+
         self.clf1.fit(self.X_train,self.y_train)
         print(self.clf1.score(self.X_train,self.y_train))
         print(self.clf1.score(self.X_test,self.y_test))
