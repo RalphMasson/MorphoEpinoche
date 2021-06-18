@@ -164,4 +164,10 @@ class ML_pointage():
         except KeyError:
             print("Image à prédire introuvable - Selectionner une image ou vérifier le chemin de l'image'")
 
-
+    def getErrorPerLandmark(self,XY_predict,XY_truth):
+        """!
+        Donne l'erreur pour chaque points dans le but de conserver les points les mieux détectés
+        @param XY_predict points trouvés par le modèle
+        @param XY_truth points trouvé par l'expérimentateur
+        """
+        return 0
