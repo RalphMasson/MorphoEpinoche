@@ -7,7 +7,9 @@ pypath2 = '/'.join(pypath[:-2])
 sys.path.insert(0,pypath1)
 
 import IA_tools as utils
+import XY_tools
 import dlib
+import numpy as np
 
 """!
     Classe de placement de points par Machine Learning
@@ -164,10 +166,37 @@ class ML_pointage():
         except KeyError:
             print("Image à prédire introuvable - Selectionner une image ou vérifier le chemin de l'image'")
 
+    def vecteurDetail(self,vecteur1):
+        import math
+        return math.atan2(vecteur1[1],vecteur1[0])*180/math.pi,np.sqrt(vecteur1[0]**2+vecteur1[1]**2)
+
     def getErrorPerLandmark(self,XY_predict,XY_truth):
         """!
         Donne l'erreur pour chaque points dans le but de conserver les points les mieux détectés
-        @param XY_predict points trouvés par le modèle
-        @param XY_truth points trouvé par l'expérimentateur
+        @param XY_predict points trouvés par le modèle (liste [[x1,y1],[x2,y2]...]
+        @param XY_truth points trouvé par l'expérimentateur (liste [[x1,y1],[x2,y2]...]
+        @return listErrorPerLandmark
         """
-        return 0
+        listErrorPerLandmark = [dict.fromkeys(['id_point','error']) for _ in range(len(XY_predict))]
+        for indx,(measured,real) in enumerate(zip(XY_predict,XY_truth)):
+
+            statsMeasured = a.vecteurDetail(measured)
+            statsReal = a.vecteurDetail(real)
+
+            dTheta = round(abs(statsMeasured[0]-statsReal[0]),6)
+            dNorm = round(abs(statsMeasured[1]-statsReal[1]),6)
+            print(dTheta)
+            print(dNorm)
+            error = round(dTheta+dNorm,6)
+
+            answer = "{mispositioning of point n°"+str(indx)+"} : "+str(error)+"\n"
+            print(answer)
+            listErrorPerLandmark[indx]['id_point']=indx
+            listErrorPerLandmark[indx]['error']=error
+
+        return listErrorPerLandmark
+
+
+
+
+
