@@ -133,6 +133,22 @@ class ML_pointage():
 
         return "Training error (average pixel deviation): {}".format(dlib.test_shape_predictor(trainfolder_path, "predictor.dat"))
 
+    def partial_train(self,imagefolder_path,tpsfile_path,trainfolder_path,n_max):
+        """!
+        Lance l'apprentissage du modèle avec les valeurs par défaut
+        @param trainfolder : path+"train.xml"
+        @param n_max : nombre max d'images à prendre pour l'apprentissage (0-1)
+        """
+
+        file_sizes=utils.utils.split_train_test(imagefolder_path,n_max)
+        dict_tps=utils.utils.read_tps(tpsfile_path)
+        utils.utils.generate_dlib_xml(dict_tps,file_sizes['train'],folder=self.path_create_model+"train",out_file=self.path_create_model +"train.xml")
+        utils.utils.generate_dlib_xml(dict_tps,file_sizes['test'],folder=self.path_create_model+"test",out_file=self.path_create_model+"test.xml")
+        utils.utils.dlib_xml_to_tps(self.path_create_model+"train.xml")
+        utils.utils.dlib_xml_to_tps(self.path_create_model+"test.xml")
+        self.parameter_model([500,3],0.08,1,20,700,20,200)
+        dlib.train_shape_predictor(trainfolder_path,self.path_create_model+"predictor.dat",self.options)
+
     def test_model(self,testfolder_path):
         """!
         Teste le modèle obtenu
@@ -151,22 +167,28 @@ class ML_pointage():
 
         return self.base_points
 
+    def xmltolist(xmlfile):
+        """!
+            Affiche les coordonnées des points prédits (de la première image)
+        """
+        df = utils.utils.dlib_xml_to_pandas(xmlfile)
+        col = list(df.columns)
+        return [[df[col[i+4]][0],df[col[i+5]][0]] for i in range(0,df.shape[1]-4,2)]
+
+
     def listePoints(self):
         """!
-        Affiche les coordonnées des points prédits
+        Affiche les coordonnées des points prédits du fichier output
         """
         try:
             self.predict(self.path_predict_image,self.path_create_model+"predictor.dat")
-            df = self.base_points
-            col = list(df.columns)
-
-            return [[df[col[i+4]][0],df[col[i+5]][0]] for i in range(0,df.shape[1]-4,2)]
+            return ML_pointage.xmltolist(self.path_create_model + "test\\output.xml")
         except (AttributeError,RuntimeError):
             print("Fichier predictor.dat introuvable - Entrainez le modèle ou vérifier le chemin du modèle")
         except KeyError:
             print("Image à prédire introuvable - Selectionner une image ou vérifier le chemin de l'image'")
 
-    def vecteurDetail(self,vecteur1):
+    def vecteurDetail(vecteur1):
         import math
         return math.atan2(vecteur1[1],vecteur1[0])*180/math.pi,np.sqrt(vecteur1[0]**2+vecteur1[1]**2)
 
@@ -180,16 +202,13 @@ class ML_pointage():
         listErrorPerLandmark = [dict.fromkeys(['id_point','error']) for _ in range(len(XY_predict))]
         for indx,(measured,real) in enumerate(zip(XY_predict,XY_truth)):
 
-            statsMeasured = a.vecteurDetail(measured)
-            statsReal = a.vecteurDetail(real)
-
-            dTheta = round(abs(statsMeasured[0]-statsReal[0]),6)
-            dNorm = round(abs(statsMeasured[1]-statsReal[1]),6)
-            print(dTheta)
-            print(dNorm)
-            error = round(dTheta+dNorm,6)
-
-            answer = "{mispositioning of point n°"+str(indx)+"} : "+str(error)+"\n"
+            # statsMeasured = ML_pointage.vecteurDetail(measured)
+            # statsReal = ML_pointage.vecteurDetail(real)
+            # dTheta = round(abs(statsMeasured[0]-statsReal[0]),6)
+            # dNorm = round(abs(statsMeasured[1]-statsReal[1]),6)
+            # error = round(16*dTheta+0.5*dNorm,6)
+            error = round(XY_tools.Externes.euclide(measured,real))
+            answer = "{mispositioning of point n°"+str(indx)+"} : "+str(error)+" pixels\n"
             print(answer)
             listErrorPerLandmark[indx]['id_point']=indx
             listErrorPerLandmark[indx]['error']=error

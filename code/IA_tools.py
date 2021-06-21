@@ -170,7 +170,7 @@ class utils():
     #Directory preparation tools
     
     
-    def split_train_test(input_dir):
+    def split_train_test(input_dir,n_max=0.8):
         '''
         Splits an image directory into 'train' and 'test' directories. The original image directory is preserved. 
         When creating the new directories, this function converts all image files to 'jpg'. The function returns
@@ -189,7 +189,7 @@ class utils():
         random.seed(845)
         filenames.sort()
         random.shuffle(filenames)
-        split = int(0.8 * len(filenames))
+        split = int(n_max * len(filenames))
         train_set = filenames[:split]
         test_set = filenames[split:]
     
