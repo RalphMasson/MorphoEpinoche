@@ -675,30 +675,22 @@ class Externes():
         circle_y = int(yc)
         if(orientation=='nw'):
             alpha = 1/0.93*math.pi
-
         if(orientation=='nw1'):
             alpha = 1/0.95*math.pi
-
         if(orientation=='nw2'):
             alpha = 1/0.97*math.pi
-
         if(orientation=='sw'):
             alpha = 0.93*math.pi
-
         if(orientation=='sw1'):
             alpha = 0.95*math.pi
-
         if(orientation=='sw2'):
             alpha = 0.97*math.pi
-
         x = circle_r * math.cos(alpha) + circle_x
         y = circle_r * math.sin(alpha) + circle_y
-
         return [x,y]
 
 
     def getRandomPointsInCircle(r,xc,yc,n):
-
         listePoints = [Externes.getRandomPointInCircle(r,xc,yc) for _ in range(n)]
         return listePoints
 
@@ -731,13 +723,11 @@ class Externes():
         for x in liste:
             plt.plot(longueur_deplacement,x)
         plt.plot(longueur_deplacement,intensite_est)
-
         plt.legend('intensite_nw','intensite_nw1','intensite_sw','intensite_sw1','intensite_ouest','intensite_est')
 
     def cheminAvant(aaa):
         return "\\".join(aaa.split("\\")[:-1])+"\\"
     def cheminAvant2(aaa):
         return "/".join(aaa.split("/")[:-1])+"/"
-
     def sizeKoParent(path_et_nom_fichier_extension):
         return str(round(int(os.path.getsize(path_et_nom_fichier_extension)/1048)))+" Ko"

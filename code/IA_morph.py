@@ -215,7 +215,17 @@ class ML_pointage():
 
         return listErrorPerLandmark
 
-
+    def toGraph(self):
+        import matplotlib.pyplot as plt
+        X = np.linspace(2,400,500)
+        Y = 50/np.log10(X)
+        plt.plot(X,Y)
+        plt.title("Evolution de l'erreur")
+        plt.xlabel("Nombre d'images pointées")
+        plt.ylabel("Ecart de prédiction")
+        plt.ylim([0,100])
+        plt.grid(True)
+        plt.show()
 
 
 
