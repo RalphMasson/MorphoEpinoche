@@ -719,11 +719,12 @@ class Externes():
         return resultList
 
     def displayGraph(longueur_deplacement,liste,intensite_est):
-        plt.figure()
-        for x in liste:
-            plt.plot(longueur_deplacement,x)
-        plt.plot(longueur_deplacement,intensite_est)
-        plt.legend('intensite_nw','intensite_nw1','intensite_sw','intensite_sw1','intensite_ouest','intensite_est')
+        # plt.figure()
+        # for x in liste:
+        #     plt.plot(longueur_deplacement,x)
+        # plt.plot(longueur_deplacement,intensite_est)
+        # plt.legend('intensite_nw','intensite_nw1','intensite_sw','intensite_sw1','intensite_ouest','intensite_est')
+        return 0
 
     def cheminAvant(aaa):
         return "\\".join(aaa.split("\\")[:-1])+"\\"

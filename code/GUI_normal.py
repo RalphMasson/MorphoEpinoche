@@ -16,6 +16,8 @@ from tkinter import messagebox
 from PIL import Image, ImageTk
 import math,functools,itertools,os,cv2,webbrowser
 import XY_compute,XY_tools,IA_sexage,GUI_little,GUI_update
+import IA_morph as ML
+
 import numpy as np
 
 # Classe pour les points de la tête
@@ -401,6 +403,31 @@ class BodyFish():
         if event.char =='z':
             canvas1.move(BodyFish.poisson,0,-10)
 
+class ModelPoints():
+    """!
+        Classe de préparation du modèle Regression Trees pour la détection des
+        points par Machine Learning
+    """
+
+    def __init__(self):
+        """!
+            Constructeur de la classe
+                Example : a = ModelPoints()
+        """
+        self.pointsML = [[0,0]]*10
+
+    def instantiate(self):
+        """!
+            Créer le modèle
+        """
+        ModelPoints.pointsML = ML.ML_pointage("","")
+        ModelPoints.path_xml = r"C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho/test_pointage_ML/v2/train.xml"
+        ModelPoints.path_xml = os.path.join(sys._MEIPASS,ModelPoints.path_xml)
+        ModelPoints.liste = ML.ML_pointage.xmltolist(ModelPoints.path_xml)
+        print(ModelPoints.liste)
+
+
+
 class Interface(tk.Tk):
     sexModele = None
     version = 1.6
@@ -417,6 +444,8 @@ class Interface(tk.Tk):
         self.add_labels()
         self.add_canvas()
         self.add_entrys()
+        a = ModelPoints()
+        a.instantiate()
 
     def add_entrys(self):
         Interface.sexModele = tk.StringVar(self)

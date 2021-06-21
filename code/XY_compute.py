@@ -1,6 +1,6 @@
 ''' Bibliothèque de fonctions de placement '''
 
-import cv2,math
+import cv2,math,sys
 # # # # # # import matplotlib.pyplot as plt
 import numpy as np
 import sys,inspect
@@ -37,7 +37,10 @@ class PointsML():
             (default = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\test_pointage_ML\\img\\test\\")
         The list is expected to be ordered
         """
-        self.pointsML = ML.ML_pointage(path_model,path_image).listePoints()
+        print("test")
+        path_model = r"C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho/test_pointage_ML/v2/"
+        path_image = "C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\test_pointage_ML\\img\\test\\"
+        self.pointsML = ML.ML_pointage(os.path.join(sys._MEIPASS, path_model),path_image).listePoints()
         print(self.pointsML)
 
 
