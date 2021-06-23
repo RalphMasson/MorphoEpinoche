@@ -15,7 +15,7 @@ from tkinter import messagebox
 from datetime import timedelta,datetime,date
 import XY_tools,IA_sexage
 import IA_morph as ML
-import io,os,time,dlib
+import io,os,time,dlib,easygui
 from contextlib import redirect_stdout
 
 # Classe pour les points de la tête
@@ -73,6 +73,7 @@ class ModelSexage():
             Constructeur de la classe
                 Example : a = ModelSexage()
         """
+
         self.pointsML = [[0,0]]*10
 
     def instantiate(self):
@@ -128,12 +129,16 @@ class InterfacePoint(tk.Tk):
         """!
         Constructeur de l'interface
         """
+        rr = easygui.passwordbox(msg='Code',title="Landmarking Verification Code")
+        while rr!="Pointage2021":
+            rr = easygui.passwordbox(msg='Code',title="Landmarking Verification Code")
         super().__init__()
         self.state('zoomed')
         self.title("Sex Determination for Three Spined Stickleback")
         self.add_labels()
         self.add_buttons()
         self.add_entrys()
+
 
     def add_labels(self):
         tk.Label(self,text="Mise à jour du modèle Pointage (Regression Trees) \n",font=("Andalus",16,"bold")).pack(padx=5,pady=5)
@@ -274,12 +279,14 @@ class InterfaceGender(tk.Tk):
         """!
         Constructeur de l'interface
         """
+        rr = easygui.passwordbox(msg='Code',title="Sexing Verification Code")
+        while rr!="Sexage2021":
+            rr = easygui.passwordbox(msg='Code',title="Sexing Verification Code")
         super().__init__()
         self.state('zoomed')
         self.title("Sex Determination for Three Spined Stickleback")
         self.add_labels()
         self.add_buttons()
-
 
     def add_labels(self):
         tk.Label(self,text="Mise à jour du modèle Sexage (Random Forest & SVM) \n",font=("Andalus",16,"bold")).pack(padx=5,pady=5)

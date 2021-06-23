@@ -14,10 +14,10 @@ sys.path.insert(0,pypath1)
 import tkinter as tk
 from tkinter import messagebox
 from PIL import Image, ImageTk
-import math,functools,itertools,os,cv2,webbrowser
+import math,functools,itertools,os,cv2,webbrowser,random,string
 import XY_compute,XY_tools,IA_sexage,GUI_little,GUI_update
 import IA_morph as ML
-
+from datetime import datetime
 import numpy as np
 
 # Classe pour les points de la tête
@@ -422,9 +422,13 @@ class ModelPoints():
         """
         ModelPoints.pointsML = ML.ML_pointage("","")
         ModelPoints.path_xml = r"C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho/test_pointage_ML/v2/train.xml"
-        ModelPoints.path_xml = os.path.join(sys._MEIPASS,ModelPoints.path_xml)
+        try:
+            ModelPoints.path_xml = os.path.join(sys._MEIPASS,ModelPoints.path_xml)
+        except Exception:
+            ModelPoints.path_xml = r"C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho/test_pointage_ML/v2/train.xml"
+
         ModelPoints.liste = ML.ML_pointage.xmltolist(ModelPoints.path_xml)
-        print(ModelPoints.liste)
+        # print(ModelPoints.liste)
 
 
 
@@ -444,6 +448,85 @@ class Interface(tk.Tk):
         self.add_labels()
         self.add_canvas()
         self.add_entrys()
+        self.loadModel()
+        self.createlog()
+        self.verbose_intro()
+
+    def createlog(self):
+        if not os.path.exists(os.getcwd()+"/log"):
+            os.mkdir(os.getcwd()+"/log")
+            pathname = os.getcwd()+"/log/"
+            date = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+            filename = "rapport" + "_" + date
+            f = open(pathname+filename+".txt","w+")
+        if os.path.exists(os.getcwd()+"/log"):
+            pathname = os.getcwd()+"/log/"
+            date = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+            filename = "rapport" + "_" + date
+            self.finalname = pathname+filename+".txt"
+            f = open(self.finalname,"w+")
+            f.close()
+
+    def verbose_intro(self):
+        message = "Rapport généré le "+datetime.now().strftime("%d/%m/%Y")+" à "+datetime.now().strftime("%H:%M:%S")+"\n"
+        message += "# Morphométrie Ineris v"+str(Interface.version)+"\n\n"
+        message += "# ML_morph version\n"
+        message += "\t - Algorithme utilisé : \n"
+        message += "\t - Performances : \n\n"
+        message += "# ML_gender version\n"
+        message += "\t - Algorithmes utilisés : \n"
+        message += "\t - Performances : \n"
+
+        f = open(self.finalname,"a")
+        f.write(message)
+        f.close()
+
+    def verbose_photo(self):
+        message = "\n# Photos importées pour la prédiction :\n"
+        for x in self.listeImages:
+            message += "\t"+x+"\n"
+        f = open(self.finalname,"a")
+        f.write(message)
+        f.close()
+
+    def verbose_points(self):
+        message = "\n# Coordonnées des points détectés :\n"
+        for i in range(1,10):
+            message += "\t -"
+            for j in range(1,len(self.listeImages)+1):
+                message += "point n°"+str(i)+": X = ... Y = ... \t"
+            message += "\n"
+        f = open(self.finalname,"a")
+        f.write(message)
+        f.close()
+
+    def verbose_distances(self):
+        message = "\n# Distances utilisées pour la prédiction du sexe :\n"
+        for i in range(1,10):
+            message += "\t -"
+            for j in range(1,len(self.listeImages)+1):
+                message += "distance n°"+str(i)+"= \t\t\t"
+            message += "\n"
+        f = open(self.finalname,"a")
+        f.write(message)
+        f.close()
+
+    def verbose_sexe(self):
+        message = "\n# Sexe finalement prédit :\n"
+        for i in range(1,len(self.listeImages)+1):
+            message += "\t - image n°"+str(i)+" :  (p=....)\n"
+        f = open(self.finalname,"a")
+        f.write(message)
+        f.close()
+
+    def verbose_conclusion(self):
+        message = "\nFIN \n"
+        message += datetime.now().strftime("%d/%m/%Y")+" à "+datetime.now().strftime("%H:%M:%S")+"\n"
+        f = open(self.finalname,"a")
+        f.write(message)
+        f.close()
+
+    def loadModel(self):
         a = ModelPoints()
         a.instantiate()
 
@@ -554,8 +637,8 @@ class Interface(tk.Tk):
 
         menuModeles = tk.Menu(menubar,tearoff=0)
         menuModeles.add_command(label="Prépare MaJ Pointage",command=Interface.improveLandmarksModel)
-        menuModeles.add_command(label="MaJ Pointage",command=self.updatePointModel)
-        menuModeles.add_command(label="MaJ Sexage",command=self.updatePointModel1)
+        menuModeles.add_command(label="MaJ Pointage 🔒",command=self.updatePointModel)
+        menuModeles.add_command(label="MaJ Sexage 🔒",command=self.updatePointModel1)
         menubar.add_cascade(label="Modèles",menu=menuModeles)
 
         menuAffichage = tk.Menu(menubar,tearoff=0)
@@ -584,19 +667,26 @@ class Interface(tk.Tk):
     def changeView(self):
         GUI_little.Temp.chemin = pypath3
         self.destroy()
+        # self.withdraw()
         root = tk.Tk()
 
         GUI_little.app = GUI_little.Interface(root)
         GUI_little.app.pack(side="top", fill="both", expand=True)
         GUI_little.app.mainloop()
 
+        # self.deiconify()
+
     def updatePointModel(self):
-        self.destroy()
+        # self.destroy()
+        # self.withdraw()
         GUI_update.InterfacePoint()
+        # self.deiconify()
 
     def updatePointModel1(self):
-        self.destroy()
+        # self.destroy()
+        # self.withdraw()
         GUI_update.InterfaceGender()
+        # self.deiconify()
 
     def afficheLongueur():
         """!
@@ -667,7 +757,13 @@ class Interface(tk.Tk):
         self.choice = 0
         self.resetListeImages()
         self.listeImages = XY_tools.Externes.openfn()
-        self.calculPoints()
+        self.verbose_photo()
+        self.verbose_points()
+        self.verbose_distances()
+        self.verbose_sexe()
+        self.verbose_conclusion()
+
+        # self.calculPoints()
 
 
     def calculPoints(self):
