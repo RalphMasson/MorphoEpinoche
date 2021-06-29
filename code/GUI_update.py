@@ -53,7 +53,7 @@ class ModelPoints():
             Règle les paramètres d'entrainement
             @return a : liste des options choisies
         """
-        a = ModelPoints.pointsML.parameter_model([500,3],1,2,6,700,20,500)
+        a = ModelPoints.pointsML.parameter_model([500,3],0.08,1,20,700,20,200)
         return a
 
     def train(self):
@@ -242,7 +242,7 @@ class InterfacePoint(tk.Tk):
         self.text.insert("insert","\n--> Apprentissage terminé\n--> Modèle mis à jour : ")
         self.text.update()
         self.text.insert("insert",str(round(int(os.path.getsize(InterfacePoint.modele_path+"predictor.dat"))/1048000))+" Mo")
-        self.text.insert("insert","\n--> Training error: {}".format(round(dlib.test_shape_predictor(InterfacePoint.trainfolder_path, "predictor.dat"),2)))
+        self.text.insert("insert","\n--> Training error: {}".format(round(dlib.test_shape_predictor(InterfacePoint.trainfolder_path,InterfacePoint.modele_path+"predictor.dat"),2)))
         self.text.insert("insert"," pixels")
         self.text.insert("insert","\n\t\t\tModèle finalisé : "+str(date.today())+" "+str(datetime.now().time()))
         self.text.insert("insert","\n#########################################")

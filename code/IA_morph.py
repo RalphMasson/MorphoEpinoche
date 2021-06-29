@@ -131,7 +131,7 @@ class ML_pointage():
 
         dlib.train_shape_predictor(trainfolder_path,self.path_create_model+"predictor.dat",self.options)
 
-        return "Training error (average pixel deviation): {}".format(dlib.test_shape_predictor(trainfolder_path, "predictor.dat"))
+        return "Training error (average pixel deviation): {}".format(dlib.test_shape_predictor(trainfolder_path, self.path_create_model+"predictor.dat"))
 
     def partial_train(self,imagefolder_path,tpsfile_path,trainfolder_path,n_max):
         """!
@@ -162,31 +162,36 @@ class ML_pointage():
         @param foldernewimage : dossier avec l'image à prédire
         @param predictor_path : "C:\\.....\\predictor.dat"
         """
-        utils.utils.predictions_to_xml(self.path_create_model+"predictor.dat", dir=foldernewimage,ignore=None,out_file=self.path_create_model+"test\\output.xml")
-        self.base_points = utils.utils.dlib_xml_to_pandas(self.path_create_model + "test\\output.xml")
+        utils.utils.predictions_to_xml(self.path_create_model+"predictor.dat", dir=foldernewimage,ignore=None,out_file=self.path_create_model+"output.xml")
+        self.base_points = utils.utils.dlib_xml_to_pandas(self.path_create_model + "output.xml")
 
         return self.base_points
 
-    def xmltolist(xmlfile):
+    def xmltolist(xmlfile,num_image_max):
         """!
             Affiche les coordonnées des points prédits (de la première image)
         """
         df = utils.utils.dlib_xml_to_pandas(xmlfile)
         col = list(df.columns)
-        return [[df[col[i+4]][0],df[col[i+5]][0]] for i in range(0,df.shape[1]-4,2)]
+        liste_coord = []
+        for k in range(num_image_max):
+            liste_coord.append([[df[col[i+4]][k],1440-df[col[i+5]][k]] for i in range(0,df.shape[1]-4,2)])
+        return liste_coord
 
 
-    def listePoints(self):
+    def listePoints(self,num_image_max):
         """!
         Affiche les coordonnées des points prédits du fichier output
         """
-        try:
-            self.predict(self.path_predict_image,self.path_create_model+"predictor.dat")
-            return ML_pointage.xmltolist(self.path_create_model + "test\\output.xml")
-        except (AttributeError,RuntimeError):
-            print("Fichier predictor.dat introuvable - Entrainez le modèle ou vérifier le chemin du modèle")
-        except KeyError:
-            print("Image à prédire introuvable - Selectionner une image ou vérifier le chemin de l'image'")
+        self.predict(self.path_predict_image,self.path_create_model+"/predictor.dat")
+        return ML_pointage.xmltolist(self.path_create_model + "/output.xml",num_image_max)
+        # try:
+        #     self.predict(self.path_predict_image,self.path_create_model+"\\predictor.dat")
+        #     return ML_pointage.xmltolist(self.path_create_model + "\\output.xml")
+        # except (AttributeError,RuntimeError):
+        #     print("Fichier predictor.dat introuvable - Entrainez le modèle ou vérifier le chemin du modèle")
+        # except KeyError:
+        #     print("Image à prédire introuvable - Selectionner une image ou vérifier le chemin de l'image'")
 
     def vecteurDetail(vecteur1):
         import math
@@ -227,5 +232,286 @@ class ML_pointage():
     #     plt.grid(True)
     #     plt.show()
 
+    # def ecart_1_train_predict(liste1,liste2):
+    # a = ML_pointage(r"C://Users//MASSON//Desktop//POINTAGe//",r"C:\Users\MASSON\Desktop\POINTAGe\train")
+    # predictTrain = a.listePoints(161)
+#     #truthTrain = ML_pointage.xmltolist(r'C:\Users\MASSON\Desktop\POINTAGe\train.xml',161)
+# #
+# pt0 = []
+# pt1 = []
+# pt2 = []
+# pt3 = []
+# pt4 = []
+# pt5 = []
+# pt6 = []
+# pt7 = []
+# pt8 = []
+# pt9 = []
+#
+# for x in truthTrain:
+#     pt0.append(x[0])
+#     pt1.append(x[1])
+#     pt2.append(x[2])
+#     pt3.append(x[3])
+#     pt4.append(x[4])
+#     pt5.append(x[5])
+#     pt6.append(x[6])
+#     pt7.append(x[7])
+#     pt8.append(x[8])
+#     pt9.append(x[9])
+#
+# pt0_pred = []
+# pt1_pred = []
+# pt2_pred = []
+# pt3_pred = []
+# pt4_pred = []
+# pt5_pred = []
+# pt6_pred = []
+# pt7_pred = []
+# pt8_pred = []
+# pt9_pred = []
+# for x in predictTrain:
+#     pt0_pred.append(x[0])
+#     pt1_pred.append(x[1])
+#     pt2_pred.append(x[2])
+#     pt3_pred.append(x[3])
+#     pt4_pred.append(x[4])
+#     pt5_pred.append(x[5])
+#     pt6_pred.append(x[6])
+#     pt7_pred.append(x[7])
+#     pt8_pred.append(x[8])
+#     pt9_pred.append(x[9])
+#
+# ecart_truth_pred0=[]
+# ecart_truth_pred1=[]
+# ecart_truth_pred2=[]
+# ecart_truth_pred3=[]
+# ecart_truth_pred4=[]
+# ecart_truth_pred5=[]
+# ecart_truth_pred6=[]
+# ecart_truth_pred7=[]
+# ecart_truth_pred8=[]
+# ecart_truth_pred9=[]
+#
+# def subliste(l1,l2):
+#     return XY_tools.Externes.euclide(l1,l2)
+#
+# for i in range(len(pt0)):
+#     ecart0 = subliste(pt0[i],pt0_pred[i])
+#     print(ecart0)
+#
+#     ecart1 = subliste(pt1[i],pt1_pred[i])
+#     ecart2 = subliste(pt2[i],pt2_pred[i])
+#     ecart3 = subliste(pt3[i],pt3_pred[i])
+#     ecart4 = subliste(pt4[i],pt4_pred[i])
+#     ecart5 = subliste(pt5[i],pt5_pred[i])
+#     ecart6 = subliste(pt6[i],pt6_pred[i])
+#     ecart7 = subliste(pt7[i],pt7_pred[i])
+#     ecart8 = subliste(pt8[i],pt8_pred[i])
+#     ecart9 = subliste(pt9[i],pt9_pred[i])
+#     ecart_truth_pred0.append(ecart0)
+#     ecart_truth_pred1.append(ecart1)
+#     ecart_truth_pred2.append(ecart2)
+#     ecart_truth_pred3.append(ecart3)
+#     ecart_truth_pred4.append(ecart4)
+#     ecart_truth_pred5.append(ecart5)
+#     ecart_truth_pred6.append(ecart6)
+#     ecart_truth_pred7.append(ecart7)
+#     ecart_truth_pred8.append(ecart8)
+#     ecart_truth_pred9.append(ecart9)
+
+#
+# import seaborn as sns
+# import pandas as pd
+# tests = [ecart_truth_pred0,ecart_truth_pred1,ecart_truth_pred2,ecart_truth_pred3,ecart_truth_pred4,ecart_truth_pred5,ecart_truth_pred6,ecart_truth_pred7,ecart_truth_pred8,ecart_truth_pred9]
+# df = pd.DataFrame(tests, index=['pt1','pt2','pt3','pt4','pt5','pt6','pt7','pt8','pt9','pt10'])
+# plt.figure()
+# df.T.boxplot(vert=False,showmeans=True)
+# plt.title("Error Training per landmark")
+# plt.subplots_adjust(left=0.25)
+# plt.xlim([0,2])
+# # plt.show()
+# plt.figure()
+# ax = sns.boxplot(data=df.T,orient="h",showmeans=True)
+# plt.xlim([0,2])
+# plt.title("Error Training per landmark")
+# plt.grid(True)
+# plt.show()
 
 
+### TESTING
+
+a = ML_pointage(r"C://Users//MASSON//Desktop//POINTAGe//",r"C:\Users\MASSON\Desktop\POINTAGe\test")
+predictTest = a.listePoints(41)
+truthTest = ML_pointage.xmltolist(r'C:\Users\MASSON\Desktop\POINTAGe\test.xml',41)
+
+
+pt0 = []
+pt1 = []
+pt2 = []
+pt3 = []
+pt4 = []
+pt5 = []
+pt6 = []
+pt7 = []
+pt8 = []
+pt9 = []
+
+for x in truthTest:
+    pt0.append(x[0])
+    pt1.append(x[1])
+    pt2.append(x[2])
+    pt3.append(x[3])
+    pt4.append(x[4])
+    pt5.append(x[5])
+    pt6.append(x[6])
+    pt7.append(x[7])
+    pt8.append(x[8])
+    pt9.append(x[9])
+
+pt0_pred = []
+pt1_pred = []
+pt2_pred = []
+pt3_pred = []
+pt4_pred = []
+pt5_pred = []
+pt6_pred = []
+pt7_pred = []
+pt8_pred = []
+pt9_pred = []
+for x in predictTest:
+    pt0_pred.append(x[0])
+    pt1_pred.append(x[1])
+    pt2_pred.append(x[2])
+    pt3_pred.append(x[3])
+    pt4_pred.append(x[4])
+    pt5_pred.append(x[5])
+    pt6_pred.append(x[6])
+    pt7_pred.append(x[7])
+    pt8_pred.append(x[8])
+    pt9_pred.append(x[9])
+
+ecart_truth_pred0=[]
+ecart_truth_pred1=[]
+ecart_truth_pred2=[]
+ecart_truth_pred3=[]
+ecart_truth_pred4=[]
+ecart_truth_pred5=[]
+ecart_truth_pred6=[]
+ecart_truth_pred7=[]
+ecart_truth_pred8=[]
+ecart_truth_pred9=[]
+
+def subliste(l1,l2):
+    return XY_tools.Externes.euclide(l1,l2)
+
+for i in range(len(pt0)):
+    ecart0 = subliste(pt0[i],pt0_pred[i])
+    print(ecart0)
+
+    ecart1 = subliste(pt1[i],pt1_pred[i])
+    ecart2 = subliste(pt2[i],pt2_pred[i])
+    ecart3 = subliste(pt3[i],pt3_pred[i])
+    ecart4 = subliste(pt4[i],pt4_pred[i])
+    ecart5 = subliste(pt5[i],pt5_pred[i])
+    ecart6 = subliste(pt6[i],pt6_pred[i])
+    ecart7 = subliste(pt7[i],pt7_pred[i])
+    ecart8 = subliste(pt8[i],pt8_pred[i])
+    ecart9 = subliste(pt9[i],pt9_pred[i])
+    ecart_truth_pred0.append(ecart0)
+    ecart_truth_pred1.append(ecart1)
+    ecart_truth_pred2.append(ecart2)
+    ecart_truth_pred3.append(ecart3)
+    ecart_truth_pred4.append(ecart4)
+    ecart_truth_pred5.append(ecart5)
+    ecart_truth_pred6.append(ecart6)
+    ecart_truth_pred7.append(ecart7)
+    ecart_truth_pred8.append(ecart8)
+    ecart_truth_pred9.append(ecart9)
+#
+import matplotlib.pyplot as plt
+# import seaborn as sns
+# import pandas as pd
+tests = [ecart_truth_pred0,ecart_truth_pred1,ecart_truth_pred2,ecart_truth_pred3,ecart_truth_pred4,ecart_truth_pred5,ecart_truth_pred6,ecart_truth_pred7,ecart_truth_pred8,ecart_truth_pred9]
+# df = pd.DataFrame(tests, index=['pt1','pt2','pt3','pt4','pt5','pt6','pt7','pt8','pt9','pt10'])
+# plt.figure()
+# df.T.boxplot(vert=False,showmeans=True)
+# plt.title("Error Training per landmark")
+# plt.subplots_adjust(left=0.25)
+# plt.xlim([0,20])
+# # plt.show()
+# plt.figure()
+# ax = sns.boxplot(data=df.T,orient="h",showmeans=True)
+# plt.xlim([0,20])
+# plt.title("Error Training per landmark")
+# plt.grid(True)
+# plt.show()
+
+
+
+
+### export
+
+meanss = [np.median(x) for x in tests]
+meanss = np.median(meanss)
+import pandas as pd
+df0 = pd.DataFrame(tests[0]).describe()
+df1 = pd.DataFrame(tests[1]).describe()
+df2 = pd.DataFrame(tests[2]).describe()
+df3 = pd.DataFrame(tests[3]).describe()
+df4 = pd.DataFrame(tests[4]).describe()
+df5 = pd.DataFrame(tests[5]).describe()
+df6 = pd.DataFrame(tests[6]).describe()
+df7 = pd.DataFrame(tests[7]).describe()
+df8 = pd.DataFrame(tests[8]).describe()
+df9 = pd.DataFrame(tests[9]).describe()
+df0['1'] = df1
+df0['2'] = df2
+df0['3'] = df3
+df0['4'] = df4
+df0['5'] = df5
+df0['6'] = df6
+df0['7'] = df7
+df0['8'] = df8
+df0['9'] = df9
+
+df0.to_csv(r"C://Users//MASSON//Desktop//POINTAGe//resultatsTrainV1.csv",sep=";")
+
+
+bins = np.linspace(0, 52, 20)
+plt.hist(tests, bins, label=['pt1', 'pt2','pt3','pt4','pt5','pt6','pt7','pt8','pt9','pt10'])
+plt.legend(loc='upper right')
+plt.title('Histogramme de la précision du placement (dataset : Testing)')
+plt.grid(True)
+plt.show()
+
+def extensionFile(filepath):
+    return os.path.splitext(filepath)[1][1:]
+
+### apprentissage progressif
+from sklearn.model_selection import train_test_split
+
+import os,shutil
+path1 = "C:\\Users\\MASSON\\Desktop\\POINTAGe\\all\\"
+pathInit = "C:\\Users\\MASSON\\Desktop\\POINTAGe\\prog\\"
+
+listeAllImage = os.listdir("C:\\Users\\MASSON\\Desktop\\POINTAGe\\all\\")
+
+for x in listeDossier:
+    os.mkdir(pathInit+x+"\\"+"train\\")
+    os.mkdir(pathInit+x+"\\"+"test\\")
+
+
+k=0.95
+listeDossier = os.listdir(pathInit)
+for x in listeDossier:
+    # print(pathInit+x+"\\")
+    # shutil.copy()
+    x_train ,x_test = train_test_split(listeAllImage,test_size=k)
+    for y in x_train:
+        shutil.copy(path1+y,pathInit+x+"\\train\\"+y)
+    for y in x_test:
+        shutil.copy(path1+y,pathInit+x+"\\test\\"+y)
+    k-=0.05
+
+# faire learnig curve

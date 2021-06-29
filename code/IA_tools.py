@@ -240,7 +240,7 @@ class utils():
             
             file_sz= [img.shape[0],img.shape[1]]
             # img = cv2.resize(img,(1200,900))
-            img = cv2.resize(img,(4608,3456))
+            img = cv2.resize(img,(1920,1440))
 
             cv2.imwrite(os.path.join(dir_path,name), img)
             # print(os.path.join(dir_path,name))
@@ -271,16 +271,18 @@ class utils():
         root.append(ET.Element('comment'))
         images_e = ET.Element('images')
         root.append(images_e)
-        # print(os.listdir(dir))
+        print(os.listdir(dir))
         for f in os.listdir(dir):
-            ff = dir+f
+            ff = dir+"\\"+f
             # print(dir+f)
             ext = ntpath.splitext(ff)[1]
             if ext in extensions:
+                # print(ff)
                 path, file = os.path.split(ff)
                 img = cv2.imread(ff)
                 image_e = ET.Element('image')
                 image_e.set('file', str(ff))
+                # print(type(img))
                 e = (dlib.rectangle(left=1, top=1, right=img.shape[1]-1, bottom=img.shape[0]-1))
                 shape = predictor(img, e)
                 # print(shape)
