@@ -427,7 +427,7 @@ class ModelPoints():
         except Exception:
             ModelPoints.path_xml = r"C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho/test_pointage_ML/v2/train.xml"
 
-        ModelPoints.liste = ML.ML_pointage.xmltolist(ModelPoints.path_xml)
+        ModelPoints.liste = ML.ML_pointage.xmltolist(ModelPoints.path_xml,0)
         # print(ModelPoints.liste)
 
 
