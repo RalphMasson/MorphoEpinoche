@@ -29,8 +29,11 @@ class HeadClass():
     distances_check : liste des distances caractéristiques affichées
     distances_all : liste de toutes les distances sauvegardés pour le modèle
     """
-    id_polygons = pointsFish = pointsEchelle = distances_check = distances_all = []
-
+    id_polygons = []
+    pointsFish = []
+    distances_check = []
+    distances_all = []
+    pointsEchelle = []
     def __init__(self, canvas, points,color):
         """!
         Constructeur du polygone de la tête
@@ -40,13 +43,14 @@ class HeadClass():
         """
         self.previous_x = self.previous_y = self.selected = self.x = None
         self.points = points
-
+        listenode = [i for i in range(1,13)]
+        num = 0
         if points!=None:
             if color=='red':outline='red'
             else: outline=''
             # print(points)
 
-            self.polygon = canvas.create_polygon(self.points,fill='',outline=outline,smooth=0,width=2,dash=())
+            self.polygon = canvas.create_polygon(self.points,fill='',outline=outline,smooth=0,width=2,dash=(1,))
             HeadClass.id_polygons.append(self.polygon)
             # print(self.polygon)
             canvas.tag_bind(self.polygon, '<ButtonPress-1>',   lambda event, tag=self.polygon: self.on_press_tag(event, 0, tag))
@@ -57,13 +61,15 @@ class HeadClass():
             for number, point in enumerate(self.points):
                 x, y = point
                 node = canvas.create_rectangle((x-3, y-3, x+3, y+3), fill=color)
-                label = canvas.create_text((x+15, y+6),text=str(node%25),font=("Purisa", 1),fill='red')
+                label = canvas.create_text((x+15, y+6),text=str(listenode[num]),font=("Purisa", 12),fill='purple')
+                num+=1
                 self.nodes.append(node)
                 self.nonodes.append(label)
                 canvas.tag_bind(node, '<ButtonPress-1>',   lambda event, number=number, tag=node: self.on_press_tag(event, number, tag))
                 canvas.tag_bind(node, '<ButtonRelease-1>', lambda event, number=number, tag=node: self.on_release_tag(event, number, tag,canvas))
                 canvas.tag_bind(node, '<B1-Motion>', lambda event, number=number: self.on_move_node(event, number,canvas))
 
+        # print(HeadClass.id_polygons)
         HeadClass.update_points(canvas)
 
         if(len(HeadClass.pointsEchelle)>0):
@@ -77,7 +83,8 @@ class HeadClass():
         for id in HeadClass.id_polygons:
             liste = canvas.coords(id)
             # print(liste)
-            if(len(canvas.coords(id))==18):HeadClass.pointsFish=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
+            # print(len(liste))
+            if(len(canvas.coords(id))==20):HeadClass.pointsFish=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
             if(len(canvas.coords(id))==4):HeadClass.pointsEchelle=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
 
     def on_press_tag(self, event, number, tag):
@@ -90,7 +97,7 @@ class HeadClass():
         self.selected = tag
         self.previous_x = event.x
         self.previous_y = event.y
-        # print(self.selected,event,tag)
+        print(self.selected,event,tag)
 
     def on_release_tag(self, event, number, tag,canvas):
         """!
@@ -113,7 +120,7 @@ class HeadClass():
             dx = event.x - self.previous_x
             dy = event.y - self.previous_y
             canvas.move(self.selected, dx, dy)
-            # print(self.selected)
+            print(self.selected)
             canvas.move(self.nonodes[self.nodes.index(self.selected)],dx,dy)
             self.points[number][0] += dx
             self.points[number][1] += dy
@@ -185,7 +192,9 @@ class HeadClass():
         """!
         Methode pour calculer certaines distances caractéristiques
         """
+        print("points echelle")
         # print(HeadClass.pointsEchelle)
+        # print(HeadClass.pointsFish)
         HeadClass.distances_check = XY_tools.Externes.calculDistances(HeadClass.pointsEchelle,HeadClass.pointsFish)
         return HeadClass.distances_check
 
@@ -350,7 +359,7 @@ class HeadFish():
         # HeadFish.centreOeil = [self.circle[0],self.circle[1]]
         HeadFish.poisson = canvas.create_image(0, 0, anchor=tk.NW,image=self.img)
         HeadFish.CV2_image_big = CV2_image
-        # canvas.move(HeadFish.poisson,-(self.circle[0]-300),-(self.circle[1]-250))
+        canvas.move(HeadFish.poisson,-(HeadFish.oeilXY[0]-200),-(HeadFish.oeilXY[1]-250))
         app.bind("<Left>",self.moveLeft)
         app.bind("<Right>",self.moveRight)
         app.bind("<Up>",self.moveUp)
@@ -779,11 +788,6 @@ class Interface(tk.Tk):
         self.verbose_conclusion()
         self.calculPoints()
 
-    def correctYAxis(self):
-
-        return self.listeImages
-
-
     def calculPoints(self):
         """!
         Méthode permettant de calculer les points et de les disposer sur l'image
@@ -799,8 +803,9 @@ class Interface(tk.Tk):
         app.labelNumImage.config(text=str(self.numImageActuelle+1)+"/"+str(len(self.listeImages)))
         BodyFish(self.canvasCorps,ImagePIL,(650,487))
         self.canvasTete.update()
+        tete = listePoints
+        HeadFish.oeilXY = [0.5*(tete[1][0]+tete[2][0]),0.5*(tete[1][1]+tete[2][1])]
 
-        tete = listePoints[0:-1]
         echelle3mm = [[80,80],[90,90]]
         HeadFish(self.canvasTete,ImagePIL,cv2.imread(self.listeImages[self.numImageActuelle]),(1920,1440))
 
@@ -809,7 +814,9 @@ class Interface(tk.Tk):
         BodyClass(self.canvasCorps, echelle10mm,'red')
         BodyClass(self.canvasCorps,corpsStandard,'cyan')
         self.canvasCorps.update()
+        pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19,pt21 = tete
 
+        tete = XY_tools.Externes.centerPoints([pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19,pt21],HeadFish.oeilXY)
         HeadClass(self.canvasTete, tete,'#ff00f2')
         HeadClass(self.canvasTete,echelle3mm,'red')
         self.canvasTete.update()

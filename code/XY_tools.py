@@ -16,6 +16,8 @@ class Externes():
         @param Y : array, (n_samples x d_dimensions)
         @return D : array, (n_samples, n_samples)
         """
+        print(X)
+        print(Y)
         import numpy as np
         XY = np.array(X)-np.array(Y)
         return np.sqrt(np.einsum('i,i->', XY, XY))
@@ -249,9 +251,12 @@ class Externes():
         @param ptsFish list of tuple : liste des points de la tête
         @return distances_check list of float : liste des distances en mm
         """
-        print(ptsEchelle)
-        # echelle3mm = Externes.euclide(ptsEchelle[0],ptsEchelle[1])
-        echelle3mm = 1
+        print("toto")
+        # print(ptsEchelle)
+        print(ptsFish)
+        print("fin toto")
+        echelle3mm = Externes.euclide(ptsEchelle[0],ptsEchelle[1])
+        # echelle3mm = 1
         snout_eye = Externes.euclide(ptsFish[0],ptsFish[1])
         snout_length = Externes.euclide(ptsFish[1],ptsFish[2])
         eye_diameter = Externes.euclide(ptsFish[0],ptsFish[8])
@@ -343,7 +348,7 @@ class Externes():
         texte = ""
         texte += "5 <-> 3 : distance nez oeil : "+str(distance[0])+" mm \n"
         texte += "5 <-> 7 : longueur museau : "+str(distance[1])+" mm \n"
-        texte += "3 <-> 19 : diametre oeil : "+str(distance[2])+" mm \n"
+        texte += "2 <-> 3 : diametre oeil : "+str(distance[2])+" mm \n"
         texte += "5 <-> 17 : longueur tête : "+str(distance[3])+" mm \n"
         texte += "11 <-> 17 : largeur tête : "+str(distance[4])+" mm \n"
         # texte += "7 <-> 9 : bas bouche - menton : "+str(distance[5])+" mm \n"
@@ -367,7 +372,7 @@ class Externes():
         @param pt tuple : point à décaler
         @return tuple : point décalé
         """
-        return [pt[0]-(eye[0]-300),pt[1]-(eye[1]-250)]
+        return [pt[0]-(eye[0]-200),pt[1]-(eye[1]-250)]
 
     def decenterPoint(A,eye):
         """!
