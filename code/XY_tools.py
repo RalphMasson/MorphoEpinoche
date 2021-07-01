@@ -249,7 +249,9 @@ class Externes():
         @param ptsFish list of tuple : liste des points de la tête
         @return distances_check list of float : liste des distances en mm
         """
-        echelle3mm = Externes.euclide(ptsEchelle[0],ptsEchelle[1])
+        print(ptsEchelle)
+        # echelle3mm = Externes.euclide(ptsEchelle[0],ptsEchelle[1])
+        echelle3mm = 1
         snout_eye = Externes.euclide(ptsFish[0],ptsFish[1])
         snout_length = Externes.euclide(ptsFish[1],ptsFish[2])
         eye_diameter = Externes.euclide(ptsFish[0],ptsFish[8])
@@ -268,9 +270,12 @@ class Externes():
         @param ptsFish list of tuple : liste des points du corps
         @return distances_check list of float : liste des distances en mm
         """
-        echelle10mm = Externes.euclide(ptsEchelle[0],ptsEchelle[1])
-        body_size = Externes.euclide(ptsFish[0],ptsFish[2])
-        body_depth = Externes.euclide(ptsFish[1],ptsFish[3])
+        # echelle10mm = Externes.euclide(ptsEchelle[0],ptsEchelle[1])
+        echelle10mm = 1
+        # body_size = Externes.euclide(ptsFish[0],ptsFish[2])
+        body_size=1
+        # body_depth = Externes.euclide(ptsFish[1],ptsFish[3])
+        body_depth = 1
         distances_check = [body_size,body_depth]
         distances_check = Externes.px10mmListe(distances_check,echelle10mm)
         return distances_check

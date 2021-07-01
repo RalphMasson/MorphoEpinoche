@@ -183,6 +183,18 @@ class ML_pointage():
         return liste_coord
 
 
+    def xmltolistY(xmlfile,num_image_max):
+        """!
+            Affiche les coordonnées des points prédits (de la première image)
+        """
+        df = utils.utils.dlib_xml_to_pandas(xmlfile)
+        col = list(df.columns)
+        liste_coord = []
+        for k in range(num_image_max):
+            liste_coord.append([[df[col[i+4]][k],df[col[i+5]][k]] for i in range(0,df.shape[1]-4,2)])
+        return liste_coord
+
+
     def listePoints(self,num_image_max):
         """!
         Affiche les coordonnées des points prédits du fichier output
@@ -342,18 +354,18 @@ class ML_pointage():
 # plt.grid(True)
 # plt.show()
 
-
-# ### TESTING
 #
-a = ML_pointage(r"C://Users//MASSON//Desktop//POINTAGe//",r"C:\Users\MASSON\Desktop\POINTAGe\test")
-predictTest = a.listePoints(41)
-truthTest = ML_pointage.xmltolist(r'C:\Users\MASSON\Desktop\POINTAGe\test.xml',41)
-
+# # ### TESTING
+# #
+# a = ML_pointage(r"C://Users//MASSON//Desktop//POINTAGe//",r"C:\Users\MASSON\Desktop\POINTAGe\test")
+# predictTest = a.listePoints(41)
+# truthTest = ML_pointage.xmltolist(r'C:\Users\MASSON\Desktop\POINTAGe\test.xml',41)
 #
-# pt0 = []
-# pt1 = []
-# pt2 = []
-# pt3 = []
+# #
+# # pt0 = []
+# # pt1 = []
+# # pt2 = []
+# # pt3 = []
 # pt4 = []
 # pt5 = []
 # pt6 = []
@@ -493,13 +505,13 @@ truthTest = ML_pointage.xmltolist(r'C:\Users\MASSON\Desktop\POINTAGe\test.xml',4
 #     return os.path.splitext(filepath)[1][1:]
 
 ### apprentissage progressif
-# from sklearn.model_selection import train_test_split
-
-import os,shutil
-path1 = "C:\\Users\\MASSON\\Desktop\\POINTAGe\\all\\"
-pathInit = r"C:/Users/MASSON/Desktop/POINTAGe/progg/"
-listeDossier = os.listdir("C:\\Users\\MASSON\\Desktop\\POINTAGe\\prog\\")
-# listeAllImage = os.listdir("C:\\Users\\MASSON\\Desktop\\POINTAGe\\all\\")
+# # from sklearn.model_selection import train_test_split
+#
+# import os,shutil
+# path1 = "C:\\Users\\MASSON\\Desktop\\POINTAGe\\all\\"
+# pathInit = r"C:/Users/MASSON/Desktop/POINTAGe/progg/"
+# listeDossier = os.listdir("C:\\Users\\MASSON\\Desktop\\POINTAGe\\prog\\")
+# # listeAllImage = os.listdir("C:\\Users\\MASSON\\Desktop\\POINTAGe\\all\\")
 #
 # for x in listeDossier:
 #     os.mkdir(pathInit+x+"\\"+"train\\")
@@ -566,17 +578,17 @@ listeDossier = os.listdir("C:\\Users\\MASSON\\Desktop\\POINTAGe\\prog\\")
 # #     np.savetxt(pathInit+x+"/test.csv", accuraciesTesting, delimiter=",", fmt='%s')
 # #     nmax-=0.08
 
-import pandas as pd
-import matplotlib.pyplot as plt
-plotpath = r'C:\Users\MASSON\Desktop\POINTAGe\progg\app19\train.csv'
-plotpath2 = r'C:\Users\MASSON\Desktop\POINTAGe\progg\app19\test.csv'
-
-x = [0,16,32,48,64,80,113,130,145,161]
-aaa = pd.read_csv(plotpath,header=None).iloc[::-1].reset_index(drop=True)
-bbb = pd.read_csv(plotpath2,header=None).iloc[::-1].reset_index(drop=True)
-plt.figure()
-plt.plot(x,aaa)
-plt.plot(x,bbb)
-plt.legend(['train','test'])
-plt.title("Evolution de l'erreur en fonction du nombre d'images")
-plt.show()
+# import pandas as pd
+# import matplotlib.pyplot as plt
+# plotpath = r'C:\Users\MASSON\Desktop\POINTAGe\progg\app19\train.csv'
+# plotpath2 = r'C:\Users\MASSON\Desktop\POINTAGe\progg\app19\test.csv'
+#
+# x = [0,16,32,48,64,80,113,130,145,161]
+# aaa = pd.read_csv(plotpath,header=None).iloc[::-1].reset_index(drop=True)
+# bbb = pd.read_csv(plotpath2,header=None).iloc[::-1].reset_index(drop=True)
+# plt.figure()
+# plt.plot(x,aaa)
+# plt.plot(x,bbb)
+# plt.legend(['train','test'])
+# plt.title("Evolution de l'erreur en fonction du nombre d'images")
+# plt.show()

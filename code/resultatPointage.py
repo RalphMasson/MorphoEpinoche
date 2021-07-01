@@ -6,11 +6,11 @@ import PIL.ImageOps
 
 
 
-img = Image.open(r"C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\test_pointage_ML\resultats\1_Modele.png")
+img = Image.open(r"C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\test_pointage_ML\resultats\4_Modele.png")
 b, g, r = img.split()
 img = Image.merge("RGB", (r, g, b)).convert("RGBA")
 
-background = Image.open(r"C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\test_pointage_ML\resultats\1_Cyril.png").convert("RGBA")
+background = Image.open(r"C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\test_pointage_ML\resultats\4_Cyril.png").convert("RGBA")
 
 # background.paste(img, (0, 0), img)
 

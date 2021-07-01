@@ -44,8 +44,11 @@ class HeadClass():
         if points!=None:
             if color=='red':outline='red'
             else: outline=''
+            # print(points)
+
             self.polygon = canvas.create_polygon(self.points,fill='',outline=outline,smooth=0,width=2,dash=())
             HeadClass.id_polygons.append(self.polygon)
+            # print(self.polygon)
             canvas.tag_bind(self.polygon, '<ButtonPress-1>',   lambda event, tag=self.polygon: self.on_press_tag(event, 0, tag))
             canvas.tag_bind(self.polygon, '<ButtonRelease-1>', lambda event, tag=self.polygon: self.on_release_tag(event, 0, tag,canvas))
             canvas.tag_bind(self.polygon, '<B1-Motion>', lambda event = self.polygon : self.on_move_polygon(event,canvas))
@@ -73,6 +76,7 @@ class HeadClass():
         """
         for id in HeadClass.id_polygons:
             liste = canvas.coords(id)
+            # print(liste)
             if(len(canvas.coords(id))==18):HeadClass.pointsFish=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
             if(len(canvas.coords(id))==4):HeadClass.pointsEchelle=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
 
@@ -86,7 +90,7 @@ class HeadClass():
         self.selected = tag
         self.previous_x = event.x
         self.previous_y = event.y
-        print(self.selected,event,tag)
+        # print(self.selected,event,tag)
 
     def on_release_tag(self, event, number, tag,canvas):
         """!
@@ -181,6 +185,7 @@ class HeadClass():
         """!
         Methode pour calculer certaines distances caractéristiques
         """
+        # print(HeadClass.pointsEchelle)
         HeadClass.distances_check = XY_tools.Externes.calculDistances(HeadClass.pointsEchelle,HeadClass.pointsFish)
         return HeadClass.distances_check
 
@@ -341,11 +346,11 @@ class HeadFish():
         @param size list : dimension souhaitée de l'image
         """
         self.img = ImageTk.PhotoImage(PIL_image.resize(size, Image.ANTIALIAS))
-        self.circle = XY_compute.Points.detect_eye(cv2.resize(CV2_image,size,Image.ANTIALIAS))
-        HeadFish.centreOeil = [self.circle[0],self.circle[1]]
+        # self.circle = XY_compute.Points.detect_eye(cv2.resize(CV2_image,size,Image.ANTIALIAS))
+        # HeadFish.centreOeil = [self.circle[0],self.circle[1]]
         HeadFish.poisson = canvas.create_image(0, 0, anchor=tk.NW,image=self.img)
         HeadFish.CV2_image_big = CV2_image
-        canvas.move(HeadFish.poisson,-(self.circle[0]-300),-(self.circle[1]-250))
+        # canvas.move(HeadFish.poisson,-(self.circle[0]-300),-(self.circle[1]-250))
         app.bind("<Left>",self.moveLeft)
         app.bind("<Right>",self.moveRight)
         app.bind("<Up>",self.moveUp)
@@ -409,26 +414,30 @@ class ModelPoints():
         points par Machine Learning
     """
 
-    def __init__(self):
+    def __init__(self,aa,bb):
         """!
             Constructeur de la classe
                 Example : a = ModelPoints()
         """
         self.pointsML = [[0,0]]*10
+        ModelPoints.pointsML = ML.ML_pointage(aa,bb)
 
     def instantiate(self):
         """!
             Créer le modèle
         """
-        ModelPoints.pointsML = ML.ML_pointage("","")
-        ModelPoints.path_xml = r"C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho/test_pointage_ML/v2/train.xml"
-        try:
-            ModelPoints.path_xml = os.path.join(sys._MEIPASS,ModelPoints.path_xml)
-        except Exception:
-            ModelPoints.path_xml = r"C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho/test_pointage_ML/v2/train.xml"
 
-        ModelPoints.liste = ML.ML_pointage.xmltolist(ModelPoints.path_xml,0)
+        ModelPoints.path_xml = r"C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho/test_pointage_ML/v2/train.xml"
+        # try:
+        #     ModelPoints.path_xml = os.path.join(sys._MEIPASS,ModelPoints.path_xml)
+        # except Exception:
+        #     ModelPoints.path_xml = r"C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho/test_pointage_ML/v2/train.xml"
+        #
+        # ModelPoints.liste = ML.ML_pointage.xmltolist(ModelPoints.path_xml,0)
         # print(ModelPoints.liste)
+
+    def predict(self,aa,bb):
+        ModelPoints.pointsML.predict(aa,bb)
 
 
 
@@ -448,7 +457,7 @@ class Interface(tk.Tk):
         self.add_labels()
         self.add_canvas()
         self.add_entrys()
-        self.loadModel()
+
         self.createlog()
         self.verbose_intro()
 
@@ -526,10 +535,16 @@ class Interface(tk.Tk):
         f.write(message)
         f.close()
 
-    def loadModel(self):
-        a = ModelPoints()
-        a.instantiate()
+    def loadModel(self,pathimage):
+        """!
+            @param pathimage dossier de l'image
+        """
+        a = ModelPoints(r"C:\Users\MASSON\Desktop\POINTAGe\\","")
+        a.predict(pathimage,r"C:\Users\MASSON\Desktop\POINTAGe\predictor.dat")
+        listepoints = ML.ML_pointage.xmltolistY(r"C:\Users\MASSON\Desktop\POINTAGe\output.xml",1)
+        return listepoints
 
+        print(listepoints)
     def add_entrys(self):
         Interface.sexModele = tk.StringVar(self)
         self.sexModel = tk.Entry(self,width=3,textvariable=Interface.sexModele)
@@ -762,118 +777,156 @@ class Interface(tk.Tk):
         self.verbose_distances()
         self.verbose_sexe()
         self.verbose_conclusion()
+        self.calculPoints()
 
-        # self.calculPoints()
+    def correctYAxis(self):
+
+        return self.listeImages
 
 
     def calculPoints(self):
         """!
         Méthode permettant de calculer les points et de les disposer sur l'image
         """
-        nbPointNonDetectes = 0
-        print("### Initialisation ###")
-        tete,echelle10mm,echelle3mm = XY_compute.Points.randomPointsBis()
-        pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19 = tete
-        self.clearAllCanvas()
 
-        print(self.numImageActuelle)
+        print(self.listeImages)
+        listePoints = self.loadModel('/'.join(self.listeImages[0].split('/')[:-1]))[0]
+        print(listePoints)
+
 
         ImagePIL = Image.open(self.listeImages[self.numImageActuelle])
         app.labelNomImage.config(text=self.listeImages[self.numImageActuelle])
         app.labelNumImage.config(text=str(self.numImageActuelle+1)+"/"+str(len(self.listeImages)))
-
-        ''' Resize pour le corps '''
-        print("\n### Traitement du corps ###")
-        corpsStandard,newPIL_image,left = XY_compute.Points.ImageCorps(ImagePIL)
-        BodyFish(self.canvasCorps,newPIL_image,(1300,975))
-        self.canvasCorps.move(BodyFish.poisson,-(left[0]-50),-(left[1]-280))
-        self.canvasCorps.update()
-        print("### OK ###")
-
-        ''' Resize pour la tête '''
-        print("\n### Traitement de la tête 1/3 ### ")
-        PIL_image_big,CV2_image_big,left1,right1 = XY_compute.Points.ImageTete(self.listeImages,self.numImageActuelle)
-        HeadFish(self.canvasTete,PIL_image_big,CV2_image_big,(3500,2625))
+        BodyFish(self.canvasCorps,ImagePIL,(650,487))
         self.canvasTete.update()
-        print("### OK ###")
 
-        print("\n### Alignement des points sur le corps'  ###")
-        corpsStandard = [[x[0]-(left[0]-50),x[1]-(left[1]-280)] for x in corpsStandard]
-        echelle10mm = [[x[0]-(left[0]-250),x[1]-(left[1]-350)] for x in echelle10mm]
+        tete = listePoints[0:-1]
+        echelle3mm = [[80,80],[90,90]]
+        HeadFish(self.canvasTete,ImagePIL,cv2.imread(self.listeImages[self.numImageActuelle]),(1920,1440))
+
+        corpsStandard = [[80,80],[81,81]]
+        echelle10mm = [[20,30],[30,50]]
         BodyClass(self.canvasCorps, echelle10mm,'red')
         BodyClass(self.canvasCorps,corpsStandard,'cyan')
         self.canvasCorps.update()
-        print("### OK ###")
 
-        ''' Initialisation des points 3 et 19 par détection auto '''
-        print("\n### Calcul des points 3 et 19 ###")
-        try:
-            [pt3,pt19]=XY_compute.Points.points3_19_independant(CV2_image_big)
-            pt3 = [pt3[0],pt3[1]]
-            pt19 = [pt19[0],pt19[1]]
-        except:
-            print("Impossible de déterminer les points 3 et 19")
-            nbPointNonDetectes+=2
-        # [pt3,pt19]=XY_compute.Points.points3_19(CV2_image_big)
-        # pt3 = [pt3[0],pt3[1]]
-        # pt19 = [pt19[0],pt19[1]]
-        print("### OK ###")
-
-        '''Initialisation du point 9 par détection auto '''
-        print("\n### Calcul du point 9 ###")
-        _,c = XY_compute.Points.contoursCorps(CV2_image_big,'head')
-        print(CV2_image_big.shape)
-        try:
-            pt9=XY_compute.Points.point9(c,pt19)
-            pt9 = [pt9[0],pt9[1]]
-            print("pt9")
-            print(pt9)
-            # print("left")
-            # print(left)
-        except:
-            print("Impossible de déterminer le point 9")
-            nbPointNonDetectes+=1
-        print("### OK ###")
-
-        '''Initialisation du point 15 et 13 par détection auto '''
-        print("\n### Calcul des points 15 et 13 ###")
-        pt15,pt13=XY_compute.Points.points15_13(CV2_image_big,pt19,left1,right1)
-        # try:
-        #     pt15,pt13=XY_compute.Points.points15_13(CV2_image_big,pt19,left1,right1)
-        #     pt15 = [pt15[0],pt15[1]]
-        #     pt13 = [pt13[0],pt13[1]]
-        # except:
-        #     print("Impossible de déterminer les points 15 et 13")
-        #     pt13 = [1288, 1228]
-        #     pt15 = [1308, 1098]
-        #     nbPointNonDetectes+=2
-        print("### OK ###")
-
-
-        '''Initialisation des points 5 et 7 par détection auto '''
-        print("\n### Calcul des points 5 et 7  ###")
-        try:
-            pt7,pt5 = XY_compute.Points.points5_7(CV2_image_big,pt9,left1)
-            pt5 = [pt5[0],pt5[1]]
-            pt7 = [pt7[0],pt7[1]]
-        except:
-            print("Impossible de détecter les points 5 et 7")
-            nbPointNonDetectes+=2
-
-        """Initialisation des points 11 et 17 par détection auto """
-        try:
-            pt17,pt11 = XY_compute.Points.points11_17(CV2_image_big,pt13,pt15)
-        except:
-            print("Impossible de détecter les points 11 et 17")
-            nbPointNonDetectes+=2
-
-        tete = XY_tools.Externes.centerPoints([pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19],HeadFish.centreOeil)
-
-        print("\n### Placement des points de la tête ###")
         HeadClass(self.canvasTete, tete,'#ff00f2')
         HeadClass(self.canvasTete,echelle3mm,'red')
-        print("### OK ###")
-        app.labelInfoPoints.config(text=str(13-nbPointNonDetectes)+" points détectés / 13 ")
+        self.canvasTete.update()
+
+
+        ## crop image :
+        ## min(np.array(lis).T[0])
+        ## max(np.array(lis).T[0])
+        ## min(np.array(lis).T[1])
+        ## max(np.array(lis).T[1])
+
+
+
+        # # # nbPointNonDetectes = 0
+        # # # print("### Initialisation ###")
+        # # # tete,echelle10mm,echelle3mm = XY_compute.Points.randomPointsBis()
+        # # # pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19 = tete
+        # # # self.clearAllCanvas()
+        # # #
+        # # # print(self.numImageActuelle)
+        # # #
+        # # # ImagePIL = Image.open(self.listeImages[self.numImageActuelle])
+        # # # app.labelNomImage.config(text=self.listeImages[self.numImageActuelle])
+        # # # app.labelNumImage.config(text=str(self.numImageActuelle+1)+"/"+str(len(self.listeImages)))
+        # # #
+        # # # ''' Resize pour le corps '''
+        # # # print("\n### Traitement du corps ###")
+        # # # corpsStandard,newPIL_image,left = XY_compute.Points.ImageCorps(ImagePIL)
+        # # # BodyFish(self.canvasCorps,newPIL_image,(1300,975))
+        # # # self.canvasCorps.move(BodyFish.poisson,-(left[0]-50),-(left[1]-280))
+        # # # self.canvasCorps.update()
+        # # # print("### OK ###")
+        # # #
+        # # # ''' Resize pour la tête '''
+        # # # print("\n### Traitement de la tête 1/3 ### ")
+        # # # PIL_image_big,CV2_image_big,left1,right1 = XY_compute.Points.ImageTete(self.listeImages,self.numImageActuelle)
+        # # # HeadFish(self.canvasTete,PIL_image_big,CV2_image_big,(3500,2625))
+        # # # self.canvasTete.update()
+        # # # print("### OK ###")
+        # # #
+        # # # print("\n### Alignement des points sur le corps'  ###")
+        # # # corpsStandard = [[x[0]-(left[0]-50),x[1]-(left[1]-280)] for x in corpsStandard]
+        # # # echelle10mm = [[x[0]-(left[0]-250),x[1]-(left[1]-350)] for x in echelle10mm]
+        # # # BodyClass(self.canvasCorps, echelle10mm,'red')
+        # # # BodyClass(self.canvasCorps,corpsStandard,'cyan')
+        # # # self.canvasCorps.update()
+        # # # print("### OK ###")
+        # # #
+        # # # ''' Initialisation des points 3 et 19 par détection auto '''
+        # # # print("\n### Calcul des points 3 et 19 ###")
+        # # # try:
+        # # #     [pt3,pt19]=XY_compute.Points.points3_19_independant(CV2_image_big)
+        # # #     pt3 = [pt3[0],pt3[1]]
+        # # #     pt19 = [pt19[0],pt19[1]]
+        # # # except:
+        # # #     print("Impossible de déterminer les points 3 et 19")
+        # # #     nbPointNonDetectes+=2
+        # # # # [pt3,pt19]=XY_compute.Points.points3_19(CV2_image_big)
+        # # # # pt3 = [pt3[0],pt3[1]]
+        # # # # pt19 = [pt19[0],pt19[1]]
+        # # # print("### OK ###")
+        # # #
+        # # # '''Initialisation du point 9 par détection auto '''
+        # # # print("\n### Calcul du point 9 ###")
+        # # # _,c = XY_compute.Points.contoursCorps(CV2_image_big,'head')
+        # # # print(CV2_image_big.shape)
+        # # # try:
+        # # #     pt9=XY_compute.Points.point9(c,pt19)
+        # # #     pt9 = [pt9[0],pt9[1]]
+        # # #     print("pt9")
+        # # #     print(pt9)
+        # # #     # print("left")
+        # # #     # print(left)
+        # # # except:
+        # # #     print("Impossible de déterminer le point 9")
+        # # #     nbPointNonDetectes+=1
+        # # # print("### OK ###")
+        # # #
+        # # # '''Initialisation du point 15 et 13 par détection auto '''
+        # # # print("\n### Calcul des points 15 et 13 ###")
+        # # # pt15,pt13=XY_compute.Points.points15_13(CV2_image_big,pt19,left1,right1)
+        # # # # try:
+        # # # #     pt15,pt13=XY_compute.Points.points15_13(CV2_image_big,pt19,left1,right1)
+        # # # #     pt15 = [pt15[0],pt15[1]]
+        # # # #     pt13 = [pt13[0],pt13[1]]
+        # # # # except:
+        # # # #     print("Impossible de déterminer les points 15 et 13")
+        # # # #     pt13 = [1288, 1228]
+        # # # #     pt15 = [1308, 1098]
+        # # # #     nbPointNonDetectes+=2
+        # # # print("### OK ###")
+        # # #
+        # # #
+        # # # '''Initialisation des points 5 et 7 par détection auto '''
+        # # # print("\n### Calcul des points 5 et 7  ###")
+        # # # try:
+        # # #     pt7,pt5 = XY_compute.Points.points5_7(CV2_image_big,pt9,left1)
+        # # #     pt5 = [pt5[0],pt5[1]]
+        # # #     pt7 = [pt7[0],pt7[1]]
+        # # # except:
+        # # #     print("Impossible de détecter les points 5 et 7")
+        # # #     nbPointNonDetectes+=2
+        # # #
+        # # # """Initialisation des points 11 et 17 par détection auto """
+        # # # try:
+        # # #     pt17,pt11 = XY_compute.Points.points11_17(CV2_image_big,pt13,pt15)
+        # # # except:
+        # # #     print("Impossible de détecter les points 11 et 17")
+        # # #     nbPointNonDetectes+=2
+        # # #
+        # # # tete = XY_tools.Externes.centerPoints([pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19],HeadFish.centreOeil)
+        # # #
+        # # # print("\n### Placement des points de la tête ###")
+        # # # HeadClass(self.canvasTete, tete,'#ff00f2')
+        # # # HeadClass(self.canvasTete,echelle3mm,'red')
+        # # # print("### OK ###")
+        # # # app.labelInfoPoints.config(text=str(13-nbPointNonDetectes)+" points détectés / 13 ")
 
     def affichePrediction():
         """!

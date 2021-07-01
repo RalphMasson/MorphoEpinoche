@@ -289,9 +289,15 @@ class InterfaceGender(tk.Tk):
         self.add_buttons()
 
     def add_labels(self):
+        """!
+            Fonction pour ajouter les textes de l'interface
+        """
         tk.Label(self,text="Mise à jour du modèle Sexage (Random Forest & SVM) \n",font=("Andalus",16,"bold")).pack(padx=5,pady=5)
 
     def add_buttons(self):
+        """!
+            Fonction pour ajouter les bouttons de l'interface
+        """
         self.boutonImageAll = tk.Button(self,text="1) Import le fichier csv",command=self.getDirectoryModel).place(relx=0.05,rely=0.22)
         self.buttonTrain = tk.Button(self,text="2) Mettre à jour le modele",command=self.prepareModel).place(relx=0.05,rely=0.26)
         self.text = tk.Text(self,height=40, width=150)
@@ -300,6 +306,9 @@ class InterfaceGender(tk.Tk):
         self.buttonOptions = tk.Button(self,text="Modifier options (leave blank to default)").place(relx = 0.02,rely = 0.35)
 
     def getDirectoryModel(self):
+        """!
+            Fonction pour avoir le chemin du dossier contenant le fichier csv
+        """
         InterfaceGender.csv_path = XY_tools.Externes.opencsv()
         InterfaceGender.csv_folder = XY_tools.Externes.cheminAvant2(InterfaceGender.csv_path)
         self.text.configure(state='normal')
@@ -308,6 +317,9 @@ class InterfaceGender(tk.Tk):
         self.text.configure(state='disabled')
 
     def prepareModel(self):
+        """!
+            Fonction pour preparer le modele
+        """
 
         a = ModelSexage()
         a.instantiate()
