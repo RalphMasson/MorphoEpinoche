@@ -16,8 +16,8 @@ class Externes():
         @param Y : array, (n_samples x d_dimensions)
         @return D : array, (n_samples, n_samples)
         """
-        print(X)
-        print(Y)
+        # print(X)
+        # print(Y)
         import numpy as np
         XY = np.array(X)-np.array(Y)
         return np.sqrt(np.einsum('i,i->', XY, XY))
@@ -97,7 +97,7 @@ class Externes():
         @param echelle float : echelle en pixel
         @return float : distance en mm
         """
-        return round(3*distance_px/echelle,4)
+        return round(50*distance_px/echelle,4)
 
     def px3mmListe(distances_px,echelle):
         """!
@@ -118,7 +118,10 @@ class Externes():
         @param echelle float : echelle en pixel
         @return float : distance en mm
         """
-        return round(10*distance_px/echelle,4)
+        print("verif")
+        print(distance_px)
+        print(echelle)
+        return round(50*distance_px/echelle,4)
 
     def px10mmListe(distances_px,echelle):
         """!
@@ -251,10 +254,10 @@ class Externes():
         @param ptsFish list of tuple : liste des points de la tête
         @return distances_check list of float : liste des distances en mm
         """
-        print("toto")
+        # print("toto")
         # print(ptsEchelle)
-        print(ptsFish)
-        print("fin toto")
+        # print(ptsFish)
+        # print("fin toto")
         echelle3mm = Externes.euclide(ptsEchelle[0],ptsEchelle[1])
         # echelle3mm = 1
         snout_eye = Externes.euclide(ptsFish[0],ptsFish[1])
@@ -275,13 +278,15 @@ class Externes():
         @param ptsFish list of tuple : liste des points du corps
         @return distances_check list of float : liste des distances en mm
         """
-        # echelle10mm = Externes.euclide(ptsEchelle[0],ptsEchelle[1])
-        echelle10mm = 1
-        # body_size = Externes.euclide(ptsFish[0],ptsFish[2])
-        body_size=1
+        # print(ptsEchelle)
+        # print(ptsFish)
+        echelle10mm = Externes.euclide(ptsEchelle[0],ptsEchelle[1])
+        # echelle10mm = 1
+        body_size = Externes.euclide(ptsFish[0],ptsFish[1])
+        # body_size=1
         # body_depth = Externes.euclide(ptsFish[1],ptsFish[3])
-        body_depth = 1
-        distances_check = [body_size,body_depth]
+        # body_depth = 1
+        distances_check = [body_size]
         distances_check = Externes.px10mmListe(distances_check,echelle10mm)
         return distances_check
 
@@ -363,7 +368,7 @@ class Externes():
         """
         texte = ""
         texte += "8 <-> 10 : Longueur Corps : "+str(distance[0])+" mm \n"
-        texte += " 13 <-> 15 : Largeur corps : "+str(distance[1])+" mm \n"
+        # texte += " 13 <-> 15 : Largeur corps : "+str(distance[1])+" mm \n"
         return texte
 
     def centerPoint(pt,eye):
@@ -372,7 +377,16 @@ class Externes():
         @param pt tuple : point à décaler
         @return tuple : point décalé
         """
-        return [pt[0]-(eye[0]-200),pt[1]-(eye[1]-250)]
+        return [pt[0]-(eye[0]-200),pt[1]-(eye[1]-200)]
+
+
+    def centerPoint2(pt,eye):
+        """!
+        Methode pour centrer un point sur l'interface
+        @param pt tuple : point à décaler
+        @return tuple : point décalé
+        """
+        return [pt[0]-(eye[0]-25),pt[1]-(eye[1]-50)]
 
     def decenterPoint(A,eye):
         """!
@@ -391,6 +405,17 @@ class Externes():
         new_lstpt = []
         for x in lstpt:
             new_lstpt.append(Externes.centerPoint(x,eye))
+        return new_lstpt
+
+    def centerPoints2(lstpt,eye):
+        """!
+        Methode pour centrer des points sur l'interface
+        @param lstpt tuple : liste de points à décaler
+        @return new_lstpt : liste de points décalés
+        """
+        new_lstpt = []
+        for x in lstpt:
+            new_lstpt.append(Externes.centerPoint2(x,eye))
         return new_lstpt
 
     def projeteOrtho(pente,intercept,xA,yA):

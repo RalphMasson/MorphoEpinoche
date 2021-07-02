@@ -592,3 +592,67 @@ class ML_pointage():
 # plt.legend(['train','test'])
 # plt.title("Evolution de l'erreur en fonction du nombre d'images")
 # plt.show()
+
+
+
+
+
+
+####
+#
+# cheminEchelle = r'C:\Users\MASSON\Desktop\pointageEchelle\\'
+# cheminPredictor = r'C:\Users\MASSON\Desktop\pointageEchelle\predictor.dat'
+#
+# a = ML_pointage(cheminEchelle,cheminEchelle+"\\train")
+# predictTrain = a.listePoints(161)
+# truthTrain = ML_pointage.xmltolist(r'C:\Users\MASSON\Desktop\pointageEchelle\train.xml',161)
+#
+# a = ML_pointage(cheminEchelle,cheminEchelle+"\\test")
+# predictTrain = a.listePoints(41)
+# truthTrain = ML_pointage.xmltolist(r'C:\Users\MASSON\Desktop\pointageEchelle\test.xml',41)
+#
+#
+# pt0 = []
+# pt1 = []
+#
+# for x in truthTrain:
+#     pt0.append(x[0])
+#     pt1.append(x[1])
+#
+# pt0_pred = []
+# pt1_pred = []
+#
+# for x in predictTrain:
+#     pt0_pred.append(x[0])
+#     pt1_pred.append(x[1])
+#
+# ecart_truth_pred0=[]
+# ecart_truth_pred1=[]
+#
+# def subliste(l1,l2):
+#     return XY_tools.Externes.euclide(l1,l2)
+#
+# for i in range(len(pt0)):
+#     ecart0 = subliste(pt0[i],pt0_pred[i])
+#     ecart1 = subliste(pt1[i],pt1_pred[i])
+#     ecart_truth_pred0.append(ecart0)
+#     ecart_truth_pred1.append(ecart1)
+#
+#
+# import seaborn as sns
+# import pandas as pd
+# import matplotlib.pyplot as plt
+# tests = [ecart_truth_pred0,ecart_truth_pred1]
+# df = pd.DataFrame(tests, index=['pt1','pt2'])
+# plt.figure()
+# df.T.boxplot(vert=False,showmeans=True)
+# plt.title("Error Training per landmark")
+# plt.subplots_adjust(left=0.25)
+# plt.xlim([0,5])
+# # plt.show()
+# plt.figure()
+# ax = sns.boxplot(data=df.T,orient="h",showmeans=True)
+# plt.xlim([0,5])
+# plt.title("Error Training per landmark")
+# plt.grid(True)
+# plt.show()
