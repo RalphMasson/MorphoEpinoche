@@ -1086,7 +1086,13 @@ class Interface(tk.Tk):
         ae = pd.DataFrame(Interface.modeleDistances).T
         # print(ae)
         prediction = clf.predict(ae)
+        prediction2 = clf.predict_proba(ae)
         print(prediction)
+        print(prediction2)
+        if prediction[0]==0:
+            app.labelSex.config(text="Femelle")
+        if prediction[0]==1:
+            app.labelSex.config(text="Male")
 
 
     def add_entrys(self):
@@ -1182,7 +1188,7 @@ class Interface(tk.Tk):
         # tk.Label(self, text = 'ADD THESE VALUES TO MODEL',font=("Purisa",12,"bold"),fg='green').place(relx=0.46,rely=0.08)
         # tk.Label(self,text='Sex for model:',fg='green').place(relx=0.46,rely=0.125)
         self.labelSex = tk.Label(self,text="")
-        self.labelSex.place(x=650,y=190)
+        self.labelSex.place(relx=0.45,rely=0.12)
 
 
         self.labelInfoPoints = tk.Label(self,text="",font=("Purisa",11),fg='gray')
