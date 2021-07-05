@@ -767,3 +767,67 @@ class Externes():
         return "/".join(aaa.split("/")[:-1])+"/"
     def sizeKoParent(path_et_nom_fichier_extension):
         return str(round(int(os.path.getsize(path_et_nom_fichier_extension)/1048)))+" Ko"
+
+    def calculDistancesv2(listepoints):
+        """!
+        all except LS
+        ['LS', 'L1-2', 'L1-3', 'L1-4', 'L1-5', 'L1-6', 'L1-7', 'L1-8', 'L1-9',
+        'L1-10', 'L2-3', 'L2-4', 'L2-5', 'L2-6', 'L2-7', 'L2-8', 'L2-9',
+        'L2-10', 'L3-4', 'L3-5', 'L3-6', 'L3-7', 'L3-8', 'L3-9', 'L3-10',
+        'L4-5', 'L4-6', 'L4-7', 'L4-8', 'L4-9', 'L4-10', 'L5-6', 'L5-7', 'L5-8',
+        'L5-9', 'L5-10', 'L6-7', 'L6-8', 'L6-9', 'L6-10', 'L7-8', 'L7-9',
+        'L7-10', 'L8-9', 'L8-10', 'L9-10']
+        """
+        distances = []
+        distances.append(Externes.euclide(listepoints[0],listepoints[1]))
+        distances.append(Externes.euclide(listepoints[0],listepoints[2]))
+        distances.append(Externes.euclide(listepoints[0],listepoints[3]))
+        distances.append(Externes.euclide(listepoints[0],listepoints[4]))
+        distances.append(Externes.euclide(listepoints[0],listepoints[5]))
+        distances.append(Externes.euclide(listepoints[0],listepoints[6]))
+        distances.append(Externes.euclide(listepoints[0],listepoints[7]))
+        distances.append(Externes.euclide(listepoints[0],listepoints[8]))
+        distances.append(Externes.euclide(listepoints[0],listepoints[9]))
+        distances.append(Externes.euclide(listepoints[1],listepoints[2]))
+        distances.append(Externes.euclide(listepoints[1],listepoints[3]))
+        distances.append(Externes.euclide(listepoints[1],listepoints[4]))
+        distances.append(Externes.euclide(listepoints[1],listepoints[5]))
+        distances.append(Externes.euclide(listepoints[1],listepoints[6]))
+        distances.append(Externes.euclide(listepoints[1],listepoints[7]))
+        distances.append(Externes.euclide(listepoints[1],listepoints[8]))
+        distances.append(Externes.euclide(listepoints[1],listepoints[9]))
+        distances.append(Externes.euclide(listepoints[2],listepoints[3]))
+        distances.append(Externes.euclide(listepoints[2],listepoints[4]))
+        distances.append(Externes.euclide(listepoints[2],listepoints[5]))
+        distances.append(Externes.euclide(listepoints[2],listepoints[6]))
+        distances.append(Externes.euclide(listepoints[2],listepoints[7]))
+        distances.append(Externes.euclide(listepoints[2],listepoints[8]))
+        distances.append(Externes.euclide(listepoints[2],listepoints[9]))
+        distances.append(Externes.euclide(listepoints[3],listepoints[4]))
+        distances.append(Externes.euclide(listepoints[3],listepoints[5]))
+        distances.append(Externes.euclide(listepoints[3],listepoints[6]))
+        distances.append(Externes.euclide(listepoints[3],listepoints[7]))
+        distances.append(Externes.euclide(listepoints[3],listepoints[8]))
+        distances.append(Externes.euclide(listepoints[3],listepoints[9]))
+        distances.append(Externes.euclide(listepoints[4],listepoints[5]))
+        distances.append(Externes.euclide(listepoints[4],listepoints[6]))
+        distances.append(Externes.euclide(listepoints[4],listepoints[7]))
+        distances.append(Externes.euclide(listepoints[4],listepoints[8]))
+        distances.append(Externes.euclide(listepoints[4],listepoints[9]))
+        distances.append(Externes.euclide(listepoints[5],listepoints[6]))
+        distances.append(Externes.euclide(listepoints[5],listepoints[7]))
+        distances.append(Externes.euclide(listepoints[5],listepoints[8]))
+        distances.append(Externes.euclide(listepoints[5],listepoints[9]))
+        distances.append(Externes.euclide(listepoints[6],listepoints[7]))
+        distances.append(Externes.euclide(listepoints[6],listepoints[8]))
+        distances.append(Externes.euclide(listepoints[6],listepoints[9]))
+        distances.append(Externes.euclide(listepoints[7],listepoints[8]))
+        distances.append(Externes.euclide(listepoints[7],listepoints[9]))
+        distances.append(Externes.euclide(listepoints[8],listepoints[9]))
+        return distances
+
+
+
+
+
+

@@ -769,6 +769,13 @@ class Interface(tk.Tk):
 
         print(listepoints)
 
+
+    def loadModel3(self,pathimage):
+        a = ModelPoints(r"C:\Users\MASSON\Desktop\pointageLongueur\\","")
+        a.predict(pathimage,r"C:\Users\MASSON\Desktop\pointageLongueur\predictor.dat")
+        listepoints = ML.ML_pointage.xmltolistY(r"C:\Users\MASSON\Desktop\pointageLongueur\output.xml",1)
+        return listepoints
+
     def add_entrys(self):
 
         Interface.sexModele = tk.StringVar(self)
@@ -1061,6 +1068,9 @@ class Interface(tk.Tk):
         HeadFish(self.canvasTete,ImagePIL,cv2.imread(self.listeImages[self.numImageActuelle]),(1920,1440))
 
         corpsStandard = [[80,80],[81,81]]
+        listePoints3 = self.loadModel3('/'.join(self.listeImages[0].split('/')[:-1]))[0]
+        listePoints3 = [[listePoints3[0][0]/3,listePoints3[0][1]/3],[listePoints3[1][0]/3,listePoints3[1][1]/3]]
+        corpsStandard = listePoints3
         echelle10mm = [[20,30],[30,50]]
         # BodyClass(self.canvasCorps, echelle10mm,'red')
         # BodyClass.pointsEchelle = [[listePoints2[0][0]/2,listePoints2[0][1]/2],[listePoints2[1][0]/2,listePoints2[1][1]/2]]

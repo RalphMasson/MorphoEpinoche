@@ -1,6 +1,7 @@
 
 import pandas as pd
 import numpy as np
+from sklearn.metrics import roc_curve, precision_recall_curve, auc, make_scorer, recall_score, accuracy_score, precision_score, confusion_matrix
 
 from sklearn.model_selection import train_test_split, GridSearchCV, StratifiedKFold,learning_curve,ShuffleSplit
 from sklearn.ensemble import RandomForestClassifier
@@ -11,7 +12,7 @@ from sklearn.metrics import roc_curve, precision_recall_curve, auc, make_scorer,
 from sklearn.feature_selection import SelectFromModel,RFE,SelectKBest, chi2
 import matplotlib.pyplot as plt
 from sklearn.metrics import plot_confusion_matrix
-
+from sklearn.metrics import classification_report
 from sklearn.ensemble import GradientBoostingClassifier
 import sys,inspect
 pypath = inspect.stack()[0][1]
@@ -83,11 +84,18 @@ X_train2, X_test2, y_train2, y_test2 = train_test_split(X2, y, test_size=0.3,str
 # # plot_learning_curve(clf, "Learning curves", X, y, axes=axes[:, 0], ylim=(0.7, 1.01),cv=cv, n_jobs=4)
 
 
-# clf = GradientBoostingClassifier(criterion = "friedman_mse",learning_rate = 0.075,n_estimators=1000,max_depth=5,max_features="sqrt",subsample=0.618,loss="deviance")
-# clf.fit(X_train,y_train)
-# y_pred = clf.predict(X_test)
+clf = GradientBoostingClassifier(criterion = "friedman_mse",learning_rate = 0.075,n_estimators=1000,max_depth=5,max_features="sqrt",subsample=0.618,loss="deviance")
+clf.fit(X_train,y_train)
+
+from joblib import dump, load
+dump(clf, r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\rapports\GBClassifierFinal.joblib')
+
+
+
+
+y_pred = clf.predict(X_test)
 #
-# print(pd.DataFrame(classification_report(y_test , y_pred, target_names=["femelle","male"],output_dict=True)).transpose()['recall'])
+print(pd.DataFrame(classification_report(y_test , y_pred, target_names=["femelle","male"],output_dict=True)).transpose()['recall'])
 # # #
 # # # titles_options = [("Normalized confusion matrix", 'true')]
 # # # for title, normalize in titles_options:
