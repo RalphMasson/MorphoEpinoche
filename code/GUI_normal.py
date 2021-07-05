@@ -19,7 +19,8 @@ import IA_morph as ML
 from datetime import datetime
 import numpy as np
 
-# Classe pour les points de la tête
+## Classes pour afficher les points sur les images
+
 class HeadClass():
     """Variables globales pour export
     id_polygons : liste des id des polygons (la tete et l'echelle)
@@ -112,14 +113,11 @@ class HeadClass():
             dx = event.x - self.previous_x
             dy = event.y - self.previous_y
             canvas.move(self.selected, dx, dy)
-            # print(self.selected)
             canvas.move(self.nonodes[self.nodes.index(self.selected)],dx,dy)
             self.points[number][0] += dx
             self.points[number][1] += dy
             coords = sum(self.points, [])
             canvas.coords(self.polygon, coords)
-            # print(canvas.coords(self.selected))
-            # print(event)
             self.previous_x = event.x
             self.previous_y = event.y
             try:
@@ -147,7 +145,6 @@ class HeadClass():
                     canvas.update()
             except:
                 None
-
 
         HeadClass.update_points(canvas)
         Interface.afficheLongueur()
@@ -185,9 +182,6 @@ class HeadClass():
         """!
         Methode pour calculer certaines distances caractéristiques
         """
-        # print("points echelle")
-        # print(HeadClass.pointsEchelle)
-        # print(HeadClass.pointsFish)
         HeadClass.distances_check = XY_tools.Externes.calculDistances(HeadClass.pointsEchelle,HeadClass.pointsFish)
         return HeadClass.distances_check
 
@@ -253,7 +247,6 @@ class BodyClass():
         for id in BodyClass.id_polygons:
             liste = canvas1.coords(id)
             if(len(canvas1.coords(id))==8):BodyClass.pointsFish=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
-            # if(len(canvas1.coords(id))==4):BodyClass.pointsEchelle=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
 
 
     def on_press_tag(self, event, number, tag,canvas1):
@@ -266,7 +259,6 @@ class BodyClass():
         self.selected = tag
         BodyClass.previous_x = event.x
         BodyClass.previous_y = event.y
-        # print(number)
         BodyClass.update_points(canvas1)
         Interface.afficheLongueurBody()
 
@@ -294,10 +286,6 @@ class BodyClass():
             dx = event.x - BodyClass.previous_x
             dy = event.y - BodyClass.previous_y
             canvas1.move(self.selected, dx, dy)
-            # print("number")
-            # print(number)
-            # print("selected")
-            # print(self.selected)
             canvas1.move(self.nonodes[BodyClass.nodes.index(self.selected)],dx,dy)
             BodyClass.points[number][0] += dx
             BodyClass.points[number][1] += dy
@@ -340,9 +328,6 @@ class BodyClass():
         """!
         Methode pour calculer certaines distances caractéristiques
         """
-        # print("test test")
-        # print(BodyClass.pointsEchelle)
-        # print(BodyClass.pointsFish)
         BodyClass.distances_check = XY_tools.Externes.calculDistances2(BodyClass.pointsFish[2:4],BodyClass.pointsFish[0:2])
         return BodyClass.distances_check
 
@@ -373,11 +358,8 @@ class ScaleClass():
         if points!=None:
             if color=='red':outline='white'
             else: outline=''
-            # print(points)
-
             self.polygon = canvas2.create_polygon(self.points,fill='',outline=outline,smooth=0,width=2,dash=(1,))
             HeadClass.id_polygons.append(self.polygon)
-            # print(self.polygon)
             canvas2.tag_bind(self.polygon, '<ButtonPress-1>',   lambda event, tag=self.polygon: self.on_press_tag(event, 0, tag))
             canvas2.tag_bind(self.polygon, '<ButtonRelease-1>', lambda event, tag=self.polygon: self.on_release_tag(event, 0, tag,canvas2))
             canvas2.tag_bind(self.polygon, '<B1-Motion>', lambda event = self.polygon : self.on_move_polygon(event,canvas2))
@@ -393,8 +375,6 @@ class ScaleClass():
                 canvas2.tag_bind(node, '<ButtonPress-1>',   lambda event, number=number, tag=node: self.on_press_tag(event, number, tag))
                 canvas2.tag_bind(node, '<ButtonRelease-1>', lambda event, number=number, tag=node: self.on_release_tag(event, number, tag,canvas2))
                 canvas2.tag_bind(node, '<B1-Motion>', lambda event, number=number: self.on_move_node(event, number,canvas2))
-
-        # print(HeadClass.id_polygons)
         ScaleClass.update_points(canvas2)
 
 
@@ -406,8 +386,6 @@ class ScaleClass():
         """
         for id in HeadClass.id_polygons:
             liste = canvas2.coords(id)
-            # print(liste)
-            # print(len(liste))
             if(len(canvas2.coords(id))==4):ScaleClass.pointsEchelle=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
 
     def on_press_tag(self, event, number, tag):
@@ -443,9 +421,6 @@ class ScaleClass():
             dx = event.x - self.previous_x
             dy = event.y - self.previous_y
             canvas2.move(self.selected, dx, dy)
-            # print("number")
-            # print(number)
-            # print(self.selected)
             canvas2.move(self.nonodes[self.nodes.index(self.selected)],dx,dy)
             self.points[number][0] += dx
             self.points[number][1] += dy
@@ -453,15 +428,9 @@ class ScaleClass():
             canvas2.coords(self.polygon, coords)
             self.previous_x = event.x
             self.previous_y = event.y
-
-
-            # print("distance")
-            # print(Interface.canvasEchelle.coords(5))
-            # print(Interface.canvasEchelle.coords(3))
             px50mm = XY_tools.Externes.euclide(Interface.canvasEchelle.coords(3),Interface.canvasEchelle.coords(5))
 
             if self.selected==5:
-                # print("True")
                 Interface.canvasCorps.move(9,dx/3,dy/3)
                 Interface.canvasCorps.update()
                 Interface.canvasCorps.move(BodyClass.nonodes[BodyClass.nodes.index(9)],dx/3,dy/3)
@@ -471,23 +440,14 @@ class ScaleClass():
                 coordes = sum(BodyClass.points, [])
                 Interface.canvasCorps.coords(BodyClass.polygon, coordes)
                 Interface.canvasCorps.update()
-                # print("events")
-                # print(event.x)
-                # print(event.y)
                 BodyClass.previous_x = event.x
                 BodyClass.previous_y = event.y
                 BodyClass.update_points(Interface.canvasCorps)
-                # lenBody = XY_tools.Externes.euclide(Interface.canvasEchelle2.coords(3),Interface.canvasEchelle2.coords(5))
-                # print(Interface.lenBody*50/px50mm)
                 Interface.afficheLongueur()
                 app.labelLongueurBody.config(text="Longueur = "+str(round(Interface.lenBody*50/px50mm,3)))
                 Interface.allDist(Interface.lenBody)
-                # print('modeleDistances')
-                # print(Interface.modeleDistances)
-
 
             if self.selected==3:
-                # print("True")
                 Interface.canvasCorps.move(7,dx/3,dy/3)
                 Interface.canvasCorps.update()
                 Interface.canvasCorps.move(BodyClass.nonodes[BodyClass.nodes.index(7)],dx/3,dy/3)
@@ -497,18 +457,11 @@ class ScaleClass():
                 coordes = sum(BodyClass.points, [])
                 Interface.canvasCorps.coords(BodyClass.polygon, coordes)
                 Interface.canvasCorps.update()
-                # print("events")
-                # print(event.x)
-                # print(event.y)
                 BodyClass.previous_x = event.x
                 BodyClass.previous_y = event.y
                 BodyClass.update_points(Interface.canvasCorps)
                 Interface.afficheLongueur()
-                # Interface.afficheLongueurBody()
                 Interface.allDist(Interface.lenBody)
-                # print('modeleDistances')
-                # print(Interface.modeleDistances)
-
 
             app.labelLongueurBody.config(text="Longueur = "+str(round(Interface.lenBody*50/px50mm,3)))
             Interface.allDist(Interface.lenBody)
@@ -596,11 +549,8 @@ class ScaleClassBody():
         if points!=None:
             if color=='red':outline='white'
             else: outline=''
-            # print(points)
-
             self.polygon = canvas3.create_polygon(self.points,fill='',outline=outline,smooth=0,width=2,dash=(1,))
             HeadClass.id_polygons.append(self.polygon)
-            # print(self.polygon)
             canvas3.tag_bind(self.polygon, '<ButtonPress-1>',   lambda event, tag=self.polygon: self.on_press_tag(event, 0, tag))
             canvas3.tag_bind(self.polygon, '<ButtonRelease-1>', lambda event, tag=self.polygon: self.on_release_tag(event, 0, tag,canvas3))
             canvas3.tag_bind(self.polygon, '<B1-Motion>', lambda event = self.polygon : self.on_move_polygon(event,canvas3))
@@ -617,7 +567,6 @@ class ScaleClassBody():
                 canvas3.tag_bind(node, '<ButtonRelease-1>', lambda event, number=number, tag=node: self.on_release_tag(event, number, tag,canvas3))
                 canvas3.tag_bind(node, '<B1-Motion>', lambda event, number=number: self.on_move_node(event, number,canvas3))
 
-        # print(HeadClass.id_polygons)
         ScaleClassBody.update_points(canvas3)
 
 
@@ -629,8 +578,6 @@ class ScaleClassBody():
         """
         for id in HeadClass.id_polygons:
             liste = canvas3.coords(id)
-            # print(liste)
-            # print(len(liste))
             if(len(canvas3.coords(id))==4):ScaleClassBody.pointsEchelle=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
 
     def on_press_tag(self, event, number, tag):
@@ -643,7 +590,6 @@ class ScaleClassBody():
         self.selected = tag
         self.previous_x = event.x
         self.previous_y = event.y
-        # print(self.selected,event,tag)
 
     def on_release_tag(self, event, number, tag,canvas3):
         """!
@@ -666,10 +612,6 @@ class ScaleClassBody():
             dx = event.x - self.previous_x
             dy = event.y - self.previous_y
             canvas3.move(self.selected, dx, dy)
-            # print("number")
-            # print(number)
-            # print("selected")
-            # print(self.selected)
             canvas3.move(self.nonodes[self.nodes.index(self.selected)],dx,dy)
             self.points[number][0] += dx
             self.points[number][1] += dy
@@ -679,7 +621,6 @@ class ScaleClassBody():
             self.previous_y = event.y
 
             if self.selected==5:
-                # print("True")
                 Interface.canvasCorps.move(5,dx/3,dy/3)
                 Interface.canvasCorps.update()
                 Interface.canvasCorps.move(BodyClass.nonodes[BodyClass.nodes.index(5)],dx/3,dy/3)
@@ -689,16 +630,12 @@ class ScaleClassBody():
                 coordes = sum(BodyClass.points, [])
                 Interface.canvasCorps.coords(BodyClass.polygon, coordes)
                 Interface.canvasCorps.update()
-                # print("events")
-                # print(event.x)
-                # print(event.y)
                 BodyClass.previous_x = event.x
                 BodyClass.previous_y = event.y
                 BodyClass.update_points(Interface.canvasCorps)
                 Interface.afficheLongueurBody()
 
             if self.selected==3:
-                # print("True")
                 Interface.canvasCorps.move(3,dx/3,dy/3)
                 Interface.canvasCorps.update()
                 Interface.canvasCorps.move(BodyClass.nonodes[BodyClass.nodes.index(3)],dx/3,dy/3)
@@ -708,9 +645,6 @@ class ScaleClassBody():
                 coordes = sum(BodyClass.points, [])
                 Interface.canvasCorps.coords(BodyClass.polygon, coordes)
                 Interface.canvasCorps.update()
-                # print("events")
-                # # print(event.x)
-                # print(event.y)
                 BodyClass.previous_x = event.x
                 BodyClass.previous_y = event.y
                 BodyClass.update_points(Interface.canvasCorps)
@@ -738,14 +672,12 @@ class ScaleClassBody():
                     canvas3.move(id11,pt11[0]-pt11_old[0],pt11[1]-pt11_old[1])
                     canvas3.move(id17,pt17[0]-pt17_old[0],pt17[1]-pt17_old[1])
                     canvas3.update()
-                # canvas1.move()
 
             except:
                 None
 
 
         ScaleClassBody.update_points(canvas3)
-        # Interface.afficheLongueur()
     def on_move_polygon(self, event,canvas3):
         """!
         Methode pour deplacer le polygone entier
@@ -756,13 +688,10 @@ class ScaleClassBody():
         if self.selected:
             dx = event.x - self.previous_x
             dy = event.y - self.previous_y
-            # move polygon
             canvas3.move(self.selected, dx, dy)
-            # move red nodes
             for item,item1 in zip(self.nodes,self.nonodes):
                 canvas3.move(item, dx, dy)
                 canvas3.move(item1,dx,dy)
-            # recalculate values in self.points
             for item in self.points:
                 item[0] += dx
                 item[1] += dy
@@ -770,156 +699,42 @@ class ScaleClassBody():
             self.previous_y = event.y
         ScaleClassBody.update_points(canvas3)
 
-
-
-
-
-
+## Canvas pour les images
 
 class HeadFish():
-    """Variables globales pour export
-    id_polygons : liste des id des polygons (la tete et l'echelle)
-    pointsTete : liste des points de la tête [(x1,y1),(x2,y2)...]
-    pointsEchelle3mm : liste des points de l'echelle [(x1,y1),(x2,y2)]
-    distances_check : liste des distances caractéristiques affichées
-    distances_all : liste de toutes les distances sauvegardés pour le modèle
-    """
     poisson = None
     centreOeil=None
     CV2_image_big = None
+    img = None
     def __init__(self, canvas,PIL_image,CV2_image,size):
-        """!
-        Constructeur de l'image de la tete
-        @param canvas tk.Canvas : cadre de l'image
-        @param PIL_image list : matrice de l'image format PIL
-        @param cv2_image list : matrice de l'image format cv2
-        @param size list : dimension souhaitée de l'image
-        """
-        self.img = ImageTk.PhotoImage(PIL_image.resize(size, Image.ANTIALIAS))
-        # self.circle = XY_compute.Points.detect_eye(cv2.resize(CV2_image,size,Image.ANTIALIAS))
-        # HeadFish.centreOeil = [self.circle[0],self.circle[1]]
-        HeadFish.poisson = canvas.create_image(0, 0, anchor=tk.NW,image=self.img)
+        HeadFish.img = ImageTk.PhotoImage(PIL_image.resize(size, Image.ANTIALIAS))
+        HeadFish.poisson = canvas.create_image(0, 0, anchor=tk.NW,image=HeadFish.img)
         HeadFish.CV2_image_big = CV2_image
         canvas.move(HeadFish.poisson,-(HeadFish.oeilXY[0]-200),-(HeadFish.oeilXY[1]-200))
-        app.bind("<Left>",self.moveLeft)
-        app.bind("<Right>",self.moveRight)
-        app.bind("<Up>",self.moveUp)
-        app.bind("<Down>",self.moveDown)
-    def moveLeft(self,event):
-        """!
-        Méthode pour déplacer l'image à gauche
-        @param event : event
-        """
-        Interface.canvasTete.move(HeadFish.poisson,10,0)
-    def moveRight(self,event):
-        """!
-        Méthode pour déplacer l'image à droite
-        @param event : event
-        """
-        Interface.canvasTete.move(HeadFish.poisson,-10,0)
-    def moveUp(self,event):
-        """!
-        Méthode pour déplacer l'image en haut
-        @param event : event
-        """
-        Interface.canvasTete.move(HeadFish.poisson,0,-10)
-    def moveDown(self,event):
-        """!
-        Méthode pour déplacer l'image en bas
-        @param event : event
-        """
-        Interface.canvasTete.move(HeadFish.poisson,0,10)
 
 class BodyFish():
     poisson = None
+    img = None
     def __init__(self, canvas1,PIL_image,size):
-        """!
-        Constructeur de l'image du corps
-        @param canvas tk.Canvas : cadre de l'image
-        @param PIL_image list : matrice de l'image format PIL
-        @param cv2_image list : matrice de l'image format cv2
-        @param size list : dimension souhaitée de l'image
-        """
-        self.img = ImageTk.PhotoImage(PIL_image.resize(size, Image.ANTIALIAS))
+        BodyFish.img = ImageTk.PhotoImage(PIL_image.resize(size, Image.ANTIALIAS))
         BodyFish.poisson = canvas1.create_image(0, 0, anchor=tk.NW, image=self.img)
-        # canvas1.move(BodyFish.poisson,-(HeadFish.oeilXY[0]-150),-(HeadFish.oeilXY[1]-250))
-        app.bind("<Key>",self.move)
-        app.bind("<Key>",self.move)
-        app.bind("<Key>",self.move)
-        app.bind("<Key>",self.move)
-    def move(self,event):
-        """!
-        Méthode pour déplacer l'image
-        @param event : touche pressée
-        """
-        if event.char=='q':
-            canvas1.move(BodyFish.poisson,-10,0)
-        if event.char=='s':
-            canvas1.move(BodyFish.poisson,10,0)
-        if event.char =='z':
-            canvas1.move(BodyFish.poisson,0,-10)
 
 class ScaleFish():
     poisson = None
+    img = None
     def __init__(self, canvas2,PIL_image,size):
-        """!
-        Constructeur de l'image du corps
-        @param canvas tk.Canvas : cadre de l'image
-        @param PIL_image list : matrice de l'image format PIL
-        @param cv2_image list : matrice de l'image format cv2
-        @param size list : dimension souhaitée de l'image
-        """
-        self.img = ImageTk.PhotoImage(PIL_image.resize(size, Image.ANTIALIAS))
+        ScaleFish.img = ImageTk.PhotoImage(PIL_image.resize(size, Image.ANTIALIAS))
         ScaleFish.poisson = canvas2.create_image(0, 0, anchor=tk.NW, image=self.img)
         Interface.canvasEchelle.itemconfig(ScaleFish.poisson,state='normal')
         canvas2.move(ScaleFish.poisson,-(ScaleFish.left[0]-25),-(ScaleFish.left[1]-50))
-        app.bind("<Key>",self.move)
-        app.bind("<Key>",self.move)
-        app.bind("<Key>",self.move)
-        app.bind("<Key>",self.move)
-    def move(self,event):
-        """!
-        Méthode pour déplacer l'image
-        @param event : touche pressée
-        """
-        if event.char=='q':
-            canvas1.move(BodyFish.poisson,-10,0)
-        if event.char=='s':
-            canvas1.move(BodyFish.poisson,10,0)
-        if event.char =='z':
-            canvas1.move(BodyFish.poisson,0,-10)
 
 class ScaleFishBody():
     poisson = None
     def __init__(self, canvas3,PIL_image,size):
-        """!
-        Constructeur de l'image du corps
-        @param canvas tk.Canvas : cadre de l'image
-        @param PIL_image list : matrice de l'image format PIL
-        @param cv2_image list : matrice de l'image format cv2
-        @param size list : dimension souhaitée de l'image
-        """
         img = ImageTk.PhotoImage(PIL_image.resize(size, Image.ANTIALIAS))
         ScaleFishBody.poisson = canvas3.create_image(0, 0, anchor=tk.NW, image=img)
-        # print(ScaleFishBody.poisson)
-        # Interface.canvasEchelle2.itemconfig(ScaleFishBody.poisson,state='normal')
-        # canvas3.move(ScaleFishBody.poisson,-(ScaleFish.left[0]-25),-(ScaleFish.left[1]-50))
-        # app.bind("<Key>",self.move)
-        # app.bind("<Key>",self.move)
-        # app.bind("<Key>",self.move)
-        # app.bind("<Key>",self.move)
-    # def move(self,event):
-    #     """!
-    #     Méthode pour déplacer l'image
-    #     @param event : touche pressée
-    #     """
-    #     if event.char=='q':
-    #         canvas1.move(BodyFish.poisson,-10,0)
-    #     if event.char=='s':
-    #         canvas1.move(BodyFish.poisson,10,0)
-    #     if event.char =='z':
-    #         canvas1.move(BodyFish.poisson,0,-10)
 
+## Import du modèle de détection
 class ModelPoints():
     """!
         Classe de préparation du modèle Regression Trees pour la détection des
@@ -951,11 +766,11 @@ class ModelPoints():
     def predict(self,aa,bb):
         ModelPoints.pointsML.predict(aa,bb)
 
-
+## Interface finale
 
 class Interface(tk.Tk):
     sexModele = None
-    version = 1.6
+    version = 1.7
     canvasTete = None
     def __init__(self):
         """!
@@ -968,8 +783,6 @@ class Interface(tk.Tk):
         self.add_buttons()
         self.add_labels()
         self.add_canvas()
-        # self.add_entrys()
-
         self.createlog()
         self.verbose_intro()
 
@@ -1047,16 +860,21 @@ class Interface(tk.Tk):
         f.write(message)
         f.close()
 
-    def loadModel(self,pathimage):
+    def Model_Tete(self,pathimage):
         """!
             @param pathimage dossier de l'image
         """
-        a = ModelPoints(r"C:\Users\MASSON\Desktop\POINTAGe\\","")
-        a.predict(pathimage,r"C:\Users\MASSON\Desktop\POINTAGe\predictor.dat")
-        listepoints = ML.ML_pointage.xmltolistY(r"C:\Users\MASSON\Desktop\POINTAGe\output.xml",1)
+
+        path = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\test_pointage_ML\pointage_cyril\\'
+        path = r'C:\Users\MASSON\Desktop\POINTAGe\\'
+        # sys._MEIPASS
+
+        a = ModelPoints(path,"")
+        a.predict(pathimage,path+"predictor.dat")
+        listepoints = ML.ML_pointage.xmltolistY(path+"output.xml",1)
         return listepoints
 
-    def loadModel2(self,pathimage):
+    def Model_Echelle(self,pathimage):
         """!
             @param pathimage dossier de l'image
         """
@@ -1065,26 +883,20 @@ class Interface(tk.Tk):
         listepoints = ML.ML_pointage.xmltolistY(r"C:\Users\MASSON\Desktop\pointageEchelle\output.xml",1)
         return listepoints
 
-        # print(listepoints)
 
-
-    def loadModel3(self,pathimage):
+    def Model_Longueur(self,pathimage):
         a = ModelPoints(r"C:\Users\MASSON\Desktop\pointageLongueur\\","")
         a.predict(pathimage,r"C:\Users\MASSON\Desktop\pointageLongueur\predictor.dat")
-
         listepoints = ML.ML_pointage.xmltolistY(r"C:\Users\MASSON\Desktop\pointageLongueur\output.xml",1)
         return listepoints
 
-    def loadModel4():
+    def Model_Sexage():
         Interface.lenBody = XY_tools.Externes.euclide(Interface.canvasEchelle2.coords(3),Interface.canvasEchelle2.coords(5))
-        # print(Interface.lenBody)
         Interface.allDist(Interface.lenBody)
         from joblib import dump, load
         import pandas as pd
         clf = load(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\rapports\GBClassifierFinal.joblib')
-        # print(Interface.modeleDistances)
         ae = pd.DataFrame(Interface.modeleDistances).T
-        # print(ae)
         prediction = clf.predict(ae)
         prediction2 = clf.predict_proba(ae)
         print(prediction)
@@ -1113,11 +925,10 @@ class Interface(tk.Tk):
         Interface.canvasCorps.config(width=630, height=400)
         Interface.canvasCorps.grid(column=1,row=8)
 
+        ''' Canvas pour l'échelle '''
         Interface.canvasEchelle = tk.Canvas(self,bg='#f0f0f0')
         Interface.canvasEchelle.config(width=1590, height=200)
         Interface.canvasEchelle.place(relx=0,rely=0.7)
-
-
 
         """Canvas pour logo"""
         pathLogo = XY_tools.Externes.resource_path("logo2.png")
@@ -1127,14 +938,10 @@ class Interface(tk.Tk):
         self.imgLogo2 = ImageTk.PhotoImage(Image.open(pathLogo).resize((157,84)))
         self.canvasLogo2.create_image(0, 0, anchor=tk.NW,image=self.imgLogo2)
 
-
-
         """Canvas pour logo"""
         Interface.canvasEchelle2 = tk.Canvas(self,bg='#f0f0f0')
         Interface.canvasEchelle2.config(width=1590,height=200)
         Interface.canvasEchelle2.place(relx=0,rely=0.7)
-
-
 
         ''' Canvas pour le schema '''
         pathSchema = XY_tools.Externes.resource_path("schema.png")
@@ -1149,23 +956,18 @@ class Interface(tk.Tk):
         self.boutonImport = tk.Button(self,text = "Import images",command = self.importImage,fg='purple')
         self.boutonImport.place(relx=0.25,rely=0.12)
         self.boutonImport.bind('<Control-o>',self.importImage)
-        tk.Button(self,text = "Predict",command = Interface.loadModel4,fg='purple').place(relx=0.35,rely=0.12)
-        # tk.Button(self,text = "Model Update (close Excel before)",command = HeadClass.genererAllDistancesHead,fg='green').place(relx=0.46,rely=0.158)
+        tk.Button(self,text = "Predict",command = Interface.Model_Sexage,fg='purple').place(relx=0.35,rely=0.12)
         self.boutonPrevious = tk.Button(self,text='<--',fg='red',command = self.previousImage)
         self.boutonPrevious.place(relx=0.38,rely=0.3)
         self.boutonNext = tk.Button(self,text='-->',fg='red',command = self.nextImage)
         self.boutonNext.place(relx=0.40,rely=0.3)
 
-        self.buttonBody = tk.Button(self,text="1)", fg='gray', command = self.afficheCorps).place(relx = 0.7,rely=0.6)
-        self.buttonBody = tk.Button(self,text="2)",fg='gray',command = self.hideCorps).place(relx=0.76,rely=0.6)
-        # self.buttonScale = tk.Button(self,text="3)",fg='gray',command = self.afficheScale).place(relx = 0.7,rely=0.65)
-        self.buttonScale = tk.Button(self,text="3)",fg='gray',command = self.hideScale).place(relx = 0.76,rely=0.65)
-
-
+        self.buttonBody = tk.Button(self,text="1) Réglage corps", fg='gray', command = self.afficheCorps).place(relx = 0.7,rely=0.6)
+        self.buttonBody = tk.Button(self,text="2) Réglage échelle",fg='gray',command = self.hideCorps).place(relx=0.77,rely=0.6)
+        self.buttonScale = tk.Button(self,text="3) Cacher",fg='gray',command = self.hideScale).place(relx = 0.84,rely=0.6)
 
     def afficheScale(self):
         Interface.canvasEchelle.itemconfig(ScaleFish.poisson,state='normal')
-        # Interface.canvasEchelle2.move(ScaleFishBody.poisson,-(ScaleFish.left[0]-25),-(ScaleFish.left[1]-50))
 
     def hideScale(self):
         Interface.canvasEchelle.itemconfig(ScaleFish.poisson,state='hidden')
@@ -1176,7 +978,6 @@ class Interface(tk.Tk):
     def hideCorps(self):
         Interface.canvasEchelle2.itemconfig(ScaleFishBody.poisson,state='hidden')
         Interface.lenBody = XY_tools.Externes.euclide(Interface.canvasEchelle2.coords(3),Interface.canvasEchelle2.coords(5))
-
         Interface.canvasEchelle2.destroy()
 
     def add_labels(self):
@@ -1185,11 +986,9 @@ class Interface(tk.Tk):
         tk.Label(self,text=" ",font=("Purisa",12,"bold")).grid(ipadx=2)
         tk.Label(self,text=" Sexing procedure of three-spined stickleback \n",font=("Andalus",16,"bold")).place(relx=0.35,rely=0.01)
         tk.Label(self,text="\n \n \n \n ").grid(column=0,row=1)
-        # tk.Label(self, text = 'ADD THESE VALUES TO MODEL',font=("Purisa",12,"bold"),fg='green').place(relx=0.46,rely=0.08)
-        # tk.Label(self,text='Sex for model:',fg='green').place(relx=0.46,rely=0.125)
+
         self.labelSex = tk.Label(self,text="")
         self.labelSex.place(relx=0.45,rely=0.12)
-
 
         self.labelInfoPoints = tk.Label(self,text="",font=("Purisa",11),fg='gray')
         self.labelInfoPoints.place(relx=0.1,rely=0.975)
@@ -1203,20 +1002,14 @@ class Interface(tk.Tk):
         self.labelNomImage.place(relx=0.4,rely=0.975)
 
         ''' Labels pour les longueurs de la tête '''
-        # tk.Label(self,text="Longueurs caractéristiques de la tête : \n",justify=tk.LEFT,font=("Purisa",8,"bold","underline")).grid(column=2,row=4)
         tk.Label(self,text="Longueurs caractéristiques de la tête : \n",justify=tk.LEFT,font=("Purisa",8,"bold","underline")).place(relx=.7,rely=.38)
         tk.Label(self,text="\n",justify=tk.LEFT,font=("Purisa",8,"bold","underline")).grid(column=2,row=4)
-
         self.labelLongueur = tk.Label(self,text="",justify=tk.LEFT)
-        # self.labelLongueur.grid(column=2,row=5)
         self.labelLongueur.place(relx=0.7,rely=0.42)
 
         ''' Labels pour les longueurs du corps '''
-        # tk.Label(self,text="Longueurs caractéristiques du corps : \n",justify=tk.LEFT,font=("Purisa",8,"bold","underline")).grid(column=2,row=6)
         tk.Label(self,text="Longueurs caractéristiques du corps : \n",justify=tk.LEFT,font=("Purisa",8,"bold","underline")).place(relx=.7,rely=.25)
-
         self.labelLongueurBody = tk.Label(self,text="",justify=tk.LEFT)
-        # self.labelLongueurBody.grid(column=2,row=7)
         self.labelLongueurBody.place(relx = .7,rely=.3)
 
 
@@ -1278,26 +1071,17 @@ class Interface(tk.Tk):
     def changeView(self):
         GUI_little.Temp.chemin = pypath3
         self.destroy()
-        # self.withdraw()
         root = tk.Tk()
 
         GUI_little.app = GUI_little.Interface(root)
         GUI_little.app.pack(side="top", fill="both", expand=True)
         GUI_little.app.mainloop()
 
-        # self.deiconify()
-
     def updatePointModel(self):
-        # self.destroy()
-        # self.withdraw()
         GUI_update.InterfacePoint()
-        # self.deiconify()
 
     def updatePointModel1(self):
-        # self.destroy()
-        # self.withdraw()
         GUI_update.InterfaceGender()
-        # self.deiconify()
 
     def afficheLongueur():
         """!
@@ -1365,19 +1149,15 @@ class Interface(tk.Tk):
         listepoints = []
         for i in range(3,22,2):
             listepoints.append([Interface.canvasTete.coords(i)[0]+3,Interface.canvasTete.coords(i)[1]+3])
-        # print(listepoints)
         px50mm = XY_tools.Externes.euclide(Interface.canvasEchelle.coords(3),Interface.canvasEchelle.coords(5))
         listedistances = XY_tools.Externes.calculDistancesv2(listepoints)
-        # print(listedistances)
-        # print("\n")
         listedistances2 = []
         print(lenBody)
         listedistances2.append(round(lenBody*50/px50mm,5))
         for x in listedistances:
             listedistances2.append(round(x*50/px50mm,5))
         Interface.modeleDistances = listedistances2
-        # print(listedistances2)
-        # print(len(listedistances2))
+
     def correctListPoint(self,liste4cord):
         return [[liste4cord[0],liste4cord[1]],[liste4cord[2],liste4cord[3]]]
 
@@ -1402,34 +1182,38 @@ class Interface(tk.Tk):
 
 
         #Points de la tête calculés par le modèle 1
-        listePoints = self.loadModel('/'.join(self.listeImages[0].split('/')[:-1]))[0]
+        listePoints = self.Model_Tete('/'.join(self.listeImages[0].split('/')[:-1]))[0]
         tete = listePoints
 
         #Oeil du poisson
         HeadFish.oeilXY = [0.5*(tete[1][0]+tete[2][0]),0.5*(tete[1][1]+tete[2][1])]
 
         #Points de l'échelle calculés par le modèle 2
-        listePoints2 = self.loadModel2('/'.join(self.listeImages[0].split('/')[:-1]))[0]
+        listePoints2 = self.Model_Echelle('/'.join(self.listeImages[0].split('/')[:-1]))[0]
         listePoints22 = listePoints2
         ScaleFish.left = listePoints2[0]
         #Placement des points de l'echelle au bon endroit
         pt1,pt2 = listePoints2
         listePoints2 = XY_tools.Externes.centerPoints2([pt1,pt2],ScaleFish.left)
-
-        #Lecture de l'image
-        ImagePIL = Image.open(self.listeImages[self.numImageActuelle])
         app.labelNomImage.config(text=self.listeImages[self.numImageActuelle])
         app.labelNumImage.config(text=str(self.numImageActuelle+1)+"/"+str(len(self.listeImages)))
 
+        #Lecture de l'image
+        self.ImagePIL = Image.open(self.listeImages[self.numImageActuelle])
+        HeadFish(self.canvasTete,self.ImagePIL,cv2.imread(self.listeImages[self.numImageActuelle]),(1920,1440))
+
         #Ajout de l'image réduite
-        BodyFish(Interface.canvasCorps,ImagePIL,(640,480))
-        self.canvasTete.update()
+        self.ImagePIL2 = Image.open(self.listeImages[self.numImageActuelle])
+        BodyFish(Interface.canvasCorps,self.ImagePIL2,(640,480))
 
         #Ajout de l'image de la tête
-        HeadFish(self.canvasTete,ImagePIL,cv2.imread(self.listeImages[self.numImageActuelle]),(1920,1440))
-
+        # self.pathCorps = self.listeImages[self.numImageActuelle]
+        # self.imgCorpss = ImageTk.PhotoImage(Image.open(self.pathCorps).resize((1920,1440)))
+        # HeadFish.poisson = self.canvasTete.create_image(0, 0, anchor=tk.NW,image=self.imgCorpss)
+        # self.canvasTete.itemconfig(HeadFish.poisson,state='normal')
+        # self.canvasTete.update()
         #Calcul des points du corps
-        listePoints3 = self.loadModel3('/'.join(self.listeImages[0].split('/')[:-1]))[0]
+        listePoints3 = self.Model_Longueur('/'.join(self.listeImages[0].split('/')[:-1]))[0]
         listePoints3 = [[listePoints3[0][0]/3,listePoints3[0][1]/3],[listePoints3[1][0]/3,listePoints3[1][1]/3]]
         corpsStandard = listePoints3
 
@@ -1453,27 +1237,20 @@ class Interface(tk.Tk):
 
         # Calcul des points  du corps Bis
 
-        listePoints3 = self.loadModel3('/'.join(self.listeImages[0].split('/')[:-1]))[0]
+        listePoints3 = self.Model_Longueur('/'.join(self.listeImages[0].split('/')[:-1]))[0]
         listePoints33 = listePoints3
         pt1,pt2 = [listePoints3[0][0],listePoints3[0][1]],[listePoints3[1][0],listePoints3[1][1]]
         ScaleFishBody.left = [listePoints3[0][0],listePoints3[0][1]]
         listePoints3 = XY_tools.Externes.centerPoints3([pt1,pt2],ScaleFishBody.left)
-        # print("listePoints3")
-        # print(listePoints3)
+
         self.pathCorps = self.listeImages[self.numImageActuelle]
         self.imgCorpss = ImageTk.PhotoImage(Image.open(self.pathCorps).resize((1920,1440)))
         ScaleFishBody.poisson = Interface.canvasEchelle2.create_image(0, 0, anchor=tk.NW,image=self.imgCorpss)
         Interface.canvasEchelle2.itemconfig(ScaleFishBody.poisson,state='hidden')
-
         ScaleClassBody(Interface.canvasEchelle2,listePoints3,'#ffffff')
         Interface.canvasEchelle2.move(ScaleFishBody.poisson,-(ScaleFishBody.left[0]-25),-(ScaleFishBody.left[1]-125))
         Interface.canvasEchelle2.update()
-        # ScaleFishBody(Interface.canvasEchelle2, ImagePIL2,(1920,1440))
-        # Interface.canvasEchelleBody.update()
 
-        # ScaleClass(self.canvasEchelle,echelle3mm2,'#ff00f2')
-
-        # self.allDist()
 
     def affichePrediction(self):
         """!
@@ -1482,8 +1259,6 @@ class Interface(tk.Tk):
         choix,couleur,p = IA_sexage.Prediction.predict(None,"","")
         app.labelSex.config(text="")
         app.labelSex.config(text=choix+" avec p="+str(round(p,2)),font=("Purisa",16),fg=couleur)
-        # print("toto")
-        # print(Interface.canvasEchelle.itemcget(ScaleFish.poisson,'state'))
 
 
     def nextImage(self):
