@@ -118,9 +118,9 @@ class Externes():
         @param echelle float : echelle en pixel
         @return float : distance en mm
         """
-        print("verif")
-        print(distance_px)
-        print(echelle)
+        # print("verif")
+        # print(distance_px)
+        # print(echelle)
         return round(50*distance_px/echelle,4)
 
     def px10mmListe(distances_px,echelle):
@@ -301,7 +301,7 @@ class Externes():
         array = np.asarray(array)
         idx = (np.abs(array - value)).argmin()
         dist = np.min(np.abs(array - value))
-        print(dist)
+        # print(dist)
         return idx,dist
 
     def openfn():
@@ -367,7 +367,7 @@ class Externes():
         @return texte String : texte affiché sur l'interface
         """
         texte = ""
-        texte += "8 <-> 10 : Longueur Corps : "+str(distance[0])+" mm \n"
+        # texte += "8 <-> 10 : Longueur Corps : "+str(distance[0])+" mm \n"
         # texte += " 13 <-> 15 : Largeur corps : "+str(distance[1])+" mm \n"
         return texte
 
@@ -387,6 +387,16 @@ class Externes():
         @return tuple : point décalé
         """
         return [pt[0]-(eye[0]-25),pt[1]-(eye[1]-50)]
+
+    def centerPoint3(pt,eye):
+        """!
+        Methode pour centrer un point sur l'interface
+        @param pt tuple : point à décaler
+        @return tuple : point décalé
+        """
+        return [pt[0]-(eye[0]-25),pt[1]-(eye[1]-125)]
+
+
 
     def decenterPoint(A,eye):
         """!
@@ -416,6 +426,17 @@ class Externes():
         new_lstpt = []
         for x in lstpt:
             new_lstpt.append(Externes.centerPoint2(x,eye))
+        return new_lstpt
+
+    def centerPoints3(lstpt,eye):
+        """!
+        Methode pour centrer des points sur l'interface
+        @param lstpt tuple : liste de points à décaler
+        @return new_lstpt : liste de points décalés
+        """
+        new_lstpt = []
+        for x in lstpt:
+            new_lstpt.append(Externes.centerPoint3(x,eye))
         return new_lstpt
 
     def projeteOrtho(pente,intercept,xA,yA):
