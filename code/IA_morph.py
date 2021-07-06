@@ -200,7 +200,7 @@ class ML_pointage():
         """!
         Affiche les coordonnées des points prédits du fichier output
         """
-        self.predict(self.path_predict_image,self.path_create_model+"/predictor.dat")
+        self.predict(self.path_predict_image,self.path_create_model+"/predictor.dat","predictor.dat")
         return ML_pointage.xmltolist(self.path_create_model + "/output.xml",num_image_max)
         # try:
         #     self.predict(self.path_predict_image,self.path_create_model+"\\predictor.dat")
@@ -250,9 +250,12 @@ class ML_pointage():
     #     plt.show()
 
     # def ecart_1_train_predict(liste1,liste2):
-    # a = ML_pointage(r"C://Users//MASSON//Desktop//POINTAGe//",r"C:\Users\MASSON\Desktop\POINTAGe\train")
-    # predictTrain = a.listePoints(161)
-#     #truthTrain = ML_pointage.xmltolist(r'C:\Users\MASSON\Desktop\POINTAGe\train.xml',161)
+# a = ML_pointage(r"C://Users//MASSON//Desktop//POINTAGe//",r"C:\Users\MASSON\Desktop\POINTAGe\train")
+# predictTrain = a.listePoints(161)
+# truthTrain = ML_pointage.xmltolist(r'C:\Users\MASSON\Desktop\POINTAGe\train.xml',161)
+#
+#
+#
 # #
 # pt0 = []
 # pt1 = []
@@ -336,37 +339,43 @@ class ML_pointage():
 #     ecart_truth_pred7.append(ecart7)
 #     ecart_truth_pred8.append(ecart8)
 #     ecart_truth_pred9.append(ecart9)
-
+#
 #
 # import seaborn as sns
 # import pandas as pd
+# import matplotlib.pyplot as plt
 # tests = [ecart_truth_pred0,ecart_truth_pred1,ecart_truth_pred2,ecart_truth_pred3,ecart_truth_pred4,ecart_truth_pred5,ecart_truth_pred6,ecart_truth_pred7,ecart_truth_pred8,ecart_truth_pred9]
 # df = pd.DataFrame(tests, index=['pt1','pt2','pt3','pt4','pt5','pt6','pt7','pt8','pt9','pt10'])
 # plt.figure()
-# df.T.boxplot(vert=False,showmeans=True)
-# plt.title("Error Training per landmark")
+# df.T.boxplot(vert=True,showbox=True,showmeans=True,showfliers=False,sym='',whis=50)
+# plt.title("Error (euclidean distance in pixels) per landmark : Training dataset")
 # plt.subplots_adjust(left=0.25)
-# plt.xlim([0,2])
+# plt.ylim([-0.5,5])
 # # plt.show()
+# import matplotlib.lines as mlines
 # plt.figure()
-# ax = sns.boxplot(data=df.T,orient="h",showmeans=True)
-# plt.xlim([0,2])
-# plt.title("Error Training per landmark")
+# triangle = mlines.Line2D([], [], color='green', marker='^', linestyle='None', markersize=5, label='Mean')
+# ax = sns.boxplot(data=df.T,orient="h",showmeans=True,showfliers=False,palette="Blues")
+# plt.plot([], [], '-', linewidth=1, color='Crimson', label='mean')
+# plt.legend(handles=[triangle])
+# plt.xlim([-0.5,3])
+# plt.title("Error (euclidean distance in pixels) per landmark : Training dataset")
 # plt.grid(True)
 # plt.show()
+#
 
 #
 # # ### TESTING
-# #
+# # #
 # a = ML_pointage(r"C://Users//MASSON//Desktop//POINTAGe//",r"C:\Users\MASSON\Desktop\POINTAGe\test")
 # predictTest = a.listePoints(41)
 # truthTest = ML_pointage.xmltolist(r'C:\Users\MASSON\Desktop\POINTAGe\test.xml',41)
-#
 # #
-# # pt0 = []
-# # pt1 = []
-# # pt2 = []
-# # pt3 = []
+# #
+# pt0 = []
+# pt1 = []
+# pt2 = []
+# pt3 = []
 # pt4 = []
 # pt5 = []
 # pt6 = []
@@ -463,15 +472,28 @@ class ML_pointage():
 # plt.title("Error Training per landmark")
 # plt.grid(True)
 # plt.show()
-
-
+#
+#
+# import matplotlib.lines as mlines
+# plt.figure()
+# triangle = mlines.Line2D([], [], color='green', marker='^', linestyle='None', markersize=5, label='Mean')
+# ax = sns.boxplot(data=df.T,orient="h",showmeans=True,showfliers=True,palette="pastel")
+# plt.plot([], [], '-', linewidth=1, color='Crimson', label='mean')
+# plt.legend(handles=[triangle])
+# plt.xlim([-0.5,17])
+# plt.title("Error (euclidean distance in pixels) per landmark : Testing dataset")
+# plt.grid(True)
+# plt.show()
+#
 
 
 # ### export
-#
+# #
 # meanss = [np.median(x) for x in tests]
+# meanss = [np.mean(x) for x in tests]
+#
 # meanss = np.median(meanss)
-# import pandas as pd
+# # import pandas as pd
 # df0 = pd.DataFrame(tests[0]).describe()
 # df1 = pd.DataFrame(tests[1]).describe()
 # df2 = pd.DataFrame(tests[2]).describe()

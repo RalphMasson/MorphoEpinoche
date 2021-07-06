@@ -861,7 +861,11 @@ class Interface(tk.Tk):
         except:
             pathPredictor = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\predictor_head.dat'
         print(pypath2)
-        a = ModelPoints(os.path.join(sys._MEIPASS,''),"")
+        try:
+            a = ModelPoints(os.path.join(sys._MEIPASS,''),"")
+        except:
+            a = ModelPoints(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\',"")
+
         try:
             a.predict(pathimage,os.path.join(sys._MEIPASS,''),"predictor_head.dat")
             print("prediction ok")
@@ -879,24 +883,69 @@ class Interface(tk.Tk):
         """!
             @param pathimage dossier de l'image
         """
-        a = ModelPoints(r"C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\","")
-        a.predict(pathimage,r"C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\predictor.dat","predictor_scale.dat")
-        listepoints = ML.ML_pointage.xmltolistY(r"C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\output.xml",1)
+        try:
+            pathPredictor = os.path.join(sys._MEIPASS, 'predictor_scale.dat')
+            print("chargement modele ok")
+        except:
+            pathPredictor = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\predictor_scale.dat'
+        print(pypath2)
+
+        try:
+            a = ModelPoints(os.path.join(sys._MEIPASS,''),"")
+        except:
+            a = ModelPoints(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\',"")
+
+        try:
+            a.predict(pathimage,os.path.join(sys._MEIPASS,''),"predictor_scale.dat")
+            print("prediction ok")
+        except:
+            a.predict(pathimage,pypath2+"\models\\","predictor_scale.dat")
+
+        try:
+            listepoints = ML.ML_pointage.xmltolistY(pypath2+"\models\\"+"output.xml",1)
+        except:
+            listepoints = ML.ML_pointage.xmltolistY(os.path.join(sys._MEIPASS,"output.xml"),1)
+        print("conversion ok")
+
         return listepoints
 
 
     def Model_Longueur(self,pathimage):
-        a = ModelPoints(r"C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\","")
-        a.predict(pathimage,r"C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\predictor_LS.dat","predictor_LS.dat")
-        listepoints = ML.ML_pointage.xmltolistY(r"C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\output.xml",1)
+
+        try:
+            pathPredictor = os.path.join(sys._MEIPASS, 'predictor_LS.dat')
+            print("chargement modele ok")
+        except:
+            pathPredictor = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\predictor_LS.dat'
+        print(pypath2)
+        try:
+            a = ModelPoints(os.path.join(sys._MEIPASS,''),"")
+        except:
+            a = ModelPoints(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\',"")
+        try:
+            a.predict(pathimage,os.path.join(sys._MEIPASS,''),"predictor_LS.dat")
+            print("prediction ok")
+        except:
+            a.predict(pathimage,pypath2+"\models\\","predictor_LS.dat")
+
+        try:
+            listepoints = ML.ML_pointage.xmltolistY(pypath2+"\models\\"+"output.xml",1)
+        except:
+            listepoints = ML.ML_pointage.xmltolistY(os.path.join(sys._MEIPASS,"output.xml"),1)
+        print("conversion ok")
         return listepoints
+
 
     def Model_Sexage():
         Interface.lenBody = XY_tools.Externes.euclide(Interface.canvasEchelle2.coords(3),Interface.canvasEchelle2.coords(5))
         Interface.allDist(Interface.lenBody)
         from joblib import dump, load
         import pandas as pd
-        clf = load(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\rapports\GBClassifierFinal.joblib')
+        try:
+            clf = load(os.path.join(sys._MEIPASS,"GBClassifierFinal.joblib"))
+        except:
+            clf = load(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\rapports\GBClassifierFinal.joblib')
+
         ae = pd.DataFrame(Interface.modeleDistances).T
         prediction = clf.predict(ae)
         prediction2 = clf.predict_proba(ae)
