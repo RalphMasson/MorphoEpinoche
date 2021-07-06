@@ -717,22 +717,26 @@ class BodyFish():
     img = None
     def __init__(self, canvas1,PIL_image,size):
         BodyFish.img = ImageTk.PhotoImage(PIL_image.resize(size, Image.ANTIALIAS))
-        BodyFish.poisson = canvas1.create_image(0, 0, anchor=tk.NW, image=self.img)
+        BodyFish.poisson = canvas1.create_image(0, 0, anchor=tk.NW, image=BodyFish.img)
 
 class ScaleFish():
     poisson = None
     img = None
     def __init__(self, canvas2,PIL_image,size):
         ScaleFish.img = ImageTk.PhotoImage(PIL_image.resize(size, Image.ANTIALIAS))
-        ScaleFish.poisson = canvas2.create_image(0, 0, anchor=tk.NW, image=self.img)
+        ScaleFish.poisson = canvas2.create_image(0, 0, anchor=tk.NW, image=ScaleFish.img)
         Interface.canvasEchelle.itemconfig(ScaleFish.poisson,state='normal')
         canvas2.move(ScaleFish.poisson,-(ScaleFish.left[0]-25),-(ScaleFish.left[1]-50))
 
 class ScaleFishBody():
     poisson = None
+    img = None
     def __init__(self, canvas3,PIL_image,size):
-        img = ImageTk.PhotoImage(PIL_image.resize(size, Image.ANTIALIAS))
-        ScaleFishBody.poisson = canvas3.create_image(0, 0, anchor=tk.NW, image=img)
+        ScaleFishBody.img = ImageTk.PhotoImage(PIL_image.resize(size, Image.ANTIALIAS))
+        ScaleFishBody.poisson = canvas3.create_image(0, 0, anchor=tk.NW, image=ScaleFishBody.img)
+        Interface.canvasEchelle2.itemconfig(ScaleFishBody.poisson,state='hidden')
+        Interface.canvasEchelle2.move(ScaleFishBody.poisson,-(ScaleFishBody.left[0]-25),-(ScaleFishBody.left[1]-125))
+
 
 ## Import du modèle de détection
 class ModelPoints():
@@ -746,25 +750,10 @@ class ModelPoints():
             Constructeur de la classe
                 Example : a = ModelPoints()
         """
-        self.pointsML = [[0,0]]*10
         ModelPoints.pointsML = ML.ML_pointage(aa,bb)
 
-    def instantiate(self):
-        """!
-            Créer le modèle
-        """
-
-        ModelPoints.path_xml = r"C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho/test_pointage_ML/v2/train.xml"
-        # try:
-        #     ModelPoints.path_xml = os.path.join(sys._MEIPASS,ModelPoints.path_xml)
-        # except Exception:
-        #     ModelPoints.path_xml = r"C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho/test_pointage_ML/v2/train.xml"
-        #
-        # ModelPoints.liste = ML.ML_pointage.xmltolist(ModelPoints.path_xml,0)
-        # print(ModelPoints.liste)
-
-    def predict(self,aa,bb):
-        ModelPoints.pointsML.predict(aa,bb)
+    def predict(self,aa,bb,predictor_name):
+        ModelPoints.pointsML.predict(aa,bb,predictor_name)
 
 ## Interface finale
 
@@ -865,29 +854,41 @@ class Interface(tk.Tk):
             @param pathimage dossier de l'image
         """
 
-        path = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\test_pointage_ML\pointage_cyril\\'
-        path = r'C:\Users\MASSON\Desktop\POINTAGe\\'
-        # sys._MEIPASS
+        # path = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\test_pointage_ML\pointage_cyril\\'
+        try:
+            pathPredictor = os.path.join(sys._MEIPASS, 'predictor_head.dat')
+            print("chargement modele ok")
+        except:
+            pathPredictor = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\predictor_head.dat'
+        print(pypath2)
+        a = ModelPoints(os.path.join(sys._MEIPASS,''),"")
+        try:
+            a.predict(pathimage,os.path.join(sys._MEIPASS,''),"predictor_head.dat")
+            print("prediction ok")
+        except:
+            a.predict(pathimage,pypath2+"\models\\","predictor_head.dat")
 
-        a = ModelPoints(path,"")
-        a.predict(pathimage,path+"predictor.dat")
-        listepoints = ML.ML_pointage.xmltolistY(path+"output.xml",1)
+        try:
+            listepoints = ML.ML_pointage.xmltolistY(pypath2+"\models\\"+"output.xml",1)
+        except:
+            listepoints = ML.ML_pointage.xmltolistY(os.path.join(sys._MEIPASS,"output.xml"),1)
+        print("conversion ok")
         return listepoints
 
     def Model_Echelle(self,pathimage):
         """!
             @param pathimage dossier de l'image
         """
-        a = ModelPoints(r"C:\Users\MASSON\Desktop\pointageEchelle\\","")
-        a.predict(pathimage,r"C:\Users\MASSON\Desktop\pointageEchelle\predictor.dat")
-        listepoints = ML.ML_pointage.xmltolistY(r"C:\Users\MASSON\Desktop\pointageEchelle\output.xml",1)
+        a = ModelPoints(r"C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\","")
+        a.predict(pathimage,r"C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\predictor.dat","predictor_scale.dat")
+        listepoints = ML.ML_pointage.xmltolistY(r"C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\output.xml",1)
         return listepoints
 
 
     def Model_Longueur(self,pathimage):
-        a = ModelPoints(r"C:\Users\MASSON\Desktop\pointageLongueur\\","")
-        a.predict(pathimage,r"C:\Users\MASSON\Desktop\pointageLongueur\predictor.dat")
-        listepoints = ML.ML_pointage.xmltolistY(r"C:\Users\MASSON\Desktop\pointageLongueur\output.xml",1)
+        a = ModelPoints(r"C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\","")
+        a.predict(pathimage,r"C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\predictor_LS.dat","predictor_LS.dat")
+        listepoints = ML.ML_pointage.xmltolistY(r"C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\output.xml",1)
         return listepoints
 
     def Model_Sexage():
@@ -905,14 +906,6 @@ class Interface(tk.Tk):
             app.labelSex.config(text="Femelle")
         if prediction[0]==1:
             app.labelSex.config(text="Male")
-
-
-    def add_entrys(self):
-
-        Interface.sexModele = tk.StringVar(self)
-        self.sexModel = tk.Entry(self,width=3,textvariable=Interface.sexModele)
-        self.sexModel.place(relx=0.52,rely=0.125)
-
 
     def add_canvas(self):
         ''' Canvas pour la tête '''
@@ -1072,7 +1065,6 @@ class Interface(tk.Tk):
         GUI_little.Temp.chemin = pypath3
         self.destroy()
         root = tk.Tk()
-
         GUI_little.app = GUI_little.Interface(root)
         GUI_little.app.pack(side="top", fill="both", expand=True)
         GUI_little.app.mainloop()
@@ -1180,76 +1172,69 @@ class Interface(tk.Tk):
         Méthode permettant de calculer les points et de les disposer sur l'image
         """
 
+        path_global = '/'.join(self.listeImages[self.numImageActuelle].split('/')[:-1])
+        print(path_global)
 
-        #Points de la tête calculés par le modèle 1
-        listePoints = self.Model_Tete('/'.join(self.listeImages[0].split('/')[:-1]))[0]
-        tete = listePoints
+        #Points de la tête
+        points_tete = self.Model_Tete(path_global)[0]
+        points_tete_copy = points_tete
 
         #Oeil du poisson
-        HeadFish.oeilXY = [0.5*(tete[1][0]+tete[2][0]),0.5*(tete[1][1]+tete[2][1])]
+        HeadFish.oeilXY = [0.5*(points_tete_copy[1][0]+points_tete_copy[2][0]),0.5*(points_tete_copy[1][1]+points_tete_copy[2][1])]
 
         #Points de l'échelle calculés par le modèle 2
-        listePoints2 = self.Model_Echelle('/'.join(self.listeImages[0].split('/')[:-1]))[0]
-        listePoints22 = listePoints2
-        ScaleFish.left = listePoints2[0]
+        points_echelle = self.Model_Echelle(path_global)[0]
+        points_echelle_copy = points_echelle
+        ScaleFish.left = points_echelle[0]
+
         #Placement des points de l'echelle au bon endroit
-        pt1,pt2 = listePoints2
-        listePoints2 = XY_tools.Externes.centerPoints2([pt1,pt2],ScaleFish.left)
+        points_echelle = XY_tools.Externes.centerPoints2([points_echelle[0],points_echelle[1]],ScaleFish.left)
         app.labelNomImage.config(text=self.listeImages[self.numImageActuelle])
         app.labelNumImage.config(text=str(self.numImageActuelle+1)+"/"+str(len(self.listeImages)))
 
-        #Lecture de l'image
+        #Image de la tête
         self.ImagePIL = Image.open(self.listeImages[self.numImageActuelle])
         HeadFish(self.canvasTete,self.ImagePIL,cv2.imread(self.listeImages[self.numImageActuelle]),(1920,1440))
 
-        #Ajout de l'image réduite
+        #Image entière
         self.ImagePIL2 = Image.open(self.listeImages[self.numImageActuelle])
         BodyFish(Interface.canvasCorps,self.ImagePIL2,(640,480))
 
-        #Ajout de l'image de la tête
-        # self.pathCorps = self.listeImages[self.numImageActuelle]
-        # self.imgCorpss = ImageTk.PhotoImage(Image.open(self.pathCorps).resize((1920,1440)))
-        # HeadFish.poisson = self.canvasTete.create_image(0, 0, anchor=tk.NW,image=self.imgCorpss)
-        # self.canvasTete.itemconfig(HeadFish.poisson,state='normal')
-        # self.canvasTete.update()
         #Calcul des points du corps
-        listePoints3 = self.Model_Longueur('/'.join(self.listeImages[0].split('/')[:-1]))[0]
+        listePoints3 = self.Model_Longueur(path_global)[0]
         listePoints3 = [[listePoints3[0][0]/3,listePoints3[0][1]/3],[listePoints3[1][0]/3,listePoints3[1][1]/3]]
         corpsStandard = listePoints3
 
         #Ajout de l'echelle
-        corpsStandard.extend([[listePoints22[0][0]/3,listePoints22[0][1]/3],[listePoints22[1][0]/3,listePoints22[1][1]/3]])
+        corpsStandard.extend([[points_echelle_copy[0][0]/3,points_echelle_copy[0][1]/3],[points_echelle_copy[1][0]/3,points_echelle_copy[1][1]/3]])
+
+        #Affichage des points sur l'image entière
         BodyClass(Interface.canvasCorps,corpsStandard,'cyan')
-
-
         Interface.canvasCorps.update()
-        pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19,pt21 = tete
-        tete = XY_tools.Externes.centerPoints([pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19,pt21],HeadFish.oeilXY)
-        HeadClass.pointsEchelle = listePoints2
-        HeadClass(self.canvasTete, tete,'#ff00f2')
 
+        #Affichage des points sur la tête
+        pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19,pt21 = points_tete_copy
+        points_tete_copy = XY_tools.Externes.centerPoints([pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19,pt21],HeadFish.oeilXY)
+        HeadClass.pointsEchelle = points_echelle
+        HeadClass(self.canvasTete, points_tete_copy,'#ff00f2')
         self.canvasTete.update()
-        ImagePIL = Image.open(self.listeImages[self.numImageActuelle])
-        tete2 = listePoints
-        ScaleFish(Interface.canvasEchelle,ImagePIL,(1920,1440))
-        ScaleClass(Interface.canvasEchelle,listePoints2,'#ffffff')
 
+        #Image de l'échelle
+        ImagePIL = Image.open(self.listeImages[self.numImageActuelle])
+        tete2 = points_tete
+        ScaleFish(Interface.canvasEchelle,ImagePIL,(1920,1440))
+        ScaleClass(Interface.canvasEchelle,points_echelle,'#ffffff')
 
         # Calcul des points  du corps Bis
+        points_longueur = self.Model_Longueur('/'.join(self.listeImages[0].split('/')[:-1]))[0]
+        pt1,pt2 = [points_longueur[0][0],points_longueur[0][1]],[points_longueur[1][0],points_longueur[1][1]]
+        ScaleFishBody.left = [points_longueur[0][0],points_longueur[0][1]]
+        points_longueur = XY_tools.Externes.centerPoints3([pt1,pt2],ScaleFishBody.left)
 
-        listePoints3 = self.Model_Longueur('/'.join(self.listeImages[0].split('/')[:-1]))[0]
-        listePoints33 = listePoints3
-        pt1,pt2 = [listePoints3[0][0],listePoints3[0][1]],[listePoints3[1][0],listePoints3[1][1]]
-        ScaleFishBody.left = [listePoints3[0][0],listePoints3[0][1]]
-        listePoints3 = XY_tools.Externes.centerPoints3([pt1,pt2],ScaleFishBody.left)
-
-        self.pathCorps = self.listeImages[self.numImageActuelle]
-        self.imgCorpss = ImageTk.PhotoImage(Image.open(self.pathCorps).resize((1920,1440)))
-        ScaleFishBody.poisson = Interface.canvasEchelle2.create_image(0, 0, anchor=tk.NW,image=self.imgCorpss)
-        Interface.canvasEchelle2.itemconfig(ScaleFishBody.poisson,state='hidden')
-        ScaleClassBody(Interface.canvasEchelle2,listePoints3,'#ffffff')
-        Interface.canvasEchelle2.move(ScaleFishBody.poisson,-(ScaleFishBody.left[0]-25),-(ScaleFishBody.left[1]-125))
-        Interface.canvasEchelle2.update()
+        # Image du corps
+        ImagePIL = Image.open(self.listeImages[self.numImageActuelle])
+        ScaleFishBody(Interface.canvasEchelle2,ImagePIL,(1920,1440))
+        ScaleClassBody(Interface.canvasEchelle2,points_longueur,'#ffffff')
 
 
     def affichePrediction(self):

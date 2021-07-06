@@ -2,7 +2,7 @@
 
 block_cipher = None
 
-added_files = [('C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\images\\logo2.png', '.'),('C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\images\\schema.png', '.'),('C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\test_pointage_ML\\v2\\train.xml', '.')]
+added_files = [('C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\images\\logo2.png', '.'),('C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\images\\schema.png', '.'),('C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\test_pointage_ML\\v2\\train.xml','.'),('C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\models\\predictor_head.dat','.'),('C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\models\\predictor_LS.dat','.'),('C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\models\\predictor_scale.dat','.')]
 
 a = Analysis(['GUI_normal.py'],
              pathex=['C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\code\\GUI_normal.py'],
