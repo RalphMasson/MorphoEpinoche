@@ -41,6 +41,21 @@ clf1 = load(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\SVCClas
 clf2 = load(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\XGBClassifierFinal.joblib')
 
 
+def oneConsensusModel(y_pred):
+    y_consensus = []
+    for i in range(len(y_pred)):
+        y_consensus.append(y_pred[i])
+
+    return y_consensus
+
+def twoConsensusModel(y_pred,y_pred1):
+    y_consensus = []
+    for i in range(len(y_pred)):
+        if (y_pred[i]==y_pred1[i]):
+            y_consensus.append(y_pred[i])
+        else:
+            y_consensus.append(0.5)
+    return y_consensus
 
 def consensusModel(y_pred,y_pred1,y_pred2):
     y_consensus = []
@@ -70,12 +85,14 @@ def print_misclassified(y_consensus,y_test):
 
 missed = []
 undetermined = []
-for i in range(1000):
+for i in range(2000):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1,stratify=y)
     y_pred = clf.predict(X_test)
     y_pred1 = clf1.predict(X_test)
     y_pred2 = clf2.predict(X_test)
-    y_consensus = consensusModel(y_pred,y_pred1,y_pred2)
+    # y_consensus = oneConsensusModel(y_pred)
+    y_consensus = twoConsensusModel(y_pred,y_pred1)
+    # y_consensus = consensusModel(y_pred,y_pred1,y_pred2)
     missed.append(100-print_misclassified(y_consensus,y_test))
     undetermined.append(print_undetermined(y_consensus))
 
@@ -86,6 +103,6 @@ df['% of undetermined individuals']=undetermined
 
 import seaborn as sns
 sns.boxplot(data=df)
-plt.title("Results of consensus model (1000 runs)")
+plt.title("Results of 2nd model (1000 runs)")
 plt.ylim([0,102])
 plt.show()
