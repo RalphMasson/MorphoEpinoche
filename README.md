@@ -26,7 +26,7 @@ Then, they are detected with regression trees according to [1],[2],[3] :
 
 # Distances calculation #
 
-Once points are detected, all combinations of distances and angles are calculated : 
+Once points are detected, collection of 46 distances are calculated : 
 
 <p align="center">
   <img src="https://github.com/RalphMasson/MorphoEpinoche/blob/master/images/illustration2.jpg" width="200" />
