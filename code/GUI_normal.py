@@ -78,7 +78,7 @@ class HeadClass():
         """
         for id in HeadClass.id_polygons:
             liste = canvas.coords(id)
-            if(len(canvas.coords(id))==20):HeadClass.pointsFish=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
+            if(len(liste)==20):HeadClass.pointsFish=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
 
     def on_press_tag(self, event, number, tag):
         """!
@@ -90,7 +90,6 @@ class HeadClass():
         self.selected = tag
         self.previous_x = event.x
         self.previous_y = event.y
-        # print(self.selected,event,tag)
 
     def on_release_tag(self, event, number, tag,canvas):
         """!
@@ -794,11 +793,11 @@ class Interface(tk.Tk):
         message = "Rapport généré le "+datetime.now().strftime("%d/%m/%Y")+" à "+datetime.now().strftime("%H:%M:%S")+"\n"
         message += "# Morphométrie Ineris v"+str(Interface.version)+"\n\n"
         message += "# ML_morph version\n"
-        message += "\t - Algorithme utilisé : \n"
-        message += "\t - Performances : \n\n"
+        message += "\t - Algorithme utilisé : Regression trees (gradient boosting) \n"
+        message += "\t - Performances : erreur de placement moyenne de 4 pixels (0.25% de la longueur standard) \n\n"
         message += "# ML_gender version\n"
-        message += "\t - Algorithmes utilisés : \n"
-        message += "\t - Performances : \n"
+        message += "\t - Algorithmes utilisés : Gradient Boosting, SVM, Random Forest (consensus) \n"
+        message += "\t - Performances : 0.9% \n"
 
         f = open(self.finalname,"a")
         f.write(message)
@@ -812,32 +811,32 @@ class Interface(tk.Tk):
         f.write(message)
         f.close()
 
-    def verbose_points(self):
+    def verbose_points(self,listepoints):
         message = "\n# Coordonnées des points détectés :\n"
+        listepoints = listepoints[0]
         for i in range(1,10):
             message += "\t -"
             for j in range(1,len(self.listeImages)+1):
-                message += "point n°"+str(i)+": X = ... Y = ... \t"
+                message += "point n°"+str(i)+": "+"X = "+str(listepoints[i][0])+" Y = " +str(listepoints[i][1])+"\t"
             message += "\n"
         f = open(self.finalname,"a")
         f.write(message)
         f.close()
 
-    def verbose_distances(self):
+    def verbose_distances(self,df_distance):
         message = "\n# Distances utilisées pour la prédiction du sexe :\n"
-        for i in range(1,10):
-            message += "\t -"
-            for j in range(1,len(self.listeImages)+1):
-                message += "distance n°"+str(i)+"= \t\t\t"
-            message += "\n"
+        for j in range(1,len(self.listeImages)+1):
+            # message += "distance n°"+str(i)+"= \t\t\t"
+            message += df_distance
+        message += "\n"
         f = open(self.finalname,"a")
         f.write(message)
         f.close()
 
-    def verbose_sexe(self):
+    def verbose_sexe(self,text,proba):
         message = "\n# Sexe finalement prédit :\n"
         for i in range(1,len(self.listeImages)+1):
-            message += "\t - image n°"+str(i)+" :  (p=....)\n"
+            message += "\t - image n°"+str(i)+": "+text+"  (p="+str(proba)+"....)\n"
         f = open(self.finalname,"a")
         f.write(message)
         f.close()
@@ -877,6 +876,8 @@ class Interface(tk.Tk):
         except:
             listepoints = ML.ML_pointage.xmltolistY(os.path.join(sys._MEIPASS,"output.xml"),1)
         print("conversion ok")
+        print(listepoints)
+        self.verbose_points(listepoints)
         return listepoints
 
     def Model_Echelle(self,pathimage):
@@ -936,25 +937,42 @@ class Interface(tk.Tk):
         return listepoints
 
 
-    def Model_Sexage():
+    def Model_Sexage(self):
         Interface.lenBody = XY_tools.Externes.euclide(Interface.canvasEchelle2.coords(3),Interface.canvasEchelle2.coords(5))
         Interface.allDist(Interface.lenBody)
         from joblib import dump, load
         import pandas as pd
         try:
             clf = load(os.path.join(sys._MEIPASS,"GBClassifierFinal.joblib"))
+            clf1 = load(os.path.join(sys._MEIPASS,"SVCClassifierFinal.joblib"))
+            clf2 = load(os.path.join(sys._MEIPASS,"XGBClassifierFinal.joblib"))
         except:
-            clf = load(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\rapports\GBClassifierFinal.joblib')
+            clf = load(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\GBClassifierFinal.joblib')
+            clf1 = load(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\SVCClassifierFinal.joblib')
+            clf2 = load(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\XGBClassifierFinal.joblib')
 
+        pd.set_option('display.max_columns', None)
+        pd.set_option('display.expand_frame_repr', False)
+        pd.set_option('max_colwidth', None)
         ae = pd.DataFrame(Interface.modeleDistances).T
         prediction = clf.predict(ae)
-        prediction2 = clf.predict_proba(ae)
-        print(prediction)
-        print(prediction2)
-        if prediction[0]==0:
-            app.labelSex.config(text="Femelle")
-        if prediction[0]==1:
-            app.labelSex.config(text="Male")
+        prediction1 = clf1.predict(ae)
+        prediction2 = clf2.predict(ae)
+        proba = max(clf.predict_proba(ae)[0])
+        listePredictionInt = [clf.predict(ae)[0], clf1.predict(ae)[0], clf2.predict(ae)[0]]
+        listeProba = [list(np.round(clf.predict_proba(ae),4).flatten()), list(np.round(clf1.predict_proba(ae),4).flatten()),list(np.round(clf2.predict_proba(ae),4).flatten())]
+
+        listePredictionStr = ["Femelle" if x==0 else "Male" for x in listePredictionInt]
+        text = ""
+        for i in range(3):
+            print(listePredictionStr[i])
+            text += listePredictionStr[i]+" "+str(listeProba[i][listePredictionInt[i]])+"\n"
+        app.labelSex.config(text = text)
+
+        self.verbose_distances(str(ae))
+        self.verbose_sexe(text,proba)
+        self.verbose_conclusion()
+
 
     def add_canvas(self):
         ''' Canvas pour la tête '''
@@ -998,7 +1016,9 @@ class Interface(tk.Tk):
         self.boutonImport = tk.Button(self,text = "Import images",command = self.importImage,fg='purple')
         self.boutonImport.place(relx=0.25,rely=0.12)
         self.boutonImport.bind('<Control-o>',self.importImage)
-        tk.Button(self,text = "Predict",command = Interface.Model_Sexage,fg='purple').place(relx=0.35,rely=0.12)
+        self.boutonPredict = tk.Button(self,text = "Predict",command = self.Model_Sexage,fg='purple')
+        self.boutonPredict.place(relx=0.35,rely=0.12)
+        self.boutonPredict.bind('<Control-p>',self.Model_Sexage)
         self.boutonPrevious = tk.Button(self,text='<--',fg='red',command = self.previousImage)
         self.boutonPrevious.place(relx=0.38,rely=0.3)
         self.boutonNext = tk.Button(self,text='-->',fg='red',command = self.nextImage)
@@ -1069,8 +1089,8 @@ class Interface(tk.Tk):
         menubar.add_cascade(label="Fichier", menu=menuFichier)
 
         menuOutils = tk.Menu(menubar,tearoff=0)
-        menuOutils.add_command(label="Prédire le sexe",command=Interface.affichePrediction,accelerator="(Ctrl+P)")
-        self.bind_all("<Control-p>",lambda e : Interface.affichePrediction())
+        menuOutils.add_command(label="Prédire le sexe",command=self.Model_Sexage,accelerator="(Ctrl+P)")
+        self.bind_all("<Control-p>",lambda e : self.Model_Sexage())
         menuOutils.add_command(label="Image suivante",command=self.nextImage,accelerator="(Ctrl+Entrée)")
         self.bind_all("<Control-Return>",lambda e : self.nextImage())
         menuOutils.add_command(label="Image précédente",command=self.previousImage,accelerator="(Ctrl+Backspace)")
@@ -1210,10 +1230,10 @@ class Interface(tk.Tk):
         self.resetListeImages()
         self.listeImages = XY_tools.Externes.openfn()
         self.verbose_photo()
-        self.verbose_points()
-        self.verbose_distances()
-        self.verbose_sexe()
-        self.verbose_conclusion()
+        # self.verbose_points()
+        # self.verbose_distances()
+
+        # self.verbose_conclusion()
         self.calculPoints()
 
     def calculPoints(self):

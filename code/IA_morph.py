@@ -364,7 +364,7 @@ class ML_pointage():
 # plt.show()
 #
 
-#
+# #
 # # ### TESTING
 # # #
 # a = ML_pointage(r"C://Users//MASSON//Desktop//POINTAGe//",r"C:\Users\MASSON\Desktop\POINTAGe\test")
@@ -456,22 +456,22 @@ class ML_pointage():
 #     ecart_truth_pred9.append(ecart9)
 # #
 # import matplotlib.pyplot as plt
-# # import seaborn as sns
-# # import pandas as pd
+# import seaborn as sns
+# import pandas as pd
 # tests = [ecart_truth_pred0,ecart_truth_pred1,ecart_truth_pred2,ecart_truth_pred3,ecart_truth_pred4,ecart_truth_pred5,ecart_truth_pred6,ecart_truth_pred7,ecart_truth_pred8,ecart_truth_pred9]
 # df = pd.DataFrame(tests, index=['pt1','pt2','pt3','pt4','pt5','pt6','pt7','pt8','pt9','pt10'])
-# plt.figure()
-# df.T.boxplot(vert=False,showmeans=True)
-# plt.title("Error Training per landmark")
-# plt.subplots_adjust(left=0.25)
-# plt.xlim([0,20])
+# # plt.figure()
+# # df.T.boxplot(vert=False,showmeans=True)
+# # plt.title("Error Training per landmark")
+# # plt.subplots_adjust(left=0.25)
+# # plt.xlim([0,20])
+# # # plt.show()
+# # plt.figure()
+# # ax = sns.boxplot(data=df.T,orient="h",showmeans=True)
+# # plt.xlim([0,20])
+# # plt.title("Error Training per landmark")
+# # plt.grid(True)
 # # plt.show()
-# plt.figure()
-# ax = sns.boxplot(data=df.T,orient="h",showmeans=True)
-# plt.xlim([0,20])
-# plt.title("Error Training per landmark")
-# plt.grid(True)
-# plt.show()
 #
 #
 # import matplotlib.lines as mlines

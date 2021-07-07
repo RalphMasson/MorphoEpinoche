@@ -83,43 +83,71 @@ X_train2, X_test2, y_train2, y_test2 = train_test_split(X2, y, test_size=0.3,str
 # # cv = ShuffleSplit(n_splits=100, test_size=0.2, random_state=0)
 # # plot_learning_curve(clf, "Learning curves", X, y, axes=axes[:, 0], ylim=(0.7, 1.01),cv=cv, n_jobs=4)
 
-
-clf = GradientBoostingClassifier(criterion = "friedman_mse",learning_rate = 0.075,n_estimators=1000,max_depth=5,max_features="sqrt",subsample=0.618,loss="deviance")
-clf.fit(X_train,y_train)
-
-from joblib import dump, load
-dump(clf, r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\rapports\GBClassifierFinal.joblib')
-
-
-
-
-y_pred = clf.predict(X_test)
 #
-print(pd.DataFrame(classification_report(y_test , y_pred, target_names=["femelle","male"],output_dict=True)).transpose()['recall'])
-# # #
-# # # titles_options = [("Normalized confusion matrix", 'true')]
-# # # for title, normalize in titles_options:
-# # #     disp = plot_confusion_matrix(clf, X_test, y_test,
-# # #                                  display_labels=[0,1],
-# # #                                  cmap=plt.cm.Blues,
-# # #                                  normalize=normalize)
-# # #     disp.ax_.set_title(title)
-# # # plt.show()
+# clf = GradientBoostingClassifier(criterion = "friedman_mse",learning_rate = 0.075,n_estimators=1000,max_depth=5,max_features="sqrt",subsample=0.618,loss="deviance")
+# clf.fit(X_train,y_train)
+#
+from joblib import dump, load
+# dump(clf, r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\rapports\GBClassifierFinal.joblib')
+# #
+#
+#
+# clf = load(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\rapports\GBClassifierFinal.joblib')
+#
+# y_pred = clf.predict(X_test)
+# #
+# print(pd.DataFrame(classification_report(y_test , y_pred, target_names=["femelle","male"],output_dict=True)).transpose()['recall'])
+# # # #
+# # # # titles_options = [("Normalized confusion matrix", 'true')]
+# # # # for title, normalize in titles_options:
+# # # #     disp = plot_confusion_matrix(clf, X_test, y_test,
+# # # #                                  display_labels=[0,1],
+# # # #                                  cmap=plt.cm.Blues,
+# # # #                                  normalize=normalize)
+# # # #     disp.ax_.set_title(title)
+# # # # plt.show()
 
 
-clf = GradientBoostingClassifier()
-
-parameters = {
-    "loss":["deviance"],
-    "learning_rate": [0.01, 0.025, 0.05, 0.075, 0.1],
-    "max_depth":[3,5,8],
-    "max_features":["log2","sqrt"],
-    "criterion": ["friedman_mse",  "mae"],
-    "subsample":[0.5, 0.618, 0.95, 1.0],
-    "n_estimators":[200,500,1000]
-    }
-
-grid_search_clf = testIA_sexage.Model.grid_search_wrapper(X_train2,y_train2,clf,parameters,refit_score='recall_score')
-
-
-
+# clf = GradientBoostingClassifier()
+#
+# parameters = {
+#     "loss":["deviance"],
+#     "learning_rate": [0.01, 0.025, 0.05, 0.075, 0.1],
+#     "max_depth":[3,5,8],
+#     "max_features":["log2","sqrt"],
+#     "criterion": ["friedman_mse",  "mae"],
+#     "subsample":[0.5, 0.618, 0.95, 1.0],
+#     "n_estimators":[200,500,1000]
+#     }
+#
+# grid_search_clf = testIA_sexage.Model.grid_search_wrapper(X_train2,y_train2,clf,parameters,refit_score='recall_score')
+#
+#
+#
+# clf_svc = SVC(C=100,gamma=0.01,kernel="poly",probability=True)
+# clf_svc.fit(X_train,y_train)
+#
+# titles_options = [("Normalized confusion matrix", 'true')]
+# for title, normalize in titles_options:
+#     disp = plot_confusion_matrix(clf_svc, X_test, y_test,
+#                                  display_labels=[0,1],
+#                                  cmap=plt.cm.Blues,
+#                                  normalize=normalize)
+#     disp.ax_.set_title(title)
+# plt.show()
+#
+# dump(clf_svc, r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\rapports\SVCClassifierFinal.joblib')
+# import xgboost as xgb
+#
+# xgb_model = xgb.XGBClassifier(objective="binary:logistic", random_state=42, eval_metric="auc",nthread=4)
+# xgb_model.fit(X_train, y_train, early_stopping_rounds=5, eval_set=[(X_test, y_test)])
+# titles_options = [("Normalized confusion matrix", 'true')]
+# for title, normalize in titles_options:
+#     disp = plot_confusion_matrix(xgb_model, X_test, y_test,
+#                                  display_labels=[0,1],
+#                                  cmap=plt.cm.Blues,
+#                                  normalize=normalize)
+#     disp.ax_.set_title(title)
+# plt.show()
+#
+# dump(xgb_model, r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\rapports\XGBClassifierFinal.joblib')
