@@ -191,8 +191,7 @@ class ML_pointage():
         df = utils.utils.dlib_xml_to_pandas(xmlfile)
         col = list(df.columns)
         liste_coord = []
-        for k in range(num_image_max):
-            liste_coord.append([[df[col[i+4]][k],df[col[i+5]][k]] for i in range(0,df.shape[1]-4,2)])
+        liste_coord.append([[df[col[i+4]][num_image_max],df[col[i+5]][num_image_max]] for i in range(0,df.shape[1]-4,2)])
         return liste_coord
 
 

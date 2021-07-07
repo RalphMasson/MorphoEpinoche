@@ -18,6 +18,7 @@ import XY_compute,XY_tools,IA_sexage,GUI_little,GUI_update
 import IA_morph as ML
 from datetime import datetime
 import numpy as np
+import xgboost as xgb
 
 ## Classes pour afficher les points sur les images
 
@@ -813,6 +814,7 @@ class Interface(tk.Tk):
 
     def verbose_points(self,listepoints):
         message = "\n# Coordonnées des points détectés :\n"
+        print(listepoints)
         listepoints = listepoints[0]
         for i in range(1,10):
             message += "\t -"
@@ -870,11 +872,11 @@ class Interface(tk.Tk):
             print("prediction ok")
         except:
             a.predict(pathimage,pypath2+"\models\\","predictor_head.dat")
-
+        print(self.numImageActuelle)
         try:
-            listepoints = ML.ML_pointage.xmltolistY(pypath2+"\models\\"+"output.xml",1)
+            listepoints = ML.ML_pointage.xmltolistY(pypath2+"\models\\"+"output.xml",self.numImageActuelle)
         except:
-            listepoints = ML.ML_pointage.xmltolistY(os.path.join(sys._MEIPASS,"output.xml"),1)
+            listepoints = ML.ML_pointage.xmltolistY(os.path.join(sys._MEIPASS,"output.xml"),self.numImageActuelle)
         print("conversion ok")
         print(listepoints)
         self.verbose_points(listepoints)
@@ -903,9 +905,9 @@ class Interface(tk.Tk):
             a.predict(pathimage,pypath2+"\models\\","predictor_scale.dat")
 
         try:
-            listepoints = ML.ML_pointage.xmltolistY(pypath2+"\models\\"+"output.xml",1)
+            listepoints = ML.ML_pointage.xmltolistY(pypath2+"\models\\"+"output.xml",self.numImageActuelle)
         except:
-            listepoints = ML.ML_pointage.xmltolistY(os.path.join(sys._MEIPASS,"output.xml"),1)
+            listepoints = ML.ML_pointage.xmltolistY(os.path.join(sys._MEIPASS,"output.xml"),self.numImageActuelle)
         print("conversion ok")
 
         return listepoints
@@ -930,9 +932,9 @@ class Interface(tk.Tk):
             a.predict(pathimage,pypath2+"\models\\","predictor_LS.dat")
 
         try:
-            listepoints = ML.ML_pointage.xmltolistY(pypath2+"\models\\"+"output.xml",1)
+            listepoints = ML.ML_pointage.xmltolistY(pypath2+"\models\\"+"output.xml",self.numImageActuelle)
         except:
-            listepoints = ML.ML_pointage.xmltolistY(os.path.join(sys._MEIPASS,"output.xml"),1)
+            listepoints = ML.ML_pointage.xmltolistY(os.path.join(sys._MEIPASS,"output.xml"),self.numImageActuelle)
         print("conversion ok")
         return listepoints
 
@@ -1020,9 +1022,9 @@ class Interface(tk.Tk):
         self.boutonPredict.place(relx=0.35,rely=0.12)
         self.boutonPredict.bind('<Control-p>',self.Model_Sexage)
         self.boutonPrevious = tk.Button(self,text='<--',fg='red',command = self.previousImage)
-        self.boutonPrevious.place(relx=0.38,rely=0.3)
+        self.boutonPrevious.place(relx=0.45,rely=0.12)
         self.boutonNext = tk.Button(self,text='-->',fg='red',command = self.nextImage)
-        self.boutonNext.place(relx=0.40,rely=0.3)
+        self.boutonNext.place(relx=0.5,rely=0.12)
 
         self.buttonBody = tk.Button(self,text="1) Réglage corps", fg='gray', command = self.afficheCorps).place(relx = 0.7,rely=0.6)
         self.buttonBody = tk.Button(self,text="2) Réglage échelle",fg='gray',command = self.hideCorps).place(relx=0.77,rely=0.6)
@@ -1172,7 +1174,7 @@ class Interface(tk.Tk):
         self.labelLongueurBody.config(text="")
         self.labelInfoPoints.config(text="")
         self.labelSex.config(text="")
-        self.canvasTete.delete('all')
+        Interface.canvasTete.delete('all')
         Interface.canvasCorps.delete('all')
         self.labelNomImage.config(text="")
 
@@ -1230,17 +1232,13 @@ class Interface(tk.Tk):
         self.resetListeImages()
         self.listeImages = XY_tools.Externes.openfn()
         self.verbose_photo()
-        # self.verbose_points()
-        # self.verbose_distances()
-
-        # self.verbose_conclusion()
         self.calculPoints()
 
     def calculPoints(self):
         """!
         Méthode permettant de calculer les points et de les disposer sur l'image
         """
-
+        print(self.listeImages[self.numImageActuelle])
         path_global = '/'.join(self.listeImages[self.numImageActuelle].split('/')[:-1])
         print(path_global)
 
@@ -1343,6 +1341,7 @@ class Interface(tk.Tk):
         time.sleep(0.3)
         self.boutonPrevious.configure(state=tk.DISABLED)
         self.boutonNext.configure(state=tk.DISABLED)
+        self.clearAllCanvas()
         self.calculPoints()
         time.sleep(0.3)
         self.boutonPrevious.configure(state=tk.ACTIVE)
