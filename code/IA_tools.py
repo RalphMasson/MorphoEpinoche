@@ -9,8 +9,6 @@ import numpy as np
 import pandas as pd
 import cv2,dlib
 
-#Tools for using previously annotated datasets
-
 class utils():
 
     def read_tps(input):
@@ -48,10 +46,6 @@ class utils():
             if ln.startswith("SCALE"):
                 sc.append(ln.split('=')[1])
         return {'lm': lm, 'im': im, 'scl': sc, 'coords': coords_array}
-    
-    
-    #dlib xml tools
-    
     
     def add_part_element(bbox,num,sz):
         '''
@@ -265,35 +259,25 @@ class utils():
         '''
         extensions = {'.jpg', '.JPG', '.jpeg', '.JPEG', '.tif','.TIF'}
         predictor = dlib.shape_predictor(predictor_name)
-        # print(predictor)
         root = ET.Element('dataset')
         root.append(ET.Element('name'))
         root.append(ET.Element('comment'))
         images_e = ET.Element('images')
         root.append(images_e)
-        # # for f in os.listdir(dir):
-        # #     ff = dir+"\\"+f
-        # #     # print(dir+f)
-        # ext = ntpath.splitext(ff)[1]
-        # if ext in extensions:
-            # print(ff)
         ff = img_path
         path, file = os.path.split(ff)
         img = cv2.imread(ff)
         if img is not None:
             image_e = ET.Element('image')
             image_e.set('file', str(ff))
-            # print(type(img))
             e = (dlib.rectangle(left=1, top=1, right=img.shape[1]-1, bottom=img.shape[0]-1))
             shape = predictor(img, e)
-            # print(shape)
             box = ET.Element('box')
             box.set('top', str(int(1)))
             box.set('left', str(int(1)))
             box.set('width', str(int(img.shape[1]-2)))
             box.set('height', str(int(img.shape[0]-2)))
             part_length = range(0,shape.num_parts) 
-            # print(part_length)
             for item, i in enumerate(sorted(part_length, key=str)):
                 if ignore is not None:
                     if i not in ignore:
@@ -317,7 +301,6 @@ class utils():
             with open(out_file, "w") as ff:
                 ff.write(xmlstr)
     
-    #Importing to pandas tools
     
     def natural_sort_XY(l): 
         '''

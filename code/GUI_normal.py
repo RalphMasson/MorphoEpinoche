@@ -626,13 +626,7 @@ class Interface(tk.Tk):
         f.close()
 
     def verbose_points(self,listepoints):
-        message = "\n# Coordonnées des points détectés :\n"
-        listepoints = listepoints[0]
-        for i in range(1,10):
-            message += "\t -"
-            for j in range(1,len(self.listeImages)+1):
-                message += "point n°"+str(i)+": "+"X = "+str(listepoints[i][0])+" Y = " +str(listepoints[i][1])+"\t"
-            message += "\n"
+        message = XY_tools.Externes.verbose_points(listepoints,self.listeImages)
         f = open(self.finalname,"a")
         f.write(message)
         f.close()
@@ -640,7 +634,6 @@ class Interface(tk.Tk):
     def verbose_distances(self,df_distance):
         message = "\n# Distances utilisées pour la prédiction du sexe :\n"
         for j in range(1,len(self.listeImages)+1):
-            # message += "distance n°"+str(i)+"= \t\t\t"
             message += df_distance
         message += "\n"
         f = open(self.finalname,"a")
@@ -677,7 +670,6 @@ class Interface(tk.Tk):
             a = ModelPoints(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\',"")
             a.predict(pathimage,pypath2+"\models\\","predictor_head.dat")
             listepoints = ML.ML_pointage.xmltolistY(pypath2+"\models\\"+"output.xml",0)
-
 
         self.verbose_points(listepoints)
         return listepoints
@@ -721,50 +713,8 @@ class Interface(tk.Tk):
         print("classification")
         Interface.lenBody = XY_tools.Externes.euclide(Interface.canvasEchelle2.coords(3),Interface.canvasEchelle2.coords(5))
         Interface.allDist(Interface.lenBody)
-        from joblib import dump, load
-        import pandas as pd
-        try:
-            clf = load(os.path.join(sys._MEIPASS,"GBClassifierFinal.joblib"))
-            clf1 = load(os.path.join(sys._MEIPASS,"SVCClassifierFinal.joblib"))
-            clf2 = load(os.path.join(sys._MEIPASS,"XGBClassifierFinal.joblib"))
-        except:
-            clf = load(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\GBClassifierFinal.joblib')
-            clf1 = load(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\SVCClassifierFinal.joblib')
-            clf2 = load(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\XGBClassifierFinal.joblib')
-
-        pd.set_option('display.max_columns', None)
-        pd.set_option('display.expand_frame_repr', False)
-        pd.set_option('max_colwidth', None)
-        ae = pd.DataFrame(Interface.modeleDistances).T
-        prediction = clf.predict(ae)
-        prediction1 = clf1.predict(ae)
-        prediction2 = clf2.predict(ae)
-
-
-        ## Consensus
-        if(prediction==prediction1==prediction2):
-            y_consensus = prediction
-        else:
-            y_consensus = 0.5
-
-        proba = max(clf.predict_proba(ae)[0])
-        listePredictionInt = [clf.predict(ae)[0], clf1.predict(ae)[0], clf2.predict(ae)[0]]
-        listeProba = [list(np.round(clf.predict_proba(ae),4).flatten()), list(np.round(clf1.predict_proba(ae),4).flatten()),list(np.round(clf2.predict_proba(ae),4).flatten())]
-
-        listePredictionStr = ["F" if x==0 else "M" for x in listePredictionInt]
-        if y_consensus==0:
-            consensusStr = "F"
-        if y_consensus==1:
-            consensusStr = "M"
-        if y_consensus==0.5:
-            consensusStr = "Undetermined"
-
-        text = ""
-        for i in range(3):
-            text += listePredictionStr[i]+" "+str(listeProba[i][listePredictionInt[i]])+";"
-        text+="\n\n Sex classification : "+consensusStr
+        text = IA_sexage.Prediction.load_models(Interface.modeleDistances)
         app.labelSex.config(text = text)
-
         self.verbose_distances(str(ae))
         self.verbose_sexe(text,proba)
         self.verbose_conclusion()

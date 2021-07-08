@@ -76,8 +76,6 @@ class Prediction():
         print(self.clf1.score(self.X_test,self.y_test))
         dump(self.clf1, self.path+"modelSVC.joblib")
 
-
-
     def predict(xPredict,modelRF,modelSVC):
         """!
             Load the 2 models of classification and makes the prediction
@@ -103,3 +101,49 @@ class Prediction():
             choice = 1
             p = 1 - p
         return labels[choice],fg,p
+
+    def load_models(modeleDistances):
+        from joblib import dump, load
+        import pandas as pd
+        import numpy as np
+        try:
+            clf = load(os.path.join(sys._MEIPASS,"GBClassifierFinal.joblib"))
+            clf1 = load(os.path.join(sys._MEIPASS,"SVCClassifierFinal.joblib"))
+            clf2 = load(os.path.join(sys._MEIPASS,"XGBClassifierFinal.joblib"))
+        except:
+            clf = load(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\GBClassifierFinal.joblib')
+            clf1 = load(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\SVCClassifierFinal.joblib')
+            clf2 = load(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\XGBClassifierFinal.joblib')
+
+        pd.set_option('display.max_columns', None)
+        pd.set_option('display.expand_frame_repr', False)
+        pd.set_option('max_colwidth', None)
+        ae = pd.DataFrame(modeleDistances).T
+        prediction = clf.predict(ae)
+        prediction1 = clf1.predict(ae)
+        prediction2 = clf2.predict(ae)
+
+
+        # Consensus
+        if(prediction==prediction1==prediction2):
+            y_consensus = prediction
+        else:
+            y_consensus = 0.5
+
+        proba = max(clf.predict_proba(ae)[0])
+        listePredictionInt = [clf.predict(ae)[0], clf1.predict(ae)[0], clf2.predict(ae)[0]]
+        listeProba = [list(np.round(clf.predict_proba(ae),4).flatten()), list(np.round(clf1.predict_proba(ae),4).flatten()),list(np.round(clf2.predict_proba(ae),4).flatten())]
+
+        listePredictionStr = ["F" if x==0 else "M" for x in listePredictionInt]
+        if y_consensus==0:
+            consensusStr = "F"
+        if y_consensus==1:
+            consensusStr = "M"
+        if y_consensus==0.5:
+            consensusStr = "Undetermined"
+
+        text = ""
+        for i in range(3):
+            text += listePredictionStr[i]+" "+str(listeProba[i][listePredictionInt[i]])+";"
+        text+="\n\n Sex classification : "+consensusStr
+        return text
