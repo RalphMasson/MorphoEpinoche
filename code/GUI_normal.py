@@ -53,7 +53,6 @@ class HeadClass():
             HeadClass.id_polygons.append(self.polygon)
             canvas.tag_bind(self.polygon, '<ButtonPress-1>',   lambda event, tag=self.polygon: self.on_press_tag(event, 0, tag))
             canvas.tag_bind(self.polygon, '<ButtonRelease-1>', lambda event, tag=self.polygon: self.on_release_tag(event, 0, tag,canvas))
-            canvas.tag_bind(self.polygon, '<B1-Motion>', lambda event = self.polygon : self.on_move_polygon(event,canvas))
             HeadClass.nodes = []
             self.nonodes = []
             for number, point in enumerate(self.points):
@@ -119,39 +118,8 @@ class HeadClass():
             canvas.coords(self.polygon, coords)
             self.previous_x = event.x
             self.previous_y = event.y
-
-
         HeadClass.update_points(canvas)
         Interface.afficheLongueur()
-    def on_move_polygon(self, event,canvas):
-        """!
-        Methode pour deplacer le polygone entier
-        @param event event : coordonnees de l'item
-        @param number int : numero de l'id
-        @param tag int : numero de l'id
-        """
-        if self.selected:
-            dx = event.x - self.previous_x
-            dy = event.y - self.previous_y
-            # move polygon
-            canvas.move(self.selected, dx, dy)
-            # move red nodes
-            for item,item1 in zip(HeadClass.nodes,self.nonodes):
-                canvas.move(item, dx, dy)
-                canvas.move(item1,dx,dy)
-            # recalculate values in self.points
-            for item in self.points:
-                item[0] += dx
-                item[1] += dy
-            self.previous_x = event.x
-            self.previous_y = event.y
-        HeadClass.update_points(canvas)
-
-    # def genererAllDistancesHead():
-    #     """!
-    #     Methode pour calculer toutes les distances de la tete
-    #     """
-    #     XY_tools.Externes.genererAllDistancesHead(HeadClass.pointsEchelle,HeadClass.pointsFish,Interface.sexModele.get(),pypath3)
 
     def calculDistances():
         """!
@@ -159,7 +127,6 @@ class HeadClass():
         """
         HeadClass.distances_check = XY_tools.Externes.calculDistances(HeadClass.pointsEchelle,HeadClass.pointsFish)
         HeadClass.distances_all = XY_tools.Externes.calculDistancesv2(HeadClass.pointsEchelle, HeadClass.pointsFish)
-        print(HeadClass.distances_all)
         return HeadClass.distances_check
 
 
@@ -171,7 +138,6 @@ class BodyClass():
     distances_check : liste des distances caractéristiques affichées
     distances_all : liste de toutes les distances sauvegardés pour le modèle
     """
-
     id_polygons = []
     pointsFish = []
     pointsEchelle = []
@@ -198,7 +164,6 @@ class BodyClass():
             BodyClass.id_polygons.append(BodyClass.polygon)
             canvas1.tag_bind(BodyClass.polygon, '<ButtonPress-3>',   lambda event, tag=BodyClass.polygon: self.on_press_tag(event, 0, tag,canvas1))
             canvas1.tag_bind(BodyClass.polygon, '<ButtonRelease-3>', lambda event, tag=BodyClass.polygon: self.on_release_tag(event, 0, tag,canvas1))
-            canvas1.tag_bind(BodyClass.polygon, '<B3-Motion>',lambda event = BodyClass.polygon : self.on_move_polygon(event,canvas1))
             BodyClass.nodes = []
             BodyClass.nonodes = []
             for number, point in enumerate(BodyClass.points):
@@ -224,7 +189,6 @@ class BodyClass():
         for id in BodyClass.id_polygons:
             liste = canvas1.coords(id)
             if(len(canvas1.coords(id))==8):BodyClass.pointsFish=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
-
 
     def on_press_tag(self, event, number, tag,canvas1):
         """!
@@ -275,32 +239,6 @@ class BodyClass():
         BodyClass.update_points(canvas1)
         Interface.afficheLongueurBody()
 
-    def on_move_polygon(self, event,canvas1):
-        """!
-        Methode pour deplacer le polygone entier
-        @param event event : coordonnees de l'item
-        @param number int : numero de l'id
-        @param tag int : numero de l'id
-        """
-        if self.selected:
-            dx = event.x - BodyClass.previous_x
-            dy = event.y - BodyClass.previous_y
-            # move polygon
-            canvas1.move(self.selected, dx, dy)
-            # move red nodes
-            for item,item1 in zip(BodyClass.nodes,self.nonodes):
-                canvas1.move(item, dx, dy)
-                canvas1.move(item1,dx,dy)
-            # recalculate values in self.points
-            for item in BodyClass.points:
-                item[0] += dx
-                item[1] += dy
-            BodyClass.previous_x = event.x
-            BodyClass.previous_y = event.y
-
-        BodyClass.update_points(canvas1)
-        Interface.afficheLongueurBody()
-
     def calculDistances():
         """!
         Methode pour calculer certaines distances caractéristiques
@@ -339,7 +277,6 @@ class ScaleClass():
             HeadClass.id_polygons.append(self.polygon)
             canvas2.tag_bind(self.polygon, '<ButtonPress-1>',   lambda event, tag=self.polygon: self.on_press_tag(event, 0, tag))
             canvas2.tag_bind(self.polygon, '<ButtonRelease-1>', lambda event, tag=self.polygon: self.on_release_tag(event, 0, tag,canvas2))
-            canvas2.tag_bind(self.polygon, '<B1-Motion>', lambda event = self.polygon : self.on_move_polygon(event,canvas2))
             self.nodes = []
             self.nonodes = []
             for number, point in enumerate(self.points):
@@ -353,8 +290,6 @@ class ScaleClass():
                 canvas2.tag_bind(node, '<ButtonRelease-1>', lambda event, number=number, tag=node: self.on_release_tag(event, number, tag,canvas2))
                 canvas2.tag_bind(node, '<B1-Motion>', lambda event, number=number: self.on_move_node(event, number,canvas2))
         ScaleClass.update_points(canvas2)
-
-
 
     def update_points(canvas2):
         """!
@@ -442,33 +377,6 @@ class ScaleClass():
 
             app.labelLongueurBody.config(text="Longueur = "+str(round(Interface.lenBody*50/px50mm,3)))
             Interface.allDist(Interface.lenBody)
-
-
-
-        ScaleClass.update_points(canvas2)
-        # Interface.afficheLongueur()
-    def on_move_polygon(self, event,canvas2):
-        """!
-        Methode pour deplacer le polygone entier
-        @param event event : coordonnees de l'item
-        @param number int : numero de l'id
-        @param tag int : numero de l'id
-        """
-        if self.selected:
-            dx = event.x - self.previous_x
-            dy = event.y - self.previous_y
-            # move polygon
-            canvas2.move(self.selected, dx, dy)
-            # move red nodes
-            for item,item1 in zip(self.nodes,self.nonodes):
-                canvas2.move(item, dx, dy)
-                canvas2.move(item1,dx,dy)
-            # recalculate values in self.points
-            for item in self.points:
-                item[0] += dx
-                item[1] += dy
-            self.previous_x = event.x
-            self.previous_y = event.y
         ScaleClass.update_points(canvas2)
 
 
@@ -504,7 +412,6 @@ class ScaleClassBody():
             HeadClass.id_polygons.append(self.polygon)
             canvas3.tag_bind(self.polygon, '<ButtonPress-1>',   lambda event, tag=self.polygon: self.on_press_tag(event, 0, tag))
             canvas3.tag_bind(self.polygon, '<ButtonRelease-1>', lambda event, tag=self.polygon: self.on_release_tag(event, 0, tag,canvas3))
-            canvas3.tag_bind(self.polygon, '<B1-Motion>', lambda event = self.polygon : self.on_move_polygon(event,canvas3))
             self.nodes = []
             self.nonodes = []
             for number, point in enumerate(self.points):
@@ -603,26 +510,6 @@ class ScaleClassBody():
 
 
 
-        ScaleClassBody.update_points(canvas3)
-    def on_move_polygon(self, event,canvas3):
-        """!
-        Methode pour deplacer le polygone entier
-        @param event event : coordonnees de l'item
-        @param number int : numero de l'id
-        @param tag int : numero de l'id
-        """
-        if self.selected:
-            dx = event.x - self.previous_x
-            dy = event.y - self.previous_y
-            canvas3.move(self.selected, dx, dy)
-            for item,item1 in zip(self.nodes,self.nonodes):
-                canvas3.move(item, dx, dy)
-                canvas3.move(item1,dx,dy)
-            for item in self.points:
-                item[0] += dx
-                item[1] += dy
-            self.previous_x = event.x
-            self.previous_y = event.y
         ScaleClassBody.update_points(canvas3)
 
 ## Canvas pour les images
@@ -779,26 +666,19 @@ class Interface(tk.Tk):
         """!
             @param pathimage dossier de l'image
         """
-        print("points tête")
         try:
             pathPredictor = os.path.join(sys._MEIPASS, 'predictor_head.dat')
+            a = ModelPoints(os.path.join(sys._MEIPASS,''),"")
+            a.predict(pathimage,os.path.join(sys._MEIPASS,''),"predictor_head.dat")
+            listepoints = ML.ML_pointage.xmltolistY(os.path.join(sys._MEIPASS,"output.xml"),0)
+
         except:
             pathPredictor = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\predictor_head.dat'
-        try:
-            a = ModelPoints(os.path.join(sys._MEIPASS,''),"")
-        except:
             a = ModelPoints(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\',"")
-        print("load ok")
-        try:
-            a.predict(pathimage,os.path.join(sys._MEIPASS,''),"predictor_head.dat")
-        except:
             a.predict(pathimage,pypath2+"\models\\","predictor_head.dat")
-
-        print("predict ok")
-        try:
             listepoints = ML.ML_pointage.xmltolistY(pypath2+"\models\\"+"output.xml",0)
-        except:
-            listepoints = ML.ML_pointage.xmltolistY(os.path.join(sys._MEIPASS,"output.xml"),0)
+
+
         self.verbose_points(listepoints)
         return listepoints
 
@@ -806,49 +686,34 @@ class Interface(tk.Tk):
         """!
             @param pathimage dossier de l'image
         """
-        print("points echelle")
         try:
             pathPredictor = os.path.join(sys._MEIPASS, 'predictor_scale.dat')
+            a = ModelPoints(os.path.join(sys._MEIPASS,''),"")
+            a.predict(pathimage,os.path.join(sys._MEIPASS,''),"predictor_scale.dat")
+            listepoints = ML.ML_pointage.xmltolistY(os.path.join(sys._MEIPASS,"output.xml"),0)
+
         except:
             pathPredictor = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\predictor_scale.dat'
-
-        try:
-            a = ModelPoints(os.path.join(sys._MEIPASS,''),"")
-        except:
             a = ModelPoints(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\',"")
-
-        try:
-            a.predict(pathimage,os.path.join(sys._MEIPASS,''),"predictor_scale.dat")
-        except:
             a.predict(pathimage,pypath2+"\models\\","predictor_scale.dat")
-
-        try:
             listepoints = ML.ML_pointage.xmltolistY(pypath2+"\models\\"+"output.xml",0)
-        except:
-            listepoints = ML.ML_pointage.xmltolistY(os.path.join(sys._MEIPASS,"output.xml"),0)
 
         return listepoints
 
 
     def Model_Longueur(self,pathimage):
-        print("points longueur")
         try:
             pathPredictor = os.path.join(sys._MEIPASS, 'predictor_LS.dat')
+            a = ModelPoints(os.path.join(sys._MEIPASS,''),"")
+            a.predict(pathimage,os.path.join(sys._MEIPASS,''),"predictor_LS.dat")
+            listepoints = ML.ML_pointage.xmltolistY(os.path.join(sys._MEIPASS,"output.xml"),0)
+
         except:
             pathPredictor = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\predictor_LS.dat'
-        try:
-            a = ModelPoints(os.path.join(sys._MEIPASS,''),"")
-        except:
             a = ModelPoints(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\',"")
-        try:
-            a.predict(pathimage,os.path.join(sys._MEIPASS,''),"predictor_LS.dat")
-        except:
             a.predict(pathimage,pypath2+"\models\\","predictor_LS.dat")
-
-        try:
             listepoints = ML.ML_pointage.xmltolistY(pypath2+"\models\\"+"output.xml",0)
-        except:
-            listepoints = ML.ML_pointage.xmltolistY(os.path.join(sys._MEIPASS,"output.xml"),0)
+
         return listepoints
 
 
