@@ -68,31 +68,6 @@ class Prediction():
         print(self.clf1.score(self.X_test,self.y_test))
         dump(self.clf1, self.path+"modelSVC.joblib")
 
-    def predict(xPredict,modelRF,modelSVC):
-        """!
-            Load the 2 models of classification and makes the prediction
-            @param distances of unknown fish
-            @param modelRF : random forest classifier
-            @param modelSVC : support vector machine classifier
-            @return sex, color, probability
-        """
-
-        if(len(modelRF)!=0):
-            clfRF = load(modelRF)
-            clfSVC = load(modelSVC)
-        from random import randrange,uniform
-        labels = ('Male','Female')
-        # choice = randrange(2)
-        p = uniform(0,1)
-        if(p>0.5):
-            fg='blue'
-            choice = 0
-            p = p
-        if(p<0.5):
-            fg='red'
-            choice = 1
-            p = 1 - p
-        return labels[choice],fg,p
 
     def load_models(modeleDistances):
         from joblib import dump, load
