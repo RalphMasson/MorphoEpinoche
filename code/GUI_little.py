@@ -15,7 +15,7 @@ import IA_morph as ML
 from tkinter import messagebox
 from PIL import Image, ImageTk
 import math,functools,itertools,os,cv2,webbrowser
-import XY_compute,XY_tools,IA_sexage
+import XY_tools,IA_sexage
 import numpy as np
 from datetime import datetime
 
@@ -124,31 +124,7 @@ class HeadClass():
             # print(canvas.coords(self.selected))
             self.previous_x = event.x
             self.previous_y = event.y
-            try:
-                if( (self.selected%25==13) or (self.selected%25==15)):
-                    if(self.selected%25==13):
-                        id13 = self.selected
-                        id11 = id13-2
-                        id15 = id13+2
-                        id17 = id15+2
-                    if(self.selected%25==15):
-                        id15 = self.selected
-                        id13 = id15-2
-                        id11 = id13-2
-                        id17 = id15+2
-                    pt13_image = [canvas.coords(id13)[0]+3,canvas.coords(id13)[1]+3]
-                    pt15_image = [canvas.coords(id15)[0]+3,canvas.coords(id15)[1]+3]
-                    pt13_calcul = XY_tools.Externes.decenterPoint(pt13_image,HeadFish.centreOeil)
-                    pt15_calcul = XY_tools.Externes.decenterPoint(pt15_image,HeadFish.centreOeil)
-                    pt17,pt11 = XY_compute.Points.points11_17(HeadFish.CV2_image_big,pt13_calcul,pt15_calcul)
-                    pt11_old = [canvas.coords(id11)[0]+3,canvas.coords(id11)[1]+3]
-                    pt17_old = [canvas.coords(id17)[0]+3,canvas.coords(id17)[1]+3]
-                    pt11,pt17 = XY_compute.Points.centerPoints([pt11,pt17],HeadFish.centreOeil)
-                    canvas.move(id11,pt11[0]-pt11_old[0],pt11[1]-pt11_old[1])
-                    canvas.move(id17,pt17[0]-pt17_old[0],pt17[1]-pt17_old[1])
-                    canvas.update()
-            except:
-                None
+
 
 
         HeadClass.update_points(canvas)
