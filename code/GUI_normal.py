@@ -13,8 +13,8 @@ sys.path.insert(0,pypath1)
 import tkinter as tk
 from tkinter import messagebox
 from PIL import Image, ImageTk
-import math,functools,itertools,os,cv2,webbrowser,random,string
-import XY_compute,XY_tools,IA_sexage,GUI_little,GUI_update
+import math,os,cv2,webbrowser
+import XY_tools,IA_sexage,GUI_little,GUI_update
 import IA_morph as ML
 from datetime import datetime
 import numpy as np
@@ -54,21 +54,20 @@ class HeadClass():
             canvas.tag_bind(self.polygon, '<ButtonPress-1>',   lambda event, tag=self.polygon: self.on_press_tag(event, 0, tag))
             canvas.tag_bind(self.polygon, '<ButtonRelease-1>', lambda event, tag=self.polygon: self.on_release_tag(event, 0, tag,canvas))
             canvas.tag_bind(self.polygon, '<B1-Motion>', lambda event = self.polygon : self.on_move_polygon(event,canvas))
-            self.nodes = []
+            HeadClass.nodes = []
             self.nonodes = []
             for number, point in enumerate(self.points):
                 x, y = point
                 node = canvas.create_rectangle((x-3, y-3, x+3, y+3), fill=color)
                 label = canvas.create_text((x+15, y+6),text=str(listenode[num]),font=("Purisa", 12),fill='purple')
                 num+=1
-                self.nodes.append(node)
+                HeadClass.nodes.append(node)
                 self.nonodes.append(label)
                 canvas.tag_bind(node, '<ButtonPress-1>',   lambda event, number=number, tag=node: self.on_press_tag(event, number, tag))
                 canvas.tag_bind(node, '<ButtonRelease-1>', lambda event, number=number, tag=node: self.on_release_tag(event, number, tag,canvas))
                 canvas.tag_bind(node, '<B1-Motion>', lambda event, number=number: self.on_move_node(event, number,canvas))
 
         HeadClass.update_points(canvas)
-
         if(len(HeadClass.pointsEchelle)>0):
              Interface.afficheLongueur()
 
@@ -113,38 +112,14 @@ class HeadClass():
             dx = event.x - self.previous_x
             dy = event.y - self.previous_y
             canvas.move(self.selected, dx, dy)
-            canvas.move(self.nonodes[self.nodes.index(self.selected)],dx,dy)
+            canvas.move(self.nonodes[HeadClass.nodes.index(self.selected)],dx,dy)
             self.points[number][0] += dx
             self.points[number][1] += dy
             coords = sum(self.points, [])
             canvas.coords(self.polygon, coords)
             self.previous_x = event.x
             self.previous_y = event.y
-            try:
-                if( (self.selected%25==13) or (self.selected%25==15)):
-                    if(self.selected%25==13):
-                        id13 = self.selected
-                        id11 = id13-2
-                        id15 = id13+2
-                        id17 = id15+2
-                    if(self.selected%25==15):
-                        id15 = self.selected
-                        id13 = id15-2
-                        id11 = id13-2
-                        id17 = id15+2
-                    pt13_image = [canvas.coords(id13)[0]+3,canvas.coords(id13)[1]+3]
-                    pt15_image = [canvas.coords(id15)[0]+3,canvas.coords(id15)[1]+3]
-                    pt13_calcul = XY_tools.Externes.decenterPoint(pt13_image,HeadFish.centreOeil)
-                    pt15_calcul = XY_tools.Externes.decenterPoint(pt15_image,HeadFish.centreOeil)
-                    pt17,pt11 = XY_compute.Points.points11_17(HeadFish.CV2_image_big,pt13_calcul,pt15_calcul)
-                    pt11_old = [canvas.coords(id11)[0]+3,canvas.coords(id11)[1]+3]
-                    pt17_old = [canvas.coords(id17)[0]+3,canvas.coords(id17)[1]+3]
-                    pt11,pt17 = XY_tools.Externes.centerPoints([pt11,pt17],HeadFish.centreOeil)
-                    canvas.move(id11,pt11[0]-pt11_old[0],pt11[1]-pt11_old[1])
-                    canvas.move(id17,pt17[0]-pt17_old[0],pt17[1]-pt17_old[1])
-                    canvas.update()
-            except:
-                None
+
 
         HeadClass.update_points(canvas)
         Interface.afficheLongueur()
@@ -161,7 +136,7 @@ class HeadClass():
             # move polygon
             canvas.move(self.selected, dx, dy)
             # move red nodes
-            for item,item1 in zip(self.nodes,self.nonodes):
+            for item,item1 in zip(HeadClass.nodes,self.nonodes):
                 canvas.move(item, dx, dy)
                 canvas.move(item1,dx,dy)
             # recalculate values in self.points
@@ -172,17 +147,19 @@ class HeadClass():
             self.previous_y = event.y
         HeadClass.update_points(canvas)
 
-    def genererAllDistancesHead():
-        """!
-        Methode pour calculer toutes les distances de la tete
-        """
-        XY_tools.Externes.genererAllDistancesHead(HeadClass.pointsEchelle,HeadClass.pointsFish,Interface.sexModele.get(),pypath3)
+    # def genererAllDistancesHead():
+    #     """!
+    #     Methode pour calculer toutes les distances de la tete
+    #     """
+    #     XY_tools.Externes.genererAllDistancesHead(HeadClass.pointsEchelle,HeadClass.pointsFish,Interface.sexModele.get(),pypath3)
 
     def calculDistances():
         """!
         Methode pour calculer certaines distances caractéristiques
         """
         HeadClass.distances_check = XY_tools.Externes.calculDistances(HeadClass.pointsEchelle,HeadClass.pointsFish)
+        HeadClass.distances_all = XY_tools.Externes.calculDistancesv2(HeadClass.pointsEchelle, HeadClass.pointsFish)
+        print(HeadClass.distances_all)
         return HeadClass.distances_check
 
 
@@ -465,33 +442,7 @@ class ScaleClass():
 
             app.labelLongueurBody.config(text="Longueur = "+str(round(Interface.lenBody*50/px50mm,3)))
             Interface.allDist(Interface.lenBody)
-            try:
-                if( (self.selected%25==13) or (self.selected%25==15)):
-                    if(self.selected%25==13):
-                        id13 = self.selected
-                        id11 = id13-2
-                        id15 = id13+2
-                        id17 = id15+2
-                    if(self.selected%25==15):
-                        id15 = self.selected
-                        id13 = id15-2
-                        id11 = id13-2
-                        id17 = id15+2
-                    pt13_image = [canvas2.coords(id13)[0]+3,canvas2.coords(id13)[1]+3]
-                    pt15_image = [canvas2.coords(id15)[0]+3,canvas2.coords(id15)[1]+3]
-                    pt13_calcul = XY_tools.Externes.decenterPoint(pt13_image,HeadFish.centreOeil)
-                    pt15_calcul = XY_tools.Externes.decenterPoint(pt15_image,HeadFish.centreOeil)
-                    pt17,pt11 = XY_compute.Points.points11_17(HeadFish.CV2_image_big,pt13_calcul,pt15_calcul)
-                    pt11_old = [canvas2.coords(id11)[0]+3,canvas2.coords(id11)[1]+3]
-                    pt17_old = [canvas2.coords(id17)[0]+3,canvas2.coords(id17)[1]+3]
-                    pt11,pt17 = XY_tools.Externes.centerPoints([pt11,pt17],HeadFish.centreOeil)
-                    canvas2.move(id11,pt11[0]-pt11_old[0],pt11[1]-pt11_old[1])
-                    canvas2.move(id17,pt17[0]-pt17_old[0],pt17[1]-pt17_old[1])
-                    canvas2.update()
-                # canvas1.move()
 
-            except:
-                None
 
 
         ScaleClass.update_points(canvas2)
@@ -649,32 +600,7 @@ class ScaleClassBody():
                 BodyClass.previous_y = event.y
                 BodyClass.update_points(Interface.canvasCorps)
                 Interface.afficheLongueurBody()
-            try:
-                if( (self.selected%25==13) or (self.selected%25==15)):
-                    if(self.selected%25==13):
-                        id13 = self.selected
-                        id11 = id13-2
-                        id15 = id13+2
-                        id17 = id15+2
-                    if(self.selected%25==15):
-                        id15 = self.selected
-                        id13 = id15-2
-                        id11 = id13-2
-                        id17 = id15+2
-                    pt13_image = [canvas3.coords(id13)[0]+3,canvas3.coords(id13)[1]+3]
-                    pt15_image = [canvas3.coords(id15)[0]+3,canvas3.coords(id15)[1]+3]
-                    pt13_calcul = XY_tools.Externes.decenterPoint(pt13_image,HeadFish.centreOeil)
-                    pt15_calcul = XY_tools.Externes.decenterPoint(pt15_image,HeadFish.centreOeil)
-                    pt17,pt11 = XY_compute.Points.points11_17(HeadFish.CV2_image_big,pt13_calcul,pt15_calcul)
-                    pt11_old = [canvas3.coords(id11)[0]+3,canvas3.coords(id11)[1]+3]
-                    pt17_old = [canvas3.coords(id17)[0]+3,canvas3.coords(id17)[1]+3]
-                    pt11,pt17 = XY_tools.Externes.centerPoints([pt11,pt17],HeadFish.centreOeil)
-                    canvas3.move(id11,pt11[0]-pt11_old[0],pt11[1]-pt11_old[1])
-                    canvas3.move(id17,pt17[0]-pt17_old[0],pt17[1]-pt17_old[1])
-                    canvas3.update()
 
-            except:
-                None
 
 
         ScaleClassBody.update_points(canvas3)
@@ -752,8 +678,8 @@ class ModelPoints():
         """
         ModelPoints.pointsML = ML.ML_pointage(aa,bb)
 
-    def predict(self,aa,bb,predictor_name):
-        ModelPoints.pointsML.predict(aa,bb,predictor_name)
+    def predict(self,path_newimage,predictor_path,predictor_name):
+        ModelPoints.pointsML.predict(path_newimage,predictor_path,predictor_name)
 
 ## Interface finale
 
@@ -814,7 +740,6 @@ class Interface(tk.Tk):
 
     def verbose_points(self,listepoints):
         message = "\n# Coordonnées des points détectés :\n"
-        print(listepoints)
         listepoints = listepoints[0]
         for i in range(1,10):
             message += "\t -"
@@ -854,31 +779,26 @@ class Interface(tk.Tk):
         """!
             @param pathimage dossier de l'image
         """
-
-        # path = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\test_pointage_ML\pointage_cyril\\'
+        print("points tête")
         try:
             pathPredictor = os.path.join(sys._MEIPASS, 'predictor_head.dat')
-            print("chargement modele ok")
         except:
             pathPredictor = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\predictor_head.dat'
-        print(pypath2)
         try:
             a = ModelPoints(os.path.join(sys._MEIPASS,''),"")
         except:
             a = ModelPoints(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\',"")
-
+        print("load ok")
         try:
             a.predict(pathimage,os.path.join(sys._MEIPASS,''),"predictor_head.dat")
-            print("prediction ok")
         except:
             a.predict(pathimage,pypath2+"\models\\","predictor_head.dat")
-        print(self.numImageActuelle)
+
+        print("predict ok")
         try:
-            listepoints = ML.ML_pointage.xmltolistY(pypath2+"\models\\"+"output.xml",self.numImageActuelle)
+            listepoints = ML.ML_pointage.xmltolistY(pypath2+"\models\\"+"output.xml",0)
         except:
-            listepoints = ML.ML_pointage.xmltolistY(os.path.join(sys._MEIPASS,"output.xml"),self.numImageActuelle)
-        print("conversion ok")
-        print(listepoints)
+            listepoints = ML.ML_pointage.xmltolistY(os.path.join(sys._MEIPASS,"output.xml"),0)
         self.verbose_points(listepoints)
         return listepoints
 
@@ -886,12 +806,11 @@ class Interface(tk.Tk):
         """!
             @param pathimage dossier de l'image
         """
+        print("points echelle")
         try:
             pathPredictor = os.path.join(sys._MEIPASS, 'predictor_scale.dat')
-            print("chargement modele ok")
         except:
             pathPredictor = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\predictor_scale.dat'
-        print(pypath2)
 
         try:
             a = ModelPoints(os.path.join(sys._MEIPASS,''),"")
@@ -900,46 +819,41 @@ class Interface(tk.Tk):
 
         try:
             a.predict(pathimage,os.path.join(sys._MEIPASS,''),"predictor_scale.dat")
-            print("prediction ok")
         except:
             a.predict(pathimage,pypath2+"\models\\","predictor_scale.dat")
 
         try:
-            listepoints = ML.ML_pointage.xmltolistY(pypath2+"\models\\"+"output.xml",self.numImageActuelle)
+            listepoints = ML.ML_pointage.xmltolistY(pypath2+"\models\\"+"output.xml",0)
         except:
-            listepoints = ML.ML_pointage.xmltolistY(os.path.join(sys._MEIPASS,"output.xml"),self.numImageActuelle)
-        print("conversion ok")
+            listepoints = ML.ML_pointage.xmltolistY(os.path.join(sys._MEIPASS,"output.xml"),0)
 
         return listepoints
 
 
     def Model_Longueur(self,pathimage):
-
+        print("points longueur")
         try:
             pathPredictor = os.path.join(sys._MEIPASS, 'predictor_LS.dat')
-            print("chargement modele ok")
         except:
             pathPredictor = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\predictor_LS.dat'
-        print(pypath2)
         try:
             a = ModelPoints(os.path.join(sys._MEIPASS,''),"")
         except:
             a = ModelPoints(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\',"")
         try:
             a.predict(pathimage,os.path.join(sys._MEIPASS,''),"predictor_LS.dat")
-            print("prediction ok")
         except:
             a.predict(pathimage,pypath2+"\models\\","predictor_LS.dat")
 
         try:
-            listepoints = ML.ML_pointage.xmltolistY(pypath2+"\models\\"+"output.xml",self.numImageActuelle)
+            listepoints = ML.ML_pointage.xmltolistY(pypath2+"\models\\"+"output.xml",0)
         except:
-            listepoints = ML.ML_pointage.xmltolistY(os.path.join(sys._MEIPASS,"output.xml"),self.numImageActuelle)
-        print("conversion ok")
+            listepoints = ML.ML_pointage.xmltolistY(os.path.join(sys._MEIPASS,"output.xml"),0)
         return listepoints
 
 
     def Model_Sexage(self):
+        print("classification")
         Interface.lenBody = XY_tools.Externes.euclide(Interface.canvasEchelle2.coords(3),Interface.canvasEchelle2.coords(5))
         Interface.allDist(Interface.lenBody)
         from joblib import dump, load
@@ -960,15 +874,30 @@ class Interface(tk.Tk):
         prediction = clf.predict(ae)
         prediction1 = clf1.predict(ae)
         prediction2 = clf2.predict(ae)
+
+
+        ## Consensus
+        if(prediction==prediction1==prediction2):
+            y_consensus = prediction
+        else:
+            y_consensus = 0.5
+
         proba = max(clf.predict_proba(ae)[0])
         listePredictionInt = [clf.predict(ae)[0], clf1.predict(ae)[0], clf2.predict(ae)[0]]
         listeProba = [list(np.round(clf.predict_proba(ae),4).flatten()), list(np.round(clf1.predict_proba(ae),4).flatten()),list(np.round(clf2.predict_proba(ae),4).flatten())]
 
-        listePredictionStr = ["Femelle" if x==0 else "Male" for x in listePredictionInt]
+        listePredictionStr = ["F" if x==0 else "M" for x in listePredictionInt]
+        if y_consensus==0:
+            consensusStr = "F"
+        if y_consensus==1:
+            consensusStr = "M"
+        if y_consensus==0.5:
+            consensusStr = "Undetermined"
+
         text = ""
         for i in range(3):
-            print(listePredictionStr[i])
-            text += listePredictionStr[i]+" "+str(listeProba[i][listePredictionInt[i]])+"\n"
+            text += listePredictionStr[i]+" "+str(listeProba[i][listePredictionInt[i]])+";"
+        text+="\n\n Sex classification : "+consensusStr
         app.labelSex.config(text = text)
 
         self.verbose_distances(str(ae))
@@ -1052,7 +981,7 @@ class Interface(tk.Tk):
         tk.Label(self,text="\n \n \n \n ").grid(column=0,row=1)
 
         self.labelSex = tk.Label(self,text="")
-        self.labelSex.place(relx=0.45,rely=0.12)
+        self.labelSex.place(relx=0.55,rely=0.12)
 
         self.labelInfoPoints = tk.Label(self,text="",font=("Purisa",11),fg='gray')
         self.labelInfoPoints.place(relx=0.1,rely=0.975)
@@ -1066,13 +995,13 @@ class Interface(tk.Tk):
         self.labelNomImage.place(relx=0.4,rely=0.975)
 
         ''' Labels pour les longueurs de la tête '''
-        tk.Label(self,text="Longueurs caractéristiques de la tête : \n",justify=tk.LEFT,font=("Purisa",8,"bold","underline")).place(relx=.7,rely=.38)
+        # tk.Label(self,text="Longueurs caractéristiques de la tête : \n",justify=tk.LEFT,font=("Purisa",8,"bold","underline")).place(relx=.7,rely=.38)
         tk.Label(self,text="\n",justify=tk.LEFT,font=("Purisa",8,"bold","underline")).grid(column=2,row=4)
         self.labelLongueur = tk.Label(self,text="",justify=tk.LEFT)
         self.labelLongueur.place(relx=0.7,rely=0.42)
 
         ''' Labels pour les longueurs du corps '''
-        tk.Label(self,text="Longueurs caractéristiques du corps : \n",justify=tk.LEFT,font=("Purisa",8,"bold","underline")).place(relx=.7,rely=.25)
+        # tk.Label(self,text="Longueurs caractéristiques du corps : \n",justify=tk.LEFT,font=("Purisa",8,"bold","underline")).place(relx=.7,rely=.25)
         self.labelLongueurBody = tk.Label(self,text="",justify=tk.LEFT)
         self.labelLongueurBody.place(relx = .7,rely=.3)
 
@@ -1150,13 +1079,15 @@ class Interface(tk.Tk):
         """!
         Méthode permettant de mettre à jour l'affichage des longueurs dans l'interface
         """
-        app.labelLongueur.config(text=XY_tools.Externes.Longueur(HeadClass.calculDistances()))
+        HeadClass.calculDistances()
+        # app.labelLongueur.config(text=XY_tools.Externes.Longueur(HeadClass.calculDistances()))
 
     def afficheLongueurBody():
         """!
         Méthode permettant de mettre à jour l'affichage des longueurs du corps dans l'interface
         """
-        app.labelLongueurBody.config(text=XY_tools.Externes.LongueurBody(BodyClass.calculDistances()))
+        BodyClass.calculDistances()
+        # app.labelLongueurBody.config(text=XY_tools.Externes.LongueurBody(BodyClass.calculDistances()))
 
     def clearAllCanvas(self):
         """!
@@ -1210,15 +1141,27 @@ class Interface(tk.Tk):
 
     def allDist(lenBody):
         listepoints = []
-        for i in range(3,22,2):
+        # print(HeadClass.nodes)
+        for i in HeadClass.nodes:
+            # print(Interface.canvasTete)
+            # print(Interface.canvasTete.coords(i))
+            # print(Interface.canvasTete.coords(i)[0]+3)
+            # print(Interface.canvasTete.coords(i)[1]+3)
             listepoints.append([Interface.canvasTete.coords(i)[0]+3,Interface.canvasTete.coords(i)[1]+3])
         px50mm = XY_tools.Externes.euclide(Interface.canvasEchelle.coords(3),Interface.canvasEchelle.coords(5))
-        listedistances = XY_tools.Externes.calculDistancesv2(listepoints)
+        # listedistances = XY_tools.Externes.calculDistancesv2(listepoints)
+
         listedistances2 = []
-        print(lenBody)
+        # print(lenBody)
         listedistances2.append(round(lenBody*50/px50mm,5))
-        for x in listedistances:
-            listedistances2.append(round(x*50/px50mm,5))
+        # print("LS")
+        # print(round(lenBody*50/px50mm,5))
+        # for x in listedistances:
+        #     listedistances2.append(round(x*50/px50mm,5))
+        #     # print(round(x*50/px50mm,5))
+        # print(listedistances2[10])
+        for x in HeadClass.distances_all:
+            listedistances2.append(x)
         Interface.modeleDistances = listedistances2
 
     def correctListPoint(self,liste4cord):
@@ -1238,19 +1181,22 @@ class Interface(tk.Tk):
         """!
         Méthode permettant de calculer les points et de les disposer sur l'image
         """
+        print("\n liste images selectionnées")
+        print(self.listeImages)
+        print("\n image actuelle")
         print(self.listeImages[self.numImageActuelle])
+        print("\n")
         path_global = '/'.join(self.listeImages[self.numImageActuelle].split('/')[:-1])
-        print(path_global)
 
         #Points de la tête
-        points_tete = self.Model_Tete(path_global)[0]
+        points_tete = self.Model_Tete(self.listeImages[self.numImageActuelle])[0]
         points_tete_copy = points_tete
 
         #Oeil du poisson
         HeadFish.oeilXY = [0.5*(points_tete_copy[1][0]+points_tete_copy[2][0]),0.5*(points_tete_copy[1][1]+points_tete_copy[2][1])]
 
         #Points de l'échelle calculés par le modèle 2
-        points_echelle = self.Model_Echelle(path_global)[0]
+        points_echelle = self.Model_Echelle(self.listeImages[self.numImageActuelle])[0]
         points_echelle_copy = points_echelle
         ScaleFish.left = points_echelle[0]
 
@@ -1268,7 +1214,7 @@ class Interface(tk.Tk):
         BodyFish(Interface.canvasCorps,self.ImagePIL2,(640,480))
 
         #Calcul des points du corps
-        listePoints3 = self.Model_Longueur(path_global)[0]
+        listePoints3 = self.Model_Longueur(self.listeImages[self.numImageActuelle])[0]
         listePoints3 = [[listePoints3[0][0]/3,listePoints3[0][1]/3],[listePoints3[1][0]/3,listePoints3[1][1]/3]]
         corpsStandard = listePoints3
 

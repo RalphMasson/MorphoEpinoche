@@ -160,14 +160,14 @@ class ML_pointage():
         """
         print("Testing error (average pixel deviation): {}".format(dlib.test_shape_predictor(testfolder_path,self.path_create_model+"predictor.dat")))
 
-    def predict(self,foldernewimage,predictor_path,predictor_name):
+    def predict(self,path_newimage,predictor_path,predictor_name):
         """!
         Prédit les points d'une image
         @param foldernewimage : dossier avec l'image à prédire
         @param predictor_path : "C:\\.....\\predictor.dat"
         @param predictor_name : default predictor.dat
         """
-        utils.utils.predictions_to_xml(self.path_create_model+predictor_name, dir=foldernewimage,ignore=None,out_file=self.path_create_model+"output.xml")
+        utils.utils.predictions_to_xml(self.path_create_model+predictor_name, img_path=path_newimage,ignore=None,out_file=self.path_create_model+"output.xml")
         self.base_points = utils.utils.dlib_xml_to_pandas(self.path_create_model + "output.xml")
 
         return self.base_points

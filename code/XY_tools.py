@@ -73,22 +73,22 @@ class Externes():
         from functools import partial
         return [partial(Externes.reorder_from_idx, i) for i in range(len(a))]
 
-    def allPointsAngles():
-        """!
-        Methode pour les combinaisons des points pour les distances (2 pts) et angles (3 pts)
-        @return listeDistance,listeAngle: liste des indices des points
-        """
-        from itertools import combinations,permutations,combinations_with_replacement
-        atest = list(combinations([i for i in range(9)],3))
-        listeCombinaisonsAngle = []
-
-        for a in atest:
-            result = Externes.cyclic_perm(a)
-            for x in range(len(a)):
-                listeCombinaisonsAngle.append(result[x](a))
-
-        listeCombinaisonsDistance = list(combinations([i for i in range(9)],2))
-        return listeCombinaisonsDistance,listeCombinaisonsAngle
+    # def allPointsAngles():
+    #     """!
+    #     Methode pour les combinaisons des points pour les distances (2 pts) et angles (3 pts)
+    #     @return listeDistance,listeAngle: liste des indices des points
+    #     """
+    #     from itertools import combinations,permutations,combinations_with_replacement
+    #     atest = list(combinations([i for i in range(9)],3))
+    #     listeCombinaisonsAngle = []
+    #
+    #     for a in atest:
+    #         result = Externes.cyclic_perm(a)
+    #         for x in range(len(a)):
+    #             listeCombinaisonsAngle.append(result[x](a))
+    #
+    #     listeCombinaisonsDistance = list(combinations([i for i in range(9)],2))
+    #     return listeCombinaisonsDistance,listeCombinaisonsAngle
 
     def px3mm(distance_px,echelle):
         """!
@@ -135,117 +135,117 @@ class Externes():
             distances.append(Externes.px10mm(x,echelle))
         return distances
 
-    def genererAllDistancesHead(ptsEchelle,ptsFish,sex,chemin):
-        """!
-        Methode pour generer les distances et angles de la tete et remplir le fichier csv
-        @param ptsEchelle list of tuple : liste des points de l'echelle
-        @param ptsFish list of tuple : liste des points de la tête
-        @param sex char : F ou M
-        @param chemin String : chemin du fichier csv
-        """
-        import numpy as np
-        import time,os
-        from win32com.client import Dispatch
-        from tkinter import messagebox
-        import tkinter as tk
-
-
-        if(len(ptsEchelle)==0 or len(ptsFish)==0):
-            tk.messagebox.showwarning(title="Attention",message="Importer une image")
-
-        elif(sex==''):
-            tk.messagebox.showwarning(title="Attention",message="Renseigner un sexe avant de mettre à jour le modèle")
-
-
-        elif(sex=='F' or sex=='M'):
-            distances_all = []
-            listeCombinaisonsDistance,listeCombinaisonsAngle = Externes.allPointsAngles()
-            pt22 = ptsEchelle[0]
-            pt24 = ptsEchelle[1]
-            if(sex=='F'):sex=0
-            if(sex=='M'):sex=1
-
-            distances_all.append(sex)
-            echelle3mm_px = Externes.euclide(pt22,pt24)
-            for x in listeCombinaisonsDistance:
-                distpx = Externes.euclide(ptsFish[x[0]],ptsFish[x[1]])
-                distmm = round(3*distpx/echelle3mm_px,4)
-                distances_all.append(distmm)
-            for x in listeCombinaisonsAngle:
-                thetas = Externes.calculAngle(ptsFish[x[0]],ptsFish[x[1]],ptsFish[x[2]])
-                thetas = np.around(thetas[0],4)
-                distances_all.append(thetas)
-
-            # chemin = "C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho/"
-            chemin2 = os.getcwd()
-            if(len(chemin)>len(chemin2)):
-                try:
-                    f = open(chemin+"/DistancesPourModele.csv", "a+")
-                except PermissionError:
-                    print(Externes.checkIfProcessRunning("excel"))
-                    print(Externes.checkIfProcessRunning("scalc"))
-                    print(Externes.checkIfProcessRunning("soffice"))
-                    print(Externes.checkIfProcessRunning("notepad"))
-
-                    if(Externes.checkIfProcessRunning("excel")):
-                        excel = Dispatch("Excel.Application")
-                        excel.Visible=False
-                        workbook = excel.Workbooks.Open(chemin+"/DistancesPourModele.csv")
-                        excel.DisplayAlerts = False
-                        excel.ActiveWorkbook.Save()
-                        excel.Quit()
-                        os.system('taskkill /f /im excel.exe')
-                    if(Externes.checkIfProcessRunning("scalc")):
-                        os.system('taskkill /f /im scalc.exe')
-
-                    if(Externes.checkIfProcessRunning("soffice")):
-                        os.system('taskkill /f /im soffice.exe')
-                        os.system('taskkill /f /im soffice.bin')
-                    if(Externes.checkIfProcessRunning("notepad")):
-                        os.system('taskkill /f /im notepad.exe')
-                    time.sleep(0.5)
-                    f = open(chemin+"\DistancesPourModele.csv","a+")
-            if(len(chemin2)>len(chemin)):
-                try:
-                    f = open(chemin2+"\DistancesPourModele.csv","a+")
-                except PermissionError:
-                    print(Externes.checkIfProcessRunning("excel"))
-                    print(Externes.checkIfProcessRunning("scalc"))
-                    print(Externes.checkIfProcessRunning("soffice"))
-                    print(Externes.checkIfProcessRunning("notepad"))
-
-                    if(Externes.checkIfProcessRunning("excel")):
-                        excel = Dispatch("Excel.Application")
-                        excel.Visible=False
-                        workbook = excel.Workbooks.Open(chemin2+"\DistancesPourModele.csv")
-                        excel.DisplayAlerts = False
-                        excel.ActiveWorkbook.Save()
-                        excel.Quit()
-                        os.system('taskkill /f /im excel.exe')
-                    if(Externes.checkIfProcessRunning("scalc")):
-                        os.system('taskkill /f /im scalc.exe')
-
-                    if(Externes.checkIfProcessRunning("soffice")):
-                        os.system('taskkill /f /im soffice.exe')
-                        os.system('taskkill /f /im soffice.bin')
-                    if(Externes.checkIfProcessRunning("notepad")):
-                        os.system('taskkill /f /im notepad.exe')
-                    time.sleep(0.5)
-                    f = open(chemin2+"\DistancesPourModele.csv","a+")
-
-            header = ['Sexe (0:F, 1:M)']+listeCombinaisonsDistance+listeCombinaisonsAngle
-            header = "; ".join(str(i) for i in header)
-            distances_all = "; ".join(str(i) for i in distances_all)
-            f.seek(0)
-            if(f.read(1)!="S"):
-                f.write(str(header)+"\n")
-            f.read()
-            f.write(str(distances_all)+"\n")
-            f.close()
-
-        else:
-            tk.messagebox.showwarning(title="Attention",message="Le sexe doit être F ou M")
-
+    # def genererAllDistancesHead(ptsEchelle,ptsFish,sex,chemin):
+    #     """!
+    #     Methode pour generer les distances et angles de la tete et remplir le fichier csv
+    #     @param ptsEchelle list of tuple : liste des points de l'echelle
+    #     @param ptsFish list of tuple : liste des points de la tête
+    #     @param sex char : F ou M
+    #     @param chemin String : chemin du fichier csv
+    #     """
+    #     import numpy as np
+    #     import time,os
+    #     from win32com.client import Dispatch
+    #     from tkinter import messagebox
+    #     import tkinter as tk
+    #
+    #
+    #     if(len(ptsEchelle)==0 or len(ptsFish)==0):
+    #         tk.messagebox.showwarning(title="Attention",message="Importer une image")
+    #
+    #     elif(sex==''):
+    #         tk.messagebox.showwarning(title="Attention",message="Renseigner un sexe avant de mettre à jour le modèle")
+    #
+    #
+    #     elif(sex=='F' or sex=='M'):
+    #         distances_all = []
+    #         listeCombinaisonsDistance,listeCombinaisonsAngle = Externes.allPointsAngles()
+    #         pt22 = ptsEchelle[0]
+    #         pt24 = ptsEchelle[1]
+    #         if(sex=='F'):sex=0
+    #         if(sex=='M'):sex=1
+    #
+    #         distances_all.append(sex)
+    #         echelle3mm_px = Externes.euclide(pt22,pt24)
+    #         for x in listeCombinaisonsDistance:
+    #             distpx = Externes.euclide(ptsFish[x[0]],ptsFish[x[1]])
+    #             distmm = round(3*distpx/echelle3mm_px,4)
+    #             distances_all.append(distmm)
+    #         for x in listeCombinaisonsAngle:
+    #             thetas = Externes.calculAngle(ptsFish[x[0]],ptsFish[x[1]],ptsFish[x[2]])
+    #             thetas = np.around(thetas[0],4)
+    #             distances_all.append(thetas)
+    #
+    #         # chemin = "C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho/"
+    #         chemin2 = os.getcwd()
+    #         if(len(chemin)>len(chemin2)):
+    #             try:
+    #                 f = open(chemin+"/DistancesPourModele.csv", "a+")
+    #             except PermissionError:
+    #                 print(Externes.checkIfProcessRunning("excel"))
+    #                 print(Externes.checkIfProcessRunning("scalc"))
+    #                 print(Externes.checkIfProcessRunning("soffice"))
+    #                 print(Externes.checkIfProcessRunning("notepad"))
+    #
+    #                 if(Externes.checkIfProcessRunning("excel")):
+    #                     excel = Dispatch("Excel.Application")
+    #                     excel.Visible=False
+    #                     workbook = excel.Workbooks.Open(chemin+"/DistancesPourModele.csv")
+    #                     excel.DisplayAlerts = False
+    #                     excel.ActiveWorkbook.Save()
+    #                     excel.Quit()
+    #                     os.system('taskkill /f /im excel.exe')
+    #                 if(Externes.checkIfProcessRunning("scalc")):
+    #                     os.system('taskkill /f /im scalc.exe')
+    #
+    #                 if(Externes.checkIfProcessRunning("soffice")):
+    #                     os.system('taskkill /f /im soffice.exe')
+    #                     os.system('taskkill /f /im soffice.bin')
+    #                 if(Externes.checkIfProcessRunning("notepad")):
+    #                     os.system('taskkill /f /im notepad.exe')
+    #                 time.sleep(0.5)
+    #                 f = open(chemin+"\DistancesPourModele.csv","a+")
+    #         if(len(chemin2)>len(chemin)):
+    #             try:
+    #                 f = open(chemin2+"\DistancesPourModele.csv","a+")
+    #             except PermissionError:
+    #                 print(Externes.checkIfProcessRunning("excel"))
+    #                 print(Externes.checkIfProcessRunning("scalc"))
+    #                 print(Externes.checkIfProcessRunning("soffice"))
+    #                 print(Externes.checkIfProcessRunning("notepad"))
+    #
+    #                 if(Externes.checkIfProcessRunning("excel")):
+    #                     excel = Dispatch("Excel.Application")
+    #                     excel.Visible=False
+    #                     workbook = excel.Workbooks.Open(chemin2+"\DistancesPourModele.csv")
+    #                     excel.DisplayAlerts = False
+    #                     excel.ActiveWorkbook.Save()
+    #                     excel.Quit()
+    #                     os.system('taskkill /f /im excel.exe')
+    #                 if(Externes.checkIfProcessRunning("scalc")):
+    #                     os.system('taskkill /f /im scalc.exe')
+    #
+    #                 if(Externes.checkIfProcessRunning("soffice")):
+    #                     os.system('taskkill /f /im soffice.exe')
+    #                     os.system('taskkill /f /im soffice.bin')
+    #                 if(Externes.checkIfProcessRunning("notepad")):
+    #                     os.system('taskkill /f /im notepad.exe')
+    #                 time.sleep(0.5)
+    #                 f = open(chemin2+"\DistancesPourModele.csv","a+")
+    #
+    #         header = ['Sexe (0:F, 1:M)']+listeCombinaisonsDistance+listeCombinaisonsAngle
+    #         header = "; ".join(str(i) for i in header)
+    #         distances_all = "; ".join(str(i) for i in distances_all)
+    #         f.seek(0)
+    #         if(f.read(1)!="S"):
+    #             f.write(str(header)+"\n")
+    #         f.read()
+    #         f.write(str(distances_all)+"\n")
+    #         f.close()
+    #
+    #     else:
+    #         tk.messagebox.showwarning(title="Attention",message="Le sexe doit être F ou M")
+    #
 
     def calculDistances(ptsEchelle,ptsFish):
         """!
@@ -270,6 +270,83 @@ class Externes():
         distances_check = [snout_eye,snout_length,eye_diameter,head_length,head_depth,jaw_length,jaw_length2]
         distances_check = Externes.px3mmListe(distances_check,echelle3mm)
         return distances_check
+
+    def calculDistancesv2(ptsEchelle,listepoints):
+        """!
+        all except LS
+        ['LS', 'L1-2', 'L1-3', 'L1-4', 'L1-5', 'L1-6', 'L1-7', 'L1-8', 'L1-9',
+        'L1-10', 'L2-3', 'L2-4', 'L2-5', 'L2-6', 'L2-7', 'L2-8', 'L2-9',
+        'L2-10', 'L3-4', 'L3-5', 'L3-6', 'L3-7', 'L3-8', 'L3-9', 'L3-10',
+        'L4-5', 'L4-6', 'L4-7', 'L4-8', 'L4-9', 'L4-10', 'L5-6', 'L5-7', 'L5-8',
+        'L5-9', 'L5-10', 'L6-7', 'L6-8', 'L6-9', 'L6-10', 'L7-8', 'L7-9',
+        'L7-10', 'L8-9', 'L8-10', 'L9-10']
+        """
+
+        distances = []
+        echelle3mm = Externes.euclide(ptsEchelle[0],ptsEchelle[1])
+
+        L12 = Externes.euclide(listepoints[0],listepoints[1])
+        L13 = Externes.euclide(listepoints[0],listepoints[2])
+        L14 = Externes.euclide(listepoints[0],listepoints[3])
+        L15 = Externes.euclide(listepoints[0],listepoints[4])
+        L16 = Externes.euclide(listepoints[0],listepoints[5])
+        L17 = Externes.euclide(listepoints[0],listepoints[6])
+        L18 = Externes.euclide(listepoints[0],listepoints[7])
+        L19 = Externes.euclide(listepoints[0],listepoints[8])
+        L110 = Externes.euclide(listepoints[0],listepoints[9])
+
+        L23 = Externes.euclide(listepoints[1],listepoints[2])
+        L24 = Externes.euclide(listepoints[1],listepoints[3])
+        L25 = Externes.euclide(listepoints[1],listepoints[4])
+        L26 = Externes.euclide(listepoints[1],listepoints[5])
+        L27 = Externes.euclide(listepoints[1],listepoints[6])
+        L28 = Externes.euclide(listepoints[1],listepoints[7])
+        L29 = Externes.euclide(listepoints[1],listepoints[8])
+        L210 = Externes.euclide(listepoints[1],listepoints[9])
+
+        L34 = Externes.euclide(listepoints[2],listepoints[3])
+        L35 = Externes.euclide(listepoints[2],listepoints[4])
+        L36 = Externes.euclide(listepoints[2],listepoints[5])
+        L37 = Externes.euclide(listepoints[2],listepoints[6])
+        L38 = Externes.euclide(listepoints[2],listepoints[7])
+        L39 = Externes.euclide(listepoints[2],listepoints[8])
+        L310 = Externes.euclide(listepoints[2],listepoints[9])
+
+        L45 = Externes.euclide(listepoints[3],listepoints[4])
+        L46 = Externes.euclide(listepoints[3],listepoints[5])
+        L47 = Externes.euclide(listepoints[3],listepoints[6])
+        L48 = Externes.euclide(listepoints[3],listepoints[7])
+        L49 = Externes.euclide(listepoints[3],listepoints[8])
+        L410 = Externes.euclide(listepoints[3],listepoints[9])
+
+        L56 = Externes.euclide(listepoints[4],listepoints[5])
+        L57 = Externes.euclide(listepoints[4],listepoints[6])
+        L58 = Externes.euclide(listepoints[4],listepoints[7])
+        L59 = Externes.euclide(listepoints[4],listepoints[8])
+        L510 = Externes.euclide(listepoints[4],listepoints[9])
+
+        L67 = Externes.euclide(listepoints[5],listepoints[6])
+        L68 = Externes.euclide(listepoints[5],listepoints[7])
+        L69 = Externes.euclide(listepoints[5],listepoints[8])
+        L610 = Externes.euclide(listepoints[5],listepoints[9])
+
+        L78 = Externes.euclide(listepoints[6],listepoints[7])
+        L79 = Externes.euclide(listepoints[6],listepoints[8])
+        L710 = Externes.euclide(listepoints[6],listepoints[9])
+
+        L89 = Externes.euclide(listepoints[7],listepoints[8])
+        L810 = Externes.euclide(listepoints[7],listepoints[9])
+
+        L910 = Externes.euclide(listepoints[8],listepoints[9])
+
+        distances = [L12, L13, L14, L15, L16, L17, L18, L19, L110, L23, L24, L25, L26, L27, L28, L29, L210, L34, L35, L36, L37, L38, L39, L310, L45, L46, L47, L48, L49, L410, L56, L57, L58, L59, L510, L67, L68, L69, L610, L78, L79, L710, L89, L810, L910]
+        distances = Externes.px3mmListe(distances,echelle3mm)
+
+        return distances
+
+
+
+
 
     def calculDistances2(ptsEchelle,ptsFish):
         """!
@@ -474,22 +551,22 @@ class Externes():
         return indexMin,pointB,distanceMin
 
 
-    def checkIfProcessRunning(processName):
-        """!
-        Methode pour déterminer si un processus est en cours ou non
-        @param processName String : nom du processus
-        @return boolean : Vrai ou Faux
-        """
-        import psutil
-        #Iterate over the all the running process
-        for proc in psutil.process_iter():
-            try:
-                # Check if process name contains the given name string.
-                if processName.lower() in proc.name().lower():
-                    return True
-            except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
-                pass
-        return False
+    # def checkIfProcessRunning(processName):
+    #     """!
+    #     Methode pour déterminer si un processus est en cours ou non
+    #     @param processName String : nom du processus
+    #     @return boolean : Vrai ou Faux
+    #     """
+    #     import psutil
+    #     #Iterate over the all the running process
+    #     for proc in psutil.process_iter():
+    #         try:
+    #             # Check if process name contains the given name string.
+    #             if processName.lower() in proc.name().lower():
+    #                 return True
+    #         except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+    #             pass
+    #     return False
 
     def penteIntercept(a,b):
         """!
@@ -526,24 +603,24 @@ class Externes():
             distanceTotale += (y[i]-ordonnee[i])**2
         return pente,distanceTotale
 
-    def averagePixelValue(imgNB,c,windowSize):
-        """!
-        Methode pour calculer la valeur moyenne autour d'un contour
-        @param imgNB list of list: matrice de l'image en noir et blanc
-        @param c contours : 1 contour de l'image
-        @param windowSize : taille du voisinage (à choisir impair)
-        @return moy float : valeur moyenne de niveau de gris
-        """
-        import numpy as np
-        import itertools
-        x = c.T[0][0]
-        y = c.T[1][0]
-        low = (windowSize-1)//2
-        up = (windowSize+1)//2
-        test =  list(itertools.chain.from_iterable([list(itertools.product(range(x[i]-low,x[i]+up),range(y[i]-low,y[i]+up))) for i in range(len(x))]))
-        pixel = [imgNB[x[1]][x[0]] for x in test]
-        moy = np.mean(pixel)
-        return moy
+    # def averagePixelValue(imgNB,c,windowSize):
+    #     """!
+    #     Methode pour calculer la valeur moyenne autour d'un contour
+    #     @param imgNB list of list: matrice de l'image en noir et blanc
+    #     @param c contours : 1 contour de l'image
+    #     @param windowSize : taille du voisinage (à choisir impair)
+    #     @return moy float : valeur moyenne de niveau de gris
+    #     """
+    #     import numpy as np
+    #     import itertools
+    #     x = c.T[0][0]
+    #     y = c.T[1][0]
+    #     low = (windowSize-1)//2
+    #     up = (windowSize+1)//2
+    #     test =  list(itertools.chain.from_iterable([list(itertools.product(range(x[i]-low,x[i]+up),range(y[i]-low,y[i]+up))) for i in range(len(x))]))
+    #     pixel = [imgNB[x[1]][x[0]] for x in test]
+    #     moy = np.mean(pixel)
+    #     return moy
 
     def averagePixelsValue(imgNB,listePoints):
         import numpy as np
@@ -750,15 +827,15 @@ class Externes():
         listePoints = [Externes.getRandomPointInCircle(r,xc,yc) for _ in range(n)]
         return listePoints
 
-    def lissage(signal_brut):
-        from scipy.signal import savgol_filter
-        signal_lisse = savgol_filter(signal_brut,window_length=51,polyorder=6,deriv=0)
-        return signal_lisse
-
-    def derive(signal_lisse):
-        from scipy.signal import savgol_filter
-        signal_derive = savgol_filter(signal_brut,window_length=51,polyorder=6,deriv=1)
-        return signal_derive
+    # def lissage(signal_brut):
+    #     from scipy.signal import savgol_filter
+    #     signal_lisse = savgol_filter(signal_brut,window_length=51,polyorder=6,deriv=0)
+    #     return signal_lisse
+    #
+    # def derive(signal_lisse):
+    #     from scipy.signal import savgol_filter
+    #     signal_derive = savgol_filter(signal_brut,window_length=51,polyorder=6,deriv=1)
+    #     return signal_derive
 
     def removeOutliers(x, outlierConstant):
         import numpy as np
@@ -788,65 +865,6 @@ class Externes():
         return "/".join(aaa.split("/")[:-1])+"/"
     def sizeKoParent(path_et_nom_fichier_extension):
         return str(round(int(os.path.getsize(path_et_nom_fichier_extension)/1048)))+" Ko"
-
-    def calculDistancesv2(listepoints):
-        """!
-        all except LS
-        ['LS', 'L1-2', 'L1-3', 'L1-4', 'L1-5', 'L1-6', 'L1-7', 'L1-8', 'L1-9',
-        'L1-10', 'L2-3', 'L2-4', 'L2-5', 'L2-6', 'L2-7', 'L2-8', 'L2-9',
-        'L2-10', 'L3-4', 'L3-5', 'L3-6', 'L3-7', 'L3-8', 'L3-9', 'L3-10',
-        'L4-5', 'L4-6', 'L4-7', 'L4-8', 'L4-9', 'L4-10', 'L5-6', 'L5-7', 'L5-8',
-        'L5-9', 'L5-10', 'L6-7', 'L6-8', 'L6-9', 'L6-10', 'L7-8', 'L7-9',
-        'L7-10', 'L8-9', 'L8-10', 'L9-10']
-        """
-        distances = []
-        distances.append(Externes.euclide(listepoints[0],listepoints[1]))
-        distances.append(Externes.euclide(listepoints[0],listepoints[2]))
-        distances.append(Externes.euclide(listepoints[0],listepoints[3]))
-        distances.append(Externes.euclide(listepoints[0],listepoints[4]))
-        distances.append(Externes.euclide(listepoints[0],listepoints[5]))
-        distances.append(Externes.euclide(listepoints[0],listepoints[6]))
-        distances.append(Externes.euclide(listepoints[0],listepoints[7]))
-        distances.append(Externes.euclide(listepoints[0],listepoints[8]))
-        distances.append(Externes.euclide(listepoints[0],listepoints[9]))
-        distances.append(Externes.euclide(listepoints[1],listepoints[2]))
-        distances.append(Externes.euclide(listepoints[1],listepoints[3]))
-        distances.append(Externes.euclide(listepoints[1],listepoints[4]))
-        distances.append(Externes.euclide(listepoints[1],listepoints[5]))
-        distances.append(Externes.euclide(listepoints[1],listepoints[6]))
-        distances.append(Externes.euclide(listepoints[1],listepoints[7]))
-        distances.append(Externes.euclide(listepoints[1],listepoints[8]))
-        distances.append(Externes.euclide(listepoints[1],listepoints[9]))
-        distances.append(Externes.euclide(listepoints[2],listepoints[3]))
-        distances.append(Externes.euclide(listepoints[2],listepoints[4]))
-        distances.append(Externes.euclide(listepoints[2],listepoints[5]))
-        distances.append(Externes.euclide(listepoints[2],listepoints[6]))
-        distances.append(Externes.euclide(listepoints[2],listepoints[7]))
-        distances.append(Externes.euclide(listepoints[2],listepoints[8]))
-        distances.append(Externes.euclide(listepoints[2],listepoints[9]))
-        distances.append(Externes.euclide(listepoints[3],listepoints[4]))
-        distances.append(Externes.euclide(listepoints[3],listepoints[5]))
-        distances.append(Externes.euclide(listepoints[3],listepoints[6]))
-        distances.append(Externes.euclide(listepoints[3],listepoints[7]))
-        distances.append(Externes.euclide(listepoints[3],listepoints[8]))
-        distances.append(Externes.euclide(listepoints[3],listepoints[9]))
-        distances.append(Externes.euclide(listepoints[4],listepoints[5]))
-        distances.append(Externes.euclide(listepoints[4],listepoints[6]))
-        distances.append(Externes.euclide(listepoints[4],listepoints[7]))
-        distances.append(Externes.euclide(listepoints[4],listepoints[8]))
-        distances.append(Externes.euclide(listepoints[4],listepoints[9]))
-        distances.append(Externes.euclide(listepoints[5],listepoints[6]))
-        distances.append(Externes.euclide(listepoints[5],listepoints[7]))
-        distances.append(Externes.euclide(listepoints[5],listepoints[8]))
-        distances.append(Externes.euclide(listepoints[5],listepoints[9]))
-        distances.append(Externes.euclide(listepoints[6],listepoints[7]))
-        distances.append(Externes.euclide(listepoints[6],listepoints[8]))
-        distances.append(Externes.euclide(listepoints[6],listepoints[9]))
-        distances.append(Externes.euclide(listepoints[7],listepoints[8]))
-        distances.append(Externes.euclide(listepoints[7],listepoints[9]))
-        distances.append(Externes.euclide(listepoints[8],listepoints[9]))
-        return distances
-
 
 
 

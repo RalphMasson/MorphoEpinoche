@@ -249,7 +249,7 @@ class utils():
     
     # Tools for predicting objects and shapes in new images
     
-    def predictions_to_xml(predictor_name,dir,ignore, out_file):
+    def predictions_to_xml(predictor_name,img_path,ignore, out_file):
         '''
         Generates a dlib format xml file for model predictions. It uses previously trained models to
         identify objects in images and to predict their shape. 
@@ -271,50 +271,51 @@ class utils():
         root.append(ET.Element('comment'))
         images_e = ET.Element('images')
         root.append(images_e)
-        print(os.listdir(dir))
-        for f in os.listdir(dir):
-            ff = dir+"\\"+f
-            # print(dir+f)
-            ext = ntpath.splitext(ff)[1]
-            if ext in extensions:
-                # print(ff)
-                path, file = os.path.split(ff)
-                img = cv2.imread(ff)
-                image_e = ET.Element('image')
-                image_e.set('file', str(ff))
-                # print(type(img))
-                e = (dlib.rectangle(left=1, top=1, right=img.shape[1]-1, bottom=img.shape[0]-1))
-                shape = predictor(img, e)
-                # print(shape)
-                box = ET.Element('box')
-                box.set('top', str(int(1)))
-                box.set('left', str(int(1)))
-                box.set('width', str(int(img.shape[1]-2)))
-                box.set('height', str(int(img.shape[0]-2)))
-                part_length = range(0,shape.num_parts) 
-                # print(part_length)
-                for item, i in enumerate(sorted(part_length, key=str)):
-                    if ignore is not None:
-                        if i not in ignore:
-                            part = ET.Element('part')
-                            part.set('name',str(int(i)))
-                            part.set('x',str(int(shape.part(item).x)))
-                            part.set('y',str(int(shape.part(item).y)))
-                            box.append(part)
-                    else:
+        # # for f in os.listdir(dir):
+        # #     ff = dir+"\\"+f
+        # #     # print(dir+f)
+        # ext = ntpath.splitext(ff)[1]
+        # if ext in extensions:
+            # print(ff)
+        ff = img_path
+        path, file = os.path.split(ff)
+        img = cv2.imread(ff)
+        if img is not None:
+            image_e = ET.Element('image')
+            image_e.set('file', str(ff))
+            # print(type(img))
+            e = (dlib.rectangle(left=1, top=1, right=img.shape[1]-1, bottom=img.shape[0]-1))
+            shape = predictor(img, e)
+            # print(shape)
+            box = ET.Element('box')
+            box.set('top', str(int(1)))
+            box.set('left', str(int(1)))
+            box.set('width', str(int(img.shape[1]-2)))
+            box.set('height', str(int(img.shape[0]-2)))
+            part_length = range(0,shape.num_parts) 
+            # print(part_length)
+            for item, i in enumerate(sorted(part_length, key=str)):
+                if ignore is not None:
+                    if i not in ignore:
                         part = ET.Element('part')
                         part.set('name',str(int(i)))
                         part.set('x',str(int(shape.part(item).x)))
                         part.set('y',str(int(shape.part(item).y)))
                         box.append(part)
-                    
-                box[:] = sorted(box, key=lambda child: (child.tag,float(child.get('name'))))
-                image_e.append(box)
-                images_e.append(image_e)
-        et = ET.ElementTree(root)
-        xmlstr = minidom.parseString(ET.tostring(et.getroot())).toprettyxml(indent="   ")
-        with open(out_file, "w") as ff:
-            ff.write(xmlstr)
+                else:
+                    part = ET.Element('part')
+                    part.set('name',str(int(i)))
+                    part.set('x',str(int(shape.part(item).x)))
+                    part.set('y',str(int(shape.part(item).y)))
+                    box.append(part)
+                
+            box[:] = sorted(box, key=lambda child: (child.tag,float(child.get('name'))))
+            image_e.append(box)
+            images_e.append(image_e)
+            et = ET.ElementTree(root)
+            xmlstr = minidom.parseString(ET.tostring(et.getroot())).toprettyxml(indent="   ")
+            with open(out_file, "w") as ff:
+                ff.write(xmlstr)
     
     #Importing to pandas tools
     
