@@ -1063,6 +1063,7 @@ class Interface(tk.Tk):
 
     def changeView(self):
         GUI_little.Temp.chemin = pypath3
+        GUI_little.Temp.ppath2 = pypath2
         self.destroy()
         root = tk.Tk()
         GUI_little.app = GUI_little.Interface(root)
@@ -1141,25 +1142,13 @@ class Interface(tk.Tk):
 
     def allDist(lenBody):
         listepoints = []
-        # print(HeadClass.nodes)
         for i in HeadClass.nodes:
-            # print(Interface.canvasTete)
-            # print(Interface.canvasTete.coords(i))
-            # print(Interface.canvasTete.coords(i)[0]+3)
-            # print(Interface.canvasTete.coords(i)[1]+3)
             listepoints.append([Interface.canvasTete.coords(i)[0]+3,Interface.canvasTete.coords(i)[1]+3])
         px50mm = XY_tools.Externes.euclide(Interface.canvasEchelle.coords(3),Interface.canvasEchelle.coords(5))
-        # listedistances = XY_tools.Externes.calculDistancesv2(listepoints)
 
         listedistances2 = []
-        # print(lenBody)
         listedistances2.append(round(lenBody*50/px50mm,5))
-        # print("LS")
-        # print(round(lenBody*50/px50mm,5))
-        # for x in listedistances:
-        #     listedistances2.append(round(x*50/px50mm,5))
-        #     # print(round(x*50/px50mm,5))
-        # print(listedistances2[10])
+
         for x in HeadClass.distances_all:
             listedistances2.append(x)
         Interface.modeleDistances = listedistances2

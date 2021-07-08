@@ -11,11 +11,13 @@ sys.path.insert(0,pypath1)
 
 # Import des bibliothèques (s'assurer qu'elles soient installées)
 import tkinter as tk
+import IA_morph as ML
 from tkinter import messagebox
 from PIL import Image, ImageTk
 import math,functools,itertools,os,cv2,webbrowser
 import XY_compute,XY_tools,IA_sexage
 import numpy as np
+from datetime import datetime
 
 # Classe pour les points de la tête
 
@@ -30,7 +32,11 @@ class HeadClass():
     distances_check : liste des distances caractéristiques affichées
     distances_all : liste de toutes les distances sauvegardés pour le modèle
     """
-    id_polygons = pointsFish = pointsEchelle = distances_check = distances_all = []
+    id_polygons = []
+    pointsFish = []
+    pointsEchelle = []
+    distances_check = []
+    distances_all = []
 
     def __init__(self, canvas, points,color):
         """!
@@ -50,13 +56,13 @@ class HeadClass():
             canvas.tag_bind(self.polygon, '<ButtonPress-1>',   lambda event, tag=self.polygon: self.on_press_tag(event, 0, tag))
             canvas.tag_bind(self.polygon, '<ButtonRelease-1>', lambda event, tag=self.polygon: self.on_release_tag(event, 0, tag,canvas))
             canvas.tag_bind(self.polygon, '<B1-Motion>', lambda event = self.polygon : self.on_move_polygon(event,canvas))
-            self.nodes = []
+            HeadClass.nodes = []
             self.nonodes = []
             for number, point in enumerate(self.points):
                 x, y = point
                 node = canvas.create_rectangle((x-3, y-3, x+3, y+3), fill=color)
                 label = canvas.create_text((x+15, y+6),text=str(node%25),font=("Purisa", 1),fill='red')
-                self.nodes.append(node)
+                HeadClass.nodes.append(node)
                 self.nonodes.append(label)
                 canvas.tag_bind(node, '<ButtonPress-1>',   lambda event, number=number, tag=node: self.on_press_tag(event, number, tag))
                 canvas.tag_bind(node, '<ButtonRelease-1>', lambda event, number=number, tag=node: self.on_release_tag(event, number, tag,canvas))
@@ -74,8 +80,7 @@ class HeadClass():
         """
         for id in HeadClass.id_polygons:
             liste = canvas.coords(id)
-            if(len(canvas.coords(id))==18):HeadClass.pointsFish=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
-            if(len(canvas.coords(id))==4):HeadClass.pointsEchelle=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
+            if(len(liste)==20):HeadClass.pointsFish=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
 
     def on_press_tag(self, event, number, tag):
         """!
@@ -111,7 +116,7 @@ class HeadClass():
             dy = event.y - self.previous_y
             canvas.move(self.selected, dx, dy)
             # print(self.selected)
-            canvas.move(self.nonodes[self.nodes.index(self.selected)],dx,dy)
+            canvas.move(self.nonodes[HeadClass.nodes.index(self.selected)],dx,dy)
             self.points[number][0] += dx
             self.points[number][1] += dy
             coords = sum(self.points, [])
@@ -161,7 +166,7 @@ class HeadClass():
             # move polygon
             canvas.move(self.selected, dx, dy)
             # move red nodes
-            for item,item1 in zip(self.nodes,self.nonodes):
+            for item,item1 in zip(HeadClass.nodes,self.nonodes):
                 canvas.move(item, dx, dy)
                 canvas.move(item1,dx,dy)
             # recalculate values in self.points
@@ -182,8 +187,16 @@ class HeadClass():
         """!
         Methode pour calculer certaines distances caractéristiques
         """
-        HeadClass.distances_check = XY_tools.Externes.calculDistances(HeadClass.pointsEchelle,HeadClass.pointsFish)
-        return HeadClass.distances_check
+        print("points fish")
+        print(HeadClass.pointsFish)
+        print("point echelle")
+        print(HeadClass.pointsEchelle)
+
+        HeadClass.distances_all = XY_tools.Externes.calculDistancesv2(HeadClass.pointsEchelle, HeadClass.pointsFish)
+        print("distance all")
+        print(HeadClass.distances_all)
+        # print(HeadClass.distances_all)
+        # return HeadClass.distances_check
 
 
 class BodyClass():
@@ -319,8 +332,327 @@ class BodyClass():
         """!
         Methode pour calculer certaines distances caractéristiques
         """
-        BodyClass.distances_check = XY_tools.Externes.calculDistances2(BodyClass.pointsEchelle,BodyClass.pointsFish)
+        BodyClass.distances_check = XY_tools.Externes.calculDistances2(BodyClass.pointsFish[2:4],BodyClass.pointsFish[0:2])
         return BodyClass.distances_check
+
+class ScaleClass():
+    """Variables globales pour export
+    id_polygons : liste des id des polygons (la tete et l'echelle)
+    pointsFish : liste des points de la tête [(x1,y1),(x2,y2)...]
+    distances_check : liste des distances caractéristiques affichées
+    distances_all : liste de toutes les distances sauvegardés pour le modèle
+    pointsEchelle : liste des points de l'echelle [(x1,y1),(x2,y2)]
+    """
+    id_polygons = []
+    pointsFish = []
+    distances_check = []
+    distances_all = []
+    pointsEchelle = []
+    def __init__(self, canvas2, points,color):
+        """!
+        Constructeur du polygone de la tête
+        @param canvas2 tk.Canvas : cadre de l'image
+        @param points list : liste des points du polygone
+        @param color String : couleur du polygone
+        """
+        self.previous_x = self.previous_y = self.selected = self.x = None
+        self.points = points
+        listenode = [i for i in range(1,13)]
+        num = 0
+        if points!=None:
+            if color=='red':outline='white'
+            else: outline=''
+            self.polygon = canvas2.create_polygon(self.points,fill='',outline=outline,smooth=0,width=2,dash=(1,))
+            print("scale")
+            print(self.polygon)
+            HeadClass.id_polygons.append(self.polygon)
+            canvas2.tag_bind(self.polygon, '<ButtonPress-1>',   lambda event, tag=self.polygon: self.on_press_tag(event, 0, tag))
+            canvas2.tag_bind(self.polygon, '<ButtonRelease-1>', lambda event, tag=self.polygon: self.on_release_tag(event, 0, tag,canvas2))
+            canvas2.tag_bind(self.polygon, '<B1-Motion>', lambda event = self.polygon : self.on_move_polygon(event,canvas2))
+            self.nodes = []
+            self.nonodes = []
+            for number, point in enumerate(self.points):
+                x, y = point
+                node = canvas2.create_rectangle((x-3, y-3, x+3, y+3), fill='#f0f0f0',outline="#f0f0f0")
+                label = canvas2.create_text((x+15, y+6),text=str(listenode[num]),font=("Purisa", 12),fill='#f0f0f0')
+                num+=1
+                self.nodes.append(node)
+                self.nonodes.append(label)
+                canvas2.tag_bind(node, '<ButtonPress-1>',   lambda event, number=number, tag=node: self.on_press_tag(event, number, tag))
+                canvas2.tag_bind(node, '<ButtonRelease-1>', lambda event, number=number, tag=node: self.on_release_tag(event, number, tag,canvas2))
+                canvas2.tag_bind(node, '<B1-Motion>', lambda event, number=number: self.on_move_node(event, number,canvas2))
+        ScaleClass.update_points(canvas2)
+
+
+
+    def update_points(canvas2):
+        """!
+        Methode de mise à jour de la position des points
+        @param canvas2 tk.Canvas : cadre de l'image
+        """
+        for id in HeadClass.id_polygons:
+            liste = canvas2.coords(id)
+            if(len(canvas2.coords(id))==4):ScaleClass.pointsEchelle=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
+
+    def on_press_tag(self, event, number, tag):
+        """!
+        Methode pour determiner l'item relaché
+        @param event event : coordonnees de l'item
+        @param number int : numero de l'id
+        @param tag int : numero de l'id
+        """
+        self.selected = tag
+        self.previous_x = event.x
+        self.previous_y = event.y
+        # print(self.selected,event,tag)
+
+    def on_release_tag(self, event, number, tag,canvas2):
+        """!
+        Methode pour determiner l'item selectionné
+        @param event event : coordonnees de l'item
+        @param number int : numero de l'id
+        @param tag int : numero de l'id
+        """
+        self.selected = self.previous_x = self.previous_y = None
+        ScaleClass.update_points(canvas2)
+
+    def on_move_node(self, event, number,canvas2):
+        """!
+        Methode pour deplacer un noeud du graphe
+        @param event event : coordonnees de l'item
+        @param number int : numero de l'id
+        @param tag int : numero de l'id
+        """
+        if self.selected:
+            dx = event.x - self.previous_x
+            dy = event.y - self.previous_y
+            canvas2.move(self.selected, dx, dy)
+            canvas2.move(self.nonodes[self.nodes.index(self.selected)],dx,dy)
+            self.points[number][0] += dx
+            self.points[number][1] += dy
+            coords = sum(self.points, [])
+            canvas2.coords(self.polygon, coords)
+            self.previous_x = event.x
+            self.previous_y = event.y
+            px50mm = XY_tools.Externes.euclide(Interface.canvasEchelle.coords(3),Interface.canvasEchelle.coords(5))
+
+            if self.selected==5:
+                Interface.canvasCorps.move(9,dx/3,dy/3)
+                Interface.canvasCorps.update()
+                Interface.canvasCorps.move(BodyClass.nonodes[BodyClass.nodes.index(9)],dx/3,dy/3)
+                Interface.canvasCorps.update()
+                BodyClass.points[3][0] += dx
+                BodyClass.points[3][1] += dy
+                coordes = sum(BodyClass.points, [])
+                Interface.canvasCorps.coords(BodyClass.polygon, coordes)
+                Interface.canvasCorps.update()
+                BodyClass.previous_x = event.x
+                BodyClass.previous_y = event.y
+                BodyClass.update_points(Interface.canvasCorps)
+                Interface.afficheLongueur()
+                app.labelLongueurBody.config(text="Longueur = "+str(round(Interface.lenBody*50/px50mm,3)))
+                Interface.allDist(Interface.lenBody)
+
+            if self.selected==3:
+                Interface.canvasCorps.move(7,dx/3,dy/3)
+                Interface.canvasCorps.update()
+                Interface.canvasCorps.move(BodyClass.nonodes[BodyClass.nodes.index(7)],dx/3,dy/3)
+                Interface.canvasCorps.update()
+                BodyClass.points[2][0] += dx
+                BodyClass.points[2][1] += dy
+                coordes = sum(BodyClass.points, [])
+                Interface.canvasCorps.coords(BodyClass.polygon, coordes)
+                Interface.canvasCorps.update()
+                BodyClass.previous_x = event.x
+                BodyClass.previous_y = event.y
+                BodyClass.update_points(Interface.canvasCorps)
+                Interface.afficheLongueur()
+                Interface.allDist(Interface.lenBody)
+
+            app.labelLongueurBody.config(text="Longueur = "+str(round(Interface.lenBody*50/px50mm,3)))
+            Interface.allDist(Interface.lenBody)
+
+
+
+        ScaleClass.update_points(canvas2)
+        # Interface.afficheLongueur()
+    def on_move_polygon(self, event,canvas2):
+        """!
+        Methode pour deplacer le polygone entier
+        @param event event : coordonnees de l'item
+        @param number int : numero de l'id
+        @param tag int : numero de l'id
+        """
+        if self.selected:
+            dx = event.x - self.previous_x
+            dy = event.y - self.previous_y
+            # move polygon
+            canvas2.move(self.selected, dx, dy)
+            # move red nodes
+            for item,item1 in zip(self.nodes,self.nonodes):
+                canvas2.move(item, dx, dy)
+                canvas2.move(item1,dx,dy)
+            # recalculate values in self.points
+            for item in self.points:
+                item[0] += dx
+                item[1] += dy
+            self.previous_x = event.x
+            self.previous_y = event.y
+        ScaleClass.update_points(canvas2)
+
+
+
+class ScaleClassBody():
+    """Variables globales pour export
+    id_polygons : liste des id des polygons (la tete et l'echelle)
+    pointsFish : liste des points de la tête [(x1,y1),(x2,y2)...]
+    distances_check : liste des distances caractéristiques affichées
+    distances_all : liste de toutes les distances sauvegardés pour le modèle
+    pointsEchelle : liste des points de l'echelle [(x1,y1),(x2,y2)]
+    """
+    id_polygons = []
+    pointsFish = []
+    distances_check = []
+    distances_all = []
+    pointsEchelle = []
+    def __init__(self, canvas3, points,color):
+        """!
+        Constructeur du polygone de la tête
+        @param canvas2 tk.Canvas : cadre de l'image
+        @param points list : liste des points du polygone
+        @param color String : couleur du polygone
+        """
+        self.previous_x = self.previous_y = self.selected = self.x = None
+        self.points = points
+        listenode = [i for i in range(1,13)]
+        num = 0
+        if points!=None:
+            if color=='red':outline='white'
+            else: outline=''
+            self.polygon = canvas3.create_polygon(self.points,fill='',outline=outline,smooth=0,width=2,dash=(1,))
+            HeadClass.id_polygons.append(self.polygon)
+            canvas3.tag_bind(self.polygon, '<ButtonPress-1>',   lambda event, tag=self.polygon: self.on_press_tag(event, 0, tag))
+            canvas3.tag_bind(self.polygon, '<ButtonRelease-1>', lambda event, tag=self.polygon: self.on_release_tag(event, 0, tag,canvas3))
+            canvas3.tag_bind(self.polygon, '<B1-Motion>', lambda event = self.polygon : self.on_move_polygon(event,canvas3))
+            self.nodes = []
+            self.nonodes = []
+            for number, point in enumerate(self.points):
+                x, y = point
+                node = canvas3.create_rectangle((x-3, y-3, x+3, y+3), fill='#f0f0f0',outline="#f0f0f0")
+                label = canvas3.create_text((x+15, y+6),text=str(listenode[num]),font=("Purisa", 12),fill='#f0f0f0')
+                num+=1
+                self.nodes.append(node)
+                self.nonodes.append(label)
+                canvas3.tag_bind(node, '<ButtonPress-1>',   lambda event, number=number, tag=node: self.on_press_tag(event, number, tag))
+                canvas3.tag_bind(node, '<ButtonRelease-1>', lambda event, number=number, tag=node: self.on_release_tag(event, number, tag,canvas3))
+                canvas3.tag_bind(node, '<B1-Motion>', lambda event, number=number: self.on_move_node(event, number,canvas3))
+
+        ScaleClassBody.update_points(canvas3)
+
+
+
+    def update_points(canvas3):
+        """!
+        Methode de mise à jour de la position des points
+        @param canvas2 tk.Canvas : cadre de l'image
+        """
+        for id in HeadClass.id_polygons:
+            liste = canvas3.coords(id)
+            if(len(canvas3.coords(id))==4):ScaleClassBody.pointsEchelle=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
+
+    def on_press_tag(self, event, number, tag):
+        """!
+        Methode pour determiner l'item relaché
+        @param event event : coordonnees de l'item
+        @param number int : numero de l'id
+        @param tag int : numero de l'id
+        """
+        self.selected = tag
+        self.previous_x = event.x
+        self.previous_y = event.y
+
+    def on_release_tag(self, event, number, tag,canvas3):
+        """!
+        Methode pour determiner l'item selectionné
+        @param event event : coordonnees de l'item
+        @param number int : numero de l'id
+        @param tag int : numero de l'id
+        """
+        self.selected = self.previous_x = self.previous_y = None
+        ScaleClassBody.update_points(canvas3)
+
+    def on_move_node(self, event, number,canvas3):
+        """!
+        Methode pour deplacer un noeud du graphe
+        @param event event : coordonnees de l'item
+        @param number int : numero de l'id
+        @param tag int : numero de l'id
+        """
+        if self.selected:
+            dx = event.x - self.previous_x
+            dy = event.y - self.previous_y
+            canvas3.move(self.selected, dx, dy)
+            canvas3.move(self.nonodes[self.nodes.index(self.selected)],dx,dy)
+            self.points[number][0] += dx
+            self.points[number][1] += dy
+            coords = sum(self.points, [])
+            canvas3.coords(self.polygon, coords)
+            self.previous_x = event.x
+            self.previous_y = event.y
+
+            if self.selected==5:
+                Interface.canvasCorps.move(5,dx/3,dy/3)
+                Interface.canvasCorps.update()
+                Interface.canvasCorps.move(BodyClass.nonodes[BodyClass.nodes.index(5)],dx/3,dy/3)
+                Interface.canvasCorps.update()
+                BodyClass.points[1][0] += dx
+                BodyClass.points[1][1] += dy
+                coordes = sum(BodyClass.points, [])
+                Interface.canvasCorps.coords(BodyClass.polygon, coordes)
+                Interface.canvasCorps.update()
+                BodyClass.previous_x = event.x
+                BodyClass.previous_y = event.y
+                BodyClass.update_points(Interface.canvasCorps)
+                Interface.afficheLongueurBody()
+
+            if self.selected==3:
+                Interface.canvasCorps.move(3,dx/3,dy/3)
+                Interface.canvasCorps.update()
+                Interface.canvasCorps.move(BodyClass.nonodes[BodyClass.nodes.index(3)],dx/3,dy/3)
+                Interface.canvasCorps.update()
+                BodyClass.points[0][0] += dx
+                BodyClass.points[0][1] += dy
+                coordes = sum(BodyClass.points, [])
+                Interface.canvasCorps.coords(BodyClass.polygon, coordes)
+                Interface.canvasCorps.update()
+                BodyClass.previous_x = event.x
+                BodyClass.previous_y = event.y
+                BodyClass.update_points(Interface.canvasCorps)
+                Interface.afficheLongueurBody()
+
+
+
+        ScaleClassBody.update_points(canvas3)
+    def on_move_polygon(self, event,canvas3):
+        """!
+        Methode pour deplacer le polygone entier
+        @param event event : coordonnees de l'item
+        @param number int : numero de l'id
+        @param tag int : numero de l'id
+        """
+        if self.selected:
+            dx = event.x - self.previous_x
+            dy = event.y - self.previous_y
+            canvas3.move(self.selected, dx, dy)
+            for item,item1 in zip(self.nodes,self.nonodes):
+                canvas3.move(item, dx, dy)
+                canvas3.move(item1,dx,dy)
+            for item in self.points:
+                item[0] += dx
+                item[1] += dy
+            self.previous_x = event.x
+            self.previous_y = event.y
+        ScaleClassBody.update_points(canvas3)
 
 class HeadFish():
     """Variables globales pour export
@@ -330,81 +662,58 @@ class HeadFish():
     distances_check : liste des distances caractéristiques affichées
     distances_all : liste de toutes les distances sauvegardés pour le modèle
     """
+
     poisson = None
     centreOeil=None
     CV2_image_big = None
+    img = None
     def __init__(self, canvas,PIL_image,CV2_image,size):
-        """!
-        Constructeur de l'image de la tete
-        @param canvas tk.Canvas : cadre de l'image
-        @param PIL_image list : matrice de l'image format PIL
-        @param cv2_image list : matrice de l'image format cv2
-        @param size list : dimension souhaitée de l'image
-        """
-        self.img = ImageTk.PhotoImage(PIL_image.resize(size, Image.ANTIALIAS))
-        self.circle = XY_compute.Points.detect_eye(cv2.resize(CV2_image,size,Image.ANTIALIAS))
-        HeadFish.centreOeil = [self.circle[0],self.circle[1]]
-        HeadFish.poisson = canvas.create_image(0, 0, anchor=tk.NW,image=self.img)
+        HeadFish.img = ImageTk.PhotoImage(PIL_image.resize(size, Image.ANTIALIAS))
+        HeadFish.poisson = canvas.create_image(0, 0, anchor=tk.NW,image=HeadFish.img)
         HeadFish.CV2_image_big = CV2_image
-        canvas.move(HeadFish.poisson,-(self.circle[0]-300),-(self.circle[1]-250))
-        app.bind("<Left>",self.moveLeft)
-        app.bind("<Right>",self.moveRight)
-        app.bind("<Up>",self.moveUp)
-        app.bind("<Down>",self.moveDown)
-    def moveLeft(self,event):
-        """!
-        Méthode pour déplacer l'image à gauche
-        @param event : event
-        """
-        canvas.move(HeadFish.poisson,-10,0)
-    def moveRight(self,event):
-        """!
-        Méthode pour déplacer l'image à droite
-        @param event : event
-        """
-        canvas.move(HeadFish.poisson,10,0)
-    def moveUp(self,event):
-        """!
-        Méthode pour déplacer l'image en haut
-        @param event : event
-        """
-        canvas.move(HeadFish.poisson,0,-10)
-    def moveDown(self,event):
-        """!
-        Méthode pour déplacer l'image en bas
-        @param event : event
-        """
-        canvas.move(HeadFish.poisson,0,10)
+        canvas.move(HeadFish.poisson,-(HeadFish.oeilXY[0]-200),-(HeadFish.oeilXY[1]-200))
 
 class BodyFish():
     poisson = None
+    img = None
     def __init__(self, canvas1,PIL_image,size):
-        """!
-        Constructeur de l'image du corps
-        @param canvas tk.Canvas : cadre de l'image
-        @param PIL_image list : matrice de l'image format PIL
-        @param cv2_image list : matrice de l'image format cv2
-        @param size list : dimension souhaitée de l'image
-        """
-        self.img = ImageTk.PhotoImage(PIL_image.resize(size, Image.ANTIALIAS))
-        BodyFish.poisson = canvas1.create_image(0, 0, anchor=tk.NW, image=self.img)
-        app.bind("<Key>",self.move)
-        app.bind("<Key>",self.move)
-        app.bind("<Key>",self.move)
-        app.bind("<Key>",self.move)
-    def move(self,event):
-        """!
-        Méthode pour déplacer l'image
-        @param event : touche pressée
-        """
-        if event.char=='q':
-            canvas1.move(BodyFish.poisson,-10,0)
-        if event.char=='s':
-            canvas1.move(BodyFish.poisson,10,0)
-        if event.char =='z':
-            canvas1.move(BodyFish.poisson,0,-10)
+        BodyFish.img = ImageTk.PhotoImage(PIL_image.resize(size, Image.ANTIALIAS))
+        BodyFish.poisson = canvas1.create_image(0, 0, anchor=tk.NW, image=BodyFish.img)
 
+## Import du modèle de détection
+class ModelPoints():
+    """!
+        Classe de préparation du modèle Regression Trees pour la détection des
+        points par Machine Learning
+    """
 
+    def __init__(self,aa,bb):
+        """!
+            Constructeur de la classe
+                Example : a = ModelPoints()
+        """
+        ModelPoints.pointsML = ML.ML_pointage(aa,bb)
+
+    def predict(self,path_newimage,predictor_path,predictor_name):
+        ModelPoints.pointsML.predict(path_newimage,predictor_path,predictor_name)
+
+class ScaleFish():
+    poisson = None
+    img = None
+    def __init__(self, canvas2,PIL_image,size):
+        ScaleFish.img = ImageTk.PhotoImage(PIL_image.resize(size, Image.ANTIALIAS))
+        # ScaleFish.poisson = canvas2.create_image(0, 0, anchor=tk.NW, image=ScaleFish.img)
+        # Interface.canvasEchelle.itemconfig(ScaleFish.poisson,state='normal')
+        # canvas2.move(ScaleFish.poisson,-(ScaleFish.left[0]-25),-(ScaleFish.left[1]-50))
+
+class ScaleFishBody():
+    poisson = None
+    img = None
+    def __init__(self, canvas3,PIL_image,size):
+        ScaleFishBody.img = ImageTk.PhotoImage(PIL_image.resize(size, Image.ANTIALIAS))
+        # ScaleFishBody.poisson = canvas3.create_image(0, 0, anchor=tk.NW, image=ScaleFishBody.img)
+        # Interface.canvasEchelle2.itemconfig(ScaleFishBody.poisson,state='hidden')
+        # Interface.canvasEchelle2.move(ScaleFishBody.poisson,-(ScaleFishBody.left[0]-25),-(ScaleFishBody.left[1]-125))
 
 class Interface(tk.Frame):
     sexModele = None
@@ -423,6 +732,7 @@ class Interface(tk.Frame):
         self.frame.pack(fill=tk.BOTH,expand=True)
         self.add_scrollbar()
         self.populate()
+        self.createlog()
 
 
     def add_scrollbar(self):
@@ -473,13 +783,13 @@ class Interface(tk.Frame):
         self.boutonImport.pack(anchor=tk.W,padx=5,pady=5,ipady=15,expand=True,fill='x')
 
         self.boutonImport.bind('<Control-o>',self.importImage)
-        tk.Button(self.frame,text = "Predict",command = Interface.affichePrediction,fg='purple').pack(anchor=tk.W,padx=5,ipady=8,fill='x')
-        tk.Label(self.frame, text = 'ADD THESE VALUES TO MODEL',font=("Purisa",12,"bold"),fg='green').pack(padx=0,pady=0)
+        tk.Button(self.frame,text = "Predict",command = self.Model_Sexage,fg='purple').pack(anchor=tk.W,padx=5,ipady=8,fill='x')
+        # tk.Label(self.frame, text = 'ADD THESE VALUES TO MODEL',font=("Purisa",12,"bold"),fg='green').pack(padx=0,pady=0)
         Interface.sexModele = tk.StringVar(self.frame)
 
-        self.sexModel = tk.Entry(self.frame,width=3,textvariable=Interface.sexModele)
-        self.sexModel.pack(padx=5,pady=5,anchor=tk.N)
-        tk.Button(self.frame,text = "Model Update (close Excel before)",command = HeadClass.genererAllDistancesHead,fg='green').pack(padx=0,pady=0,fill='x')
+        # self.sexModel = tk.Entry(self.frame,width=3,textvariable=Interface.sexModele)
+        # self.sexModel.pack(padx=5,pady=5,anchor=tk.N)
+        # tk.Button(self.frame,text = "Model Update (close Excel before)",command = HeadClass.genererAllDistancesHead,fg='green').pack(padx=0,pady=0,fill='x')
         self.boutonPrevious = tk.Button(self.frame,text='←',font=("Purisa",13,"bold"),command = self.previousImage)
         self.boutonPrevious.pack(fill='x',ipady=8)
         self.boutonNext = tk.Button(self.frame,text='→',font=("Purisa",13,"bold"),command = self.nextImage)
@@ -493,20 +803,40 @@ class Interface(tk.Frame):
 
         ''' Canvas pour la tête '''
         self.labelLongueur = tk.Label(self.frame,text="",justify=tk.LEFT)
-        self.canvasTete = tk.Canvas(self.frame,bg='#f0f0f0',bd=0,highlightthickness=1, highlightbackground="black")
-        self.canvasTete.config(width=600, height=500)
-        self.canvasTete.pack()
+        Interface.canvasTete = tk.Canvas(self.frame,bg='#f0f0f0',bd=0,highlightthickness=1, highlightbackground="black")
+        Interface.canvasTete.config(width=600, height=500)
+        Interface.canvasTete.pack()
         self.labelLongueurBody = tk.Label(self.frame,justify=tk.LEFT)
 
         ''' Canvas pour le corps '''
-        self.canvasCorps = tk.Canvas(self.frame,bg='#f0f0f0',highlightthickness=1, highlightbackground="black")
-        self.canvasCorps.config(width=1000, height=500)
-        self.canvasCorps.pack(padx=5)
+        Interface.canvasCorps = tk.Canvas(self.frame,bg='#f0f0f0',highlightthickness=1, highlightbackground="black")
+        Interface.canvasCorps.config(width=630, height=500)
+        Interface.canvasCorps.pack(padx=6)
         self.labelNumImage = tk.Label(self.frame,text="Image :",font=("Purisa",11),fg='gray')
         self.labelNumImage.pack()
         self.labelNomImage = tk.Label(self.frame,text="",font=("Purisa",11),fg='gray')
         self.labelNomImage.pack()
 
+
+        Interface.canvasEchelle2 = tk.Canvas(self,bg='#f0f0f0')
+        Interface.canvasEchelle = tk.Canvas(self,bg='#f0f0f0')
+
+
+    def allDist(lenBody):
+        listepoints = []
+        for i in HeadClass.nodes:
+            listepoints.append([Interface.canvasTete.coords(i)[0]+3,Interface.canvasTete.coords(i)[1]+3])
+        px50mm = XY_tools.Externes.euclide(Interface.canvasEchelle.coords(3),Interface.canvasEchelle.coords(5))
+
+        listedistances2 = []
+        print(lenBody)
+        print(px50mm)
+        listedistances2.append(round(lenBody*50/px50mm,5))
+        print(HeadClass.distances_all)
+
+        for x in HeadClass.distances_all:
+            listedistances2.append(x)
+        Interface.modeleDistances = listedistances2
 
     def onFrameConfigure(self, event):
         '''Reset the scroll region to encompass the inner frame'''
@@ -525,7 +855,7 @@ class Interface(tk.Frame):
 
         menuOutils = tk.Menu(menubar,tearoff=0)
         menuOutils.add_command(label="Prédire le sexe",command=Interface.affichePrediction,accelerator="(Ctrl+P)")
-        self.bind_all("<Control-p>",lambda e : Interface.affichePrediction())
+        self.bind_all("<Control-p>",lambda e : self.Model_Sexage())
         menuOutils.add_command(label="Image suivante",command=self.nextImage,accelerator="(Ctrl+Entrée)")
         self.bind_all("<Control-Return>",lambda e : self.nextImage())
         menuOutils.add_command(label="Image précédente",command=self.previousImage,accelerator="(Ctrl+Backspace)")
@@ -543,6 +873,81 @@ class Interface(tk.Frame):
         menubar.add_cascade(label="Aide", menu=menuAide)
 
         self.root.config(menu=menubar)
+
+    def createlog(self):
+        if not os.path.exists(os.getcwd()+"/log"):
+            os.mkdir(os.getcwd()+"/log")
+            pathname = os.getcwd()+"/log/"
+            date = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+            filename = "rapport" + "_" + date
+            f = open(pathname+filename+".txt","w+")
+        if os.path.exists(os.getcwd()+"/log"):
+            pathname = os.getcwd()+"/log/"
+            date = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+            filename = "rapport" + "_" + date
+            self.finalname = pathname+filename+".txt"
+            f = open(self.finalname,"w+")
+            f.close()
+
+    def verbose_intro(self):
+        message = "Rapport généré le "+datetime.now().strftime("%d/%m/%Y")+" à "+datetime.now().strftime("%H:%M:%S")+"\n"
+        message += "# Morphométrie Ineris v"+str(Interface.version)+"\n\n"
+        message += "# ML_morph version\n"
+        message += "\t - Algorithme utilisé : Regression trees (gradient boosting) \n"
+        message += "\t - Performances : erreur de placement moyenne de 4 pixels (0.25% de la longueur standard) \n\n"
+        message += "# ML_gender version\n"
+        message += "\t - Algorithmes utilisés : Gradient Boosting, SVM, Random Forest (consensus) \n"
+        message += "\t - Performances : 0.9% \n"
+
+        f = open(self.finalname,"a")
+        f.write(message)
+        f.close()
+
+    def verbose_photo(self):
+        message = "\n# Photos importées pour la prédiction :\n"
+        for x in self.listeImages:
+            message += "\t"+x+"\n"
+        f = open(self.finalname,"a")
+        f.write(message)
+        f.close()
+
+    def verbose_points(self,listepoints):
+        message = "\n# Coordonnées des points détectés :\n"
+        listepoints = listepoints[0]
+        for i in range(1,10):
+            message += "\t -"
+            for j in range(1,len(self.listeImages)+1):
+                message += "point n°"+str(i)+": "+"X = "+str(listepoints[i][0])+" Y = " +str(listepoints[i][1])+"\t"
+            message += "\n"
+        f = open(self.finalname,"a")
+        f.write(message)
+        f.close()
+
+    def verbose_distances(self,df_distance):
+        message = "\n# Distances utilisées pour la prédiction du sexe :\n"
+        for j in range(1,len(self.listeImages)+1):
+            # message += "distance n°"+str(i)+"= \t\t\t"
+            message += df_distance
+        message += "\n"
+        f = open(self.finalname,"a")
+        f.write(message)
+        f.close()
+
+    def verbose_sexe(self,text,proba):
+        message = "\n# Sexe finalement prédit :\n"
+        for i in range(1,len(self.listeImages)+1):
+            message += "\t - image n°"+str(i)+": "+text+"  (p="+str(proba)+"....)\n"
+        f = open(self.finalname,"a")
+        f.write(message)
+        f.close()
+
+    def verbose_conclusion(self):
+        message = "\nFIN \n"
+        message += datetime.now().strftime("%d/%m/%Y")+" à "+datetime.now().strftime("%H:%M:%S")+"\n"
+        f = open(self.finalname,"a")
+        f.write(message)
+        f.close()
+
 
     def getVersion():
         try:
@@ -581,13 +986,15 @@ class Interface(tk.Frame):
         """!
         Méthode permettant de mettre à jour l'affichage des longueurs dans l'interface
         """
-        app.labelLongueur.config(text=XY_tools.Externes.Longueur(HeadClass.calculDistances()))
+        # app.labelLongueur.config(text=XY_tools.Externes.Longueur(HeadClass.calculDistances()))
+        HeadClass.calculDistances()
 
     def afficheLongueurBody():
         """!
         Méthode permettant de mettre à jour l'affichage des longueurs du corps dans l'interface
         """
-        app.labelLongueurBody.config(text=XY_tools.Externes.LongueurBody(BodyClass.calculDistances()))
+        # app.labelLongueurBody.config(text=XY_tools.Externes.LongueurBody(BodyClass.calculDistances()))
+        BodyClass.calculDistances()
 
     def clearAllCanvas(self):
         """!
@@ -631,116 +1038,214 @@ class Interface(tk.Frame):
         self.resetListeImages()
         self.listeImages = XY_tools.Externes.openfn()
         self.calculPoints()
+        # print("chemin temp")
+        # print(Temp.chemin)
 
 
     def calculPoints(self):
         """!
         Méthode permettant de calculer les points et de les disposer sur l'image
         """
-        nbPointNonDetectes = 0
-        print("### Initialisation ###")
-        tete,echelle10mm,echelle3mm = XY_compute.Points.randomPointsBis()
-        pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19 = tete
-        self.clearAllCanvas()
+        # print("\n liste images selectionnées")
+        # print(self.listeImages)
+        # print("\n image actuelle")
+        # print(self.listeImages[self.numImageActuelle])
+        # print("\n")
+        path_global = '/'.join(self.listeImages[self.numImageActuelle].split('/')[:-1])
 
-        print(self.numImageActuelle)
+        #Points de la tête
+        points_tete = self.Model_Tete(self.listeImages[self.numImageActuelle])[0]
+        points_tete_copy = points_tete
 
-        ImagePIL = Image.open(self.listeImages[self.numImageActuelle])
+        #Oeil du poisson
+        HeadFish.oeilXY = [0.5*(points_tete_copy[1][0]+points_tete_copy[2][0]),0.5*(points_tete_copy[1][1]+points_tete_copy[2][1])]
+
+        #Points de l'échelle calculés par le modèle 2
+        points_echelle = self.Model_Echelle(self.listeImages[self.numImageActuelle])[0]
+        points_echelle_copy = points_echelle
+        ScaleFish.left = points_echelle[0]
+
+        #Placement des points de l'echelle au bon endroit
+        points_echelle = XY_tools.Externes.centerPoints2([points_echelle[0],points_echelle[1]],ScaleFish.left)
         app.labelNomImage.config(text=self.listeImages[self.numImageActuelle])
         app.labelNumImage.config(text=str(self.numImageActuelle+1)+"/"+str(len(self.listeImages)))
 
-        ''' Resize pour le corps '''
-        print("\n### Traitement du corps ###")
-        corpsStandard,newPIL_image,left = XY_compute.Points.ImageCorps(ImagePIL)
-        BodyFish(self.canvasCorps,newPIL_image,(1300,975))
-        self.canvasCorps.move(BodyFish.poisson,-(left[0]-50),-(left[1]-280))
-        self.canvasCorps.update()
-        print("### OK ###")
+        #Image de la tête
+        self.ImagePIL = Image.open(self.listeImages[self.numImageActuelle])
+        HeadFish(self.canvasTete,self.ImagePIL,cv2.imread(self.listeImages[self.numImageActuelle]),(1920,1440))
 
-        ''' Resize pour la tête '''
-        print("\n### Traitement de la tête 1/3 ### ")
-        PIL_image_big,CV2_image_big,left1,right1 = XY_compute.Points.ImageTete(self.listeImages,self.numImageActuelle)
-        HeadFish(self.canvasTete,PIL_image_big,CV2_image_big,(3500,2625))
+        #Image entière
+        self.ImagePIL2 = Image.open(self.listeImages[self.numImageActuelle])
+        BodyFish(Interface.canvasCorps,self.ImagePIL2,(640,480))
+
+        #Calcul des points du corps
+        listePoints3 = self.Model_Longueur(self.listeImages[self.numImageActuelle])[0]
+        listePoints3 = [[listePoints3[0][0]/3,listePoints3[0][1]/3],[listePoints3[1][0]/3,listePoints3[1][1]/3]]
+        corpsStandard = listePoints3
+
+        #Ajout de l'echelle
+        corpsStandard.extend([[points_echelle_copy[0][0]/3,points_echelle_copy[0][1]/3],[points_echelle_copy[1][0]/3,points_echelle_copy[1][1]/3]])
+
+        #Affichage des points sur l'image entière
+        BodyClass(Interface.canvasCorps,corpsStandard,'cyan')
+        Interface.canvasCorps.update()
+
+        #Affichage des points sur la tête
+        pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19,pt21 = points_tete_copy
+        points_tete_copy = XY_tools.Externes.centerPoints([pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19,pt21],HeadFish.oeilXY)
+        HeadClass.pointsEchelle = points_echelle
+        HeadClass(self.canvasTete, points_tete_copy,'#ff00f2')
         self.canvasTete.update()
-        print("### OK ###")
 
-        print("\n### Alignement des points sur le corps'  ###")
-        corpsStandard = [[x[0]-(left[0]-50),x[1]-(left[1]-280)] for x in corpsStandard]
-        echelle10mm = [[x[0]-(left[0]-250),x[1]-(left[1]-350)] for x in echelle10mm]
-        BodyClass(self.canvasCorps, echelle10mm,'red')
-        BodyClass(self.canvasCorps,corpsStandard,'cyan')
-        self.canvasCorps.update()
-        print("### OK ###")
+        #Image de l'échelle
+        ImagePIL = Image.open(self.listeImages[self.numImageActuelle])
+        tete2 = points_tete
+        ScaleFish(Interface.canvasEchelle,ImagePIL,(1920,1440))
+        ScaleClass(Interface.canvasEchelle,points_echelle,'#ffffff')
 
-        ''' Initialisation des points 3 et 19 par détection auto '''
-        print("\n### Calcul des points 3 et 19 ###")
+        # Calcul des points  du corps Bis
+        points_longueur = self.Model_Longueur('/'.join(self.listeImages[0].split('/')[:-1]))[0]
+        pt1,pt2 = [points_longueur[0][0],points_longueur[0][1]],[points_longueur[1][0],points_longueur[1][1]]
+        ScaleFishBody.left = [points_longueur[0][0],points_longueur[0][1]]
+        points_longueur = XY_tools.Externes.centerPoints3([pt1,pt2],ScaleFishBody.left)
+
+        # Image du corps
+        ImagePIL = Image.open(self.listeImages[self.numImageActuelle])
+        ScaleFishBody(Interface.canvasEchelle2,ImagePIL,(1920,1440))
+        ScaleClassBody(Interface.canvasEchelle2,points_longueur,'#ffffff')
+
+    def Model_Tete(self,pathimage):
+        """!
+            @param pathimage dossier de l'image
+        """
+        print("points tête")
         try:
-            [pt3,pt19]=XY_compute.Points.points3_19(CV2_image_big)
-            pt3 = [pt3[0],pt3[1]]
-            pt19 = [pt19[0],pt19[1]]
+            pathPredictor = os.path.join(sys._MEIPASS, 'predictor_head.dat')
         except:
-            print("Impossible de déterminer les points 3 et 19")
-            nbPointNonDetectes+=2
-        # [pt3,pt19]=XY_compute.Points.points3_19(CV2_image_big)
-        # pt3 = [pt3[0],pt3[1]]
-        # pt19 = [pt19[0],pt19[1]]
-        print("### OK ###")
-
-        '''Initialisation du point 9 par détection auto '''
-        print("\n### Calcul du point 9 ###")
-        _,c = XY_compute.Points.contoursCorps(CV2_image_big,'head')
-        print(CV2_image_big.shape)
+            pathPredictor = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\predictor_head.dat'
         try:
-            pt9=XY_compute.Points.point9(c,pt19)
-            pt9 = [pt9[0],pt9[1]]
-            print("pt9")
-            print(pt9)
-            # print("left")
-            # print(left)
+            a = ModelPoints(os.path.join(sys._MEIPASS,''),"")
         except:
-            print("Impossible de déterminer le point 9")
-            nbPointNonDetectes+=1
-        print("### OK ###")
-
-        '''Initialisation du point 15 et 13 par détection auto '''
-        print("\n### Calcul des points 15 et 13 ###")
-        pt15,pt13=XY_compute.Points.points15_13(CV2_image_big,pt19,left1,right1)
-        # try:
-        #     pt15,pt13=XY_compute.Points.points15_13(CV2_image_big,pt19,left1,right1)
-        #     pt15 = [pt15[0],pt15[1]]
-        #     pt13 = [pt13[0],pt13[1]]
-        # except:
-        #     print("Impossible de déterminer les points 15 et 13")
-        #     pt13 = [1288, 1228]
-        #     pt15 = [1308, 1098]
-        #     nbPointNonDetectes+=2
-        print("### OK ###")
-
-
-        '''Initialisation des points 5 et 7 par détection auto '''
-        print("\n### Calcul des points 5 et 7  ###")
+            a = ModelPoints(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\',"")
+        # print("load ok")
         try:
-            pt7,pt5 = XY_compute.Points.points5_7(CV2_image_big,pt9,left1)
-            pt5 = [pt5[0],pt5[1]]
-            pt7 = [pt7[0],pt7[1]]
+            a.predict(pathimage,os.path.join(sys._MEIPASS,''),"predictor_head.dat")
         except:
-            print("Impossible de détecter les points 5 et 7")
-            nbPointNonDetectes+=2
+            a.predict(pathimage,Temp.ppath2+"\models\\","predictor_head.dat")
 
-        """Initialisation des points 11 et 17 par détection auto """
+        # print("predict ok")
+        # print(Temp.chemin)
         try:
-            pt17,pt11 = XY_compute.Points.points11_17(CV2_image_big,pt13,pt15)
+            listepoints = ML.ML_pointage.xmltolistY(Temp.ppath2+"\models\\"+"output.xml",0)
         except:
-            print("Impossible de détecter les points 11 et 17")
-            nbPointNonDetectes+=2
+            listepoints = ML.ML_pointage.xmltolistY(os.path.join(sys._MEIPASS,"output.xml"),0)
+        self.verbose_points(listepoints)
+        return listepoints
 
-        tete = XY_tools.Externes.centerPoints([pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19],HeadFish.centreOeil)
+    def Model_Echelle(self,pathimage):
+        """!
+            @param pathimage dossier de l'image
+        """
+        print("points echelle")
+        try:
+            pathPredictor = os.path.join(sys._MEIPASS, 'predictor_scale.dat')
+        except:
+            pathPredictor = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\predictor_scale.dat'
 
-        print("\n### Placement des points de la tête ###")
-        HeadClass(self.canvasTete, tete,'#ff00f2')
-        HeadClass(self.canvasTete,echelle3mm,'red')
-        print("### OK ###")
-        app.labelInfoPoints.config(text=str(13-nbPointNonDetectes)+" points détectés / 13 ")
+        try:
+            a = ModelPoints(os.path.join(sys._MEIPASS,''),"")
+        except:
+            a = ModelPoints(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\',"")
+
+        try:
+            a.predict(pathimage,os.path.join(sys._MEIPASS,''),"predictor_scale.dat")
+        except:
+            a.predict(pathimage,Temp.ppath2+"\models\\","predictor_scale.dat")
+
+        try:
+            listepoints = ML.ML_pointage.xmltolistY(Temp.ppath2+"\models\\"+"output.xml",0)
+        except:
+            listepoints = ML.ML_pointage.xmltolistY(os.path.join(sys._MEIPASS,"output.xml"),0)
+
+        return listepoints
+
+
+    def Model_Longueur(self,pathimage):
+        print("points longueur")
+        try:
+            pathPredictor = os.path.join(sys._MEIPASS, 'predictor_LS.dat')
+        except:
+            pathPredictor = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\predictor_LS.dat'
+        try:
+            a = ModelPoints(os.path.join(sys._MEIPASS,''),"")
+        except:
+            a = ModelPoints(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\',"")
+        try:
+            a.predict(pathimage,os.path.join(sys._MEIPASS,''),"predictor_LS.dat")
+        except:
+            a.predict(pathimage,Temp.ppath2+"\models\\","predictor_LS.dat")
+
+        try:
+            listepoints = ML.ML_pointage.xmltolistY(Temp.ppath2+"\models\\"+"output.xml",0)
+        except:
+            listepoints = ML.ML_pointage.xmltolistY(os.path.join(sys._MEIPASS,"output.xml"),0)
+        return listepoints
+
+
+    def Model_Sexage(self):
+        print("classification")
+        Interface.lenBody = XY_tools.Externes.euclide(Interface.canvasEchelle2.coords(3),Interface.canvasEchelle2.coords(5))
+        Interface.allDist(Interface.lenBody)
+        from joblib import dump, load
+        import pandas as pd
+        try:
+            clf = load(os.path.join(sys._MEIPASS,"GBClassifierFinal.joblib"))
+            clf1 = load(os.path.join(sys._MEIPASS,"SVCClassifierFinal.joblib"))
+            clf2 = load(os.path.join(sys._MEIPASS,"XGBClassifierFinal.joblib"))
+        except:
+            clf = load(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\GBClassifierFinal.joblib')
+            clf1 = load(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\SVCClassifierFinal.joblib')
+            clf2 = load(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\XGBClassifierFinal.joblib')
+
+        pd.set_option('display.max_columns', None)
+        pd.set_option('display.expand_frame_repr', False)
+        pd.set_option('max_colwidth', None)
+        ae = pd.DataFrame(Interface.modeleDistances).T
+
+        # print(ae)
+        prediction = clf.predict(ae)
+        prediction1 = clf1.predict(ae)
+        prediction2 = clf2.predict(ae)
+
+
+        ## Consensus
+        if(prediction==prediction1==prediction2):
+            y_consensus = prediction
+        else:
+            y_consensus = 0.5
+
+        proba = max(clf.predict_proba(ae)[0])
+        listePredictionInt = [clf.predict(ae)[0], clf1.predict(ae)[0], clf2.predict(ae)[0]]
+        listeProba = [list(np.round(clf.predict_proba(ae),4).flatten()), list(np.round(clf1.predict_proba(ae),4).flatten()),list(np.round(clf2.predict_proba(ae),4).flatten())]
+
+        listePredictionStr = ["F" if x==0 else "M" for x in listePredictionInt]
+        if y_consensus==0:
+            consensusStr = "F"
+        if y_consensus==1:
+            consensusStr = "M"
+        if y_consensus==0.5:
+            consensusStr = "Undetermined"
+
+        text = ""
+        for i in range(3):
+            text += listePredictionStr[i]+" "+str(listeProba[i][listePredictionInt[i]])+";"
+        text+="\n\n Sex classification : "+consensusStr
+        app.labelSex.config(text = text)
+
+        self.verbose_distances(str(ae))
+        self.verbose_sexe(text,proba)
+        self.verbose_conclusion()
+
 
     def affichePrediction():
         """!
