@@ -572,7 +572,7 @@ class ModelPoints():
 
 class Interface(tk.Tk):
     sexModele = None
-    version = 1.7
+    version = 1.8
     canvasTete = None
     def __init__(self):
         """!
@@ -587,6 +587,132 @@ class Interface(tk.Tk):
         self.add_canvas()
         self.createlog()
         self.verbose_intro()
+
+    def add_canvas(self):
+        ''' Canvas pour la tête '''
+        Interface.canvasTete = tk.Canvas(self,bg='#f0f0f0',bd=0,highlightthickness=1, highlightbackground="black")
+        Interface.canvasTete.config(width=450, height=400)
+        Interface.canvasTete.grid(column=0,row=8)
+
+        ''' Canvas pour le corps '''
+        Interface.canvasCorps = tk.Canvas(self,bg='#f0f0f0',highlightthickness=1, highlightbackground="black")
+        Interface.canvasCorps.config(width=630, height=400)
+        Interface.canvasCorps.grid(column=1,row=8)
+
+        ''' Canvas pour l'échelle '''
+        Interface.canvasEchelle = tk.Canvas(self,bg='#f0f0f0')
+        Interface.canvasEchelle.config(width=1590, height=200)
+        Interface.canvasEchelle.place(relx=0,rely=0.7)
+
+        """Canvas pour logo"""
+        pathLogo = XY_tools.Externes.resource_path("logo2.png")
+        self.canvasLogo2 = tk.Canvas(self,bg='#f0f0f0')
+        self.canvasLogo2.config(width=157,height=84)
+        self.canvasLogo2.place(x=0,y=0)
+        self.imgLogo2 = ImageTk.PhotoImage(Image.open(pathLogo).resize((157,84)))
+        self.canvasLogo2.create_image(0, 0, anchor=tk.NW,image=self.imgLogo2)
+
+        """Canvas pour logo"""
+        Interface.canvasEchelle2 = tk.Canvas(self,bg='#f0f0f0')
+        Interface.canvasEchelle2.config(width=1590,height=200)
+        Interface.canvasEchelle2.place(relx=0,rely=0.7)
+
+        ''' Canvas pour le schema '''
+        pathSchema = XY_tools.Externes.resource_path("schema.png")
+        self.canvasSchema = tk.Canvas(self,bg='#f0f0f0')
+        self.canvasSchema.config(width = 288,height=192)
+        self.canvasSchema.place(x=1250,y=0)
+        self.imgSchema = ImageTk.PhotoImage(Image.open(pathSchema).resize((288,192)))
+        self.canvasSchema.create_image(0,0,anchor=tk.NW,image=self.imgSchema)
+
+
+    def add_buttons(self):
+        self.boutonImport = tk.Button(self,text = "Import images",command = self.importImage,fg='purple')
+        self.boutonImport.place(relx=0.25,rely=0.12)
+        self.boutonImport.bind('<Control-o>',self.importImage)
+        self.boutonPredict = tk.Button(self,text = "Predict",command = self.Model_Sexage,fg='purple')
+        self.boutonPredict.place(relx=0.35,rely=0.12)
+        self.boutonPredict.bind('<Control-p>',self.Model_Sexage)
+        self.boutonPrevious = tk.Button(self,text='<--',fg='red',command = self.previousImage)
+        self.boutonPrevious.place(relx=0.45,rely=0.12)
+        self.boutonNext = tk.Button(self,text='-->',fg='red',command = self.nextImage)
+        self.boutonNext.place(relx=0.5,rely=0.12)
+
+        tk.Button(self,text="1) Réglage corps", fg='gray', command = self.afficheCorps).place(relx = 0.7,rely=0.6)
+        tk.Button(self,text="2) Réglage échelle",fg='gray',command = self.hideCorps).place(relx=0.77,rely=0.6)
+        tk.Button(self,text="3) Cacher",fg='gray',command = self.hideScale).place(relx = 0.84,rely=0.6)
+
+    def add_labels(self):
+        ''' Label Intro de presentation'''
+        tk.Label(self, text = 'PREDICTION',font=("Purisa",12,"bold"),fg='purple').place(relx=0.25,rely=0.08)
+        tk.Label(self,text=" ",font=("Purisa",12,"bold")).grid(ipadx=2)
+        tk.Label(self,text=" Sexing procedure of three-spined stickleback \n",font=("Andalus",16,"bold")).place(relx=0.35,rely=0.01)
+        tk.Label(self,text="\n \n \n \n ").grid(column=0,row=1)
+
+        self.labelSex = tk.Label(self,text="")
+        self.labelSex.place(relx=0.55,rely=0.12)
+
+        tk.Label(self,text=" ").grid(column=0,row=3)
+
+        self.labelNumImage = tk.Label(self,text="",font=("Purisa",11),fg='gray')
+        self.labelNumImage.place(relx=0.35,rely=0.975)
+        self.labelNomImage = tk.Label(self,text="",font=("Purisa",11),fg='gray')
+        self.labelNomImage.place(relx=0.4,rely=0.975)
+
+        ''' Labels pour les longueurs de la tête '''
+        # tk.Label(self,text="Longueurs caractéristiques de la tête : \n",justify=tk.LEFT,font=("Purisa",8,"bold","underline")).place(relx=.7,rely=.38)
+        tk.Label(self,text="\n",justify=tk.LEFT,font=("Purisa",8,"bold","underline")).grid(column=2,row=4)
+        self.labelLongueur = tk.Label(self,text="",justify=tk.LEFT)
+        self.labelLongueur.place(relx=0.7,rely=0.42)
+
+        ''' Labels pour les longueurs du corps '''
+        # tk.Label(self,text="Longueurs caractéristiques du corps : \n",justify=tk.LEFT,font=("Purisa",8,"bold","underline")).place(relx=.7,rely=.25)
+        self.labelLongueurBody = tk.Label(self,text="",justify=tk.LEFT)
+        self.labelLongueurBody.place(relx = .7,rely=.3)
+
+    def add_menu(self):
+        ''' Fenetre et menu'''
+        self.state('zoomed')
+        self.title("Sex Determination for Three Spined Stickleback")
+        menubar = tk.Menu(self)
+        menuFichier = tk.Menu(menubar,tearoff=0)
+        menuFichier.add_command(label="Importer", command=self.importImage,accelerator="(Ctrl+O)")
+        self.bind_all("<Control-o>",lambda e : self.importImage())
+        menuFichier.add_separator()
+        menuFichier.add_command(label="Quitter", command=self.destroy,accelerator="(Ctrl+Q)")
+        self.bind_all("<Control-q>",lambda e : self.destroy())
+        menubar.add_cascade(label="Fichier", menu=menuFichier)
+
+        menuOutils = tk.Menu(menubar,tearoff=0)
+        menuOutils.add_command(label="Prédire le sexe",command=self.Model_Sexage,accelerator="(Ctrl+P)")
+        self.bind_all("<Control-p>",lambda e : self.Model_Sexage())
+        menuOutils.add_command(label="Image suivante",command=self.nextImage,accelerator="(Ctrl+Entrée)")
+        self.bind_all("<Control-Return>",lambda e : self.nextImage())
+        menuOutils.add_command(label="Image précédente",command=self.previousImage,accelerator="(Ctrl+Backspace)")
+        self.bind_all("<Control-BackSpace>",lambda e : self.previousImage())
+
+        menuOutils.add_separator()
+        menuOutils.add_command(label="Ouvrir base de données",command=self.openDataBase,accelerator="(Ctrl+H)")
+        self.bind_all("<Control-h>",lambda e : self.openDataBase())
+        menubar.add_cascade(label="Outils",menu=menuOutils)
+
+        menuModeles = tk.Menu(menubar,tearoff=0)
+        menuModeles.add_command(label="Prépare MaJ Pointage",command=Interface.improveLandmarksModel)
+        menuModeles.add_command(label="MaJ Pointage 🔒",command=self.updatePointModel)
+        menuModeles.add_command(label="MaJ Sexage 🔒",command=self.updatePointModel1)
+        menubar.add_cascade(label="Modèles",menu=menuModeles)
+
+        menuAffichage = tk.Menu(menubar,tearoff=0)
+        menuAffichage.add_command(label="Vue pour petit écran",command=self.changeView,accelerator="(Ctrl+N)")
+        self.bind_all("<Control-n>",lambda e : self.changeView())
+        menubar.add_cascade(label="Affichage",menu=menuAffichage)
+
+        menuAide = tk.Menu(menubar, tearoff=0)
+        menuAide.add_command(label="A propos", command=self.help,accelerator="(Ctrl+I)")
+        self.bind_all("<Control-i>",lambda e : self.help())
+        menuAide.add_command(label="Version",command=Interface.getVersion)
+        menubar.add_cascade(label="Aide", menu=menuAide)
+        self.config(menu=menubar)
 
     def createlog(self):
         if not os.path.exists(os.getcwd()+"/log"):
@@ -713,66 +839,11 @@ class Interface(tk.Tk):
         print("classification")
         Interface.lenBody = XY_tools.Externes.euclide(Interface.canvasEchelle2.coords(3),Interface.canvasEchelle2.coords(5))
         Interface.allDist(Interface.lenBody)
-        text = IA_sexage.Prediction.load_models(Interface.modeleDistances)
+        text,ae,proba = IA_sexage.Prediction.load_models(Interface.modeleDistances)
         app.labelSex.config(text = text)
         self.verbose_distances(str(ae))
         self.verbose_sexe(text,proba)
         self.verbose_conclusion()
-
-
-    def add_canvas(self):
-        ''' Canvas pour la tête '''
-        Interface.canvasTete = tk.Canvas(self,bg='#f0f0f0',bd=0,highlightthickness=1, highlightbackground="black")
-        Interface.canvasTete.config(width=450, height=400)
-        Interface.canvasTete.grid(column=0,row=8)
-
-        ''' Canvas pour le corps '''
-        Interface.canvasCorps = tk.Canvas(self,bg='#f0f0f0',highlightthickness=1, highlightbackground="black")
-        Interface.canvasCorps.config(width=630, height=400)
-        Interface.canvasCorps.grid(column=1,row=8)
-
-        ''' Canvas pour l'échelle '''
-        Interface.canvasEchelle = tk.Canvas(self,bg='#f0f0f0')
-        Interface.canvasEchelle.config(width=1590, height=200)
-        Interface.canvasEchelle.place(relx=0,rely=0.7)
-
-        """Canvas pour logo"""
-        pathLogo = XY_tools.Externes.resource_path("logo2.png")
-        self.canvasLogo2 = tk.Canvas(self,bg='#f0f0f0')
-        self.canvasLogo2.config(width=157,height=84)
-        self.canvasLogo2.place(x=0,y=0)
-        self.imgLogo2 = ImageTk.PhotoImage(Image.open(pathLogo).resize((157,84)))
-        self.canvasLogo2.create_image(0, 0, anchor=tk.NW,image=self.imgLogo2)
-
-        """Canvas pour logo"""
-        Interface.canvasEchelle2 = tk.Canvas(self,bg='#f0f0f0')
-        Interface.canvasEchelle2.config(width=1590,height=200)
-        Interface.canvasEchelle2.place(relx=0,rely=0.7)
-
-        ''' Canvas pour le schema '''
-        pathSchema = XY_tools.Externes.resource_path("schema.png")
-        self.canvasSchema = tk.Canvas(self,bg='#f0f0f0')
-        self.canvasSchema.config(width = 288,height=192)
-        self.canvasSchema.place(x=1250,y=0)
-        self.imgSchema = ImageTk.PhotoImage(Image.open(pathSchema).resize((288,192)))
-        self.canvasSchema.create_image(0,0,anchor=tk.NW,image=self.imgSchema)
-
-
-    def add_buttons(self):
-        self.boutonImport = tk.Button(self,text = "Import images",command = self.importImage,fg='purple')
-        self.boutonImport.place(relx=0.25,rely=0.12)
-        self.boutonImport.bind('<Control-o>',self.importImage)
-        self.boutonPredict = tk.Button(self,text = "Predict",command = self.Model_Sexage,fg='purple')
-        self.boutonPredict.place(relx=0.35,rely=0.12)
-        self.boutonPredict.bind('<Control-p>',self.Model_Sexage)
-        self.boutonPrevious = tk.Button(self,text='<--',fg='red',command = self.previousImage)
-        self.boutonPrevious.place(relx=0.45,rely=0.12)
-        self.boutonNext = tk.Button(self,text='-->',fg='red',command = self.nextImage)
-        self.boutonNext.place(relx=0.5,rely=0.12)
-
-        self.buttonBody = tk.Button(self,text="1) Réglage corps", fg='gray', command = self.afficheCorps).place(relx = 0.7,rely=0.6)
-        self.buttonBody = tk.Button(self,text="2) Réglage échelle",fg='gray',command = self.hideCorps).place(relx=0.77,rely=0.6)
-        self.buttonScale = tk.Button(self,text="3) Cacher",fg='gray',command = self.hideScale).place(relx = 0.84,rely=0.6)
 
     def afficheScale(self):
         Interface.canvasEchelle.itemconfig(ScaleFish.poisson,state='normal')
@@ -787,83 +858,6 @@ class Interface(tk.Tk):
         Interface.canvasEchelle2.itemconfig(ScaleFishBody.poisson,state='hidden')
         Interface.lenBody = XY_tools.Externes.euclide(Interface.canvasEchelle2.coords(3),Interface.canvasEchelle2.coords(5))
         Interface.canvasEchelle2.destroy()
-
-    def add_labels(self):
-        ''' Label Intro de presentation'''
-        tk.Label(self, text = 'PREDICTION',font=("Purisa",12,"bold"),fg='purple').place(relx=0.25,rely=0.08)
-        tk.Label(self,text=" ",font=("Purisa",12,"bold")).grid(ipadx=2)
-        tk.Label(self,text=" Sexing procedure of three-spined stickleback \n",font=("Andalus",16,"bold")).place(relx=0.35,rely=0.01)
-        tk.Label(self,text="\n \n \n \n ").grid(column=0,row=1)
-
-        self.labelSex = tk.Label(self,text="")
-        self.labelSex.place(relx=0.55,rely=0.12)
-
-        self.labelInfoPoints = tk.Label(self,text="",font=("Purisa",11),fg='gray')
-        self.labelInfoPoints.place(relx=0.1,rely=0.975)
-
-        self.labelVide = tk.Label(self,text=" ")
-        self.labelVide.grid(column=0,row=3)
-
-        self.labelNumImage = tk.Label(self,text="",font=("Purisa",11),fg='gray')
-        self.labelNumImage.place(relx=0.35,rely=0.975)
-        self.labelNomImage = tk.Label(self,text="",font=("Purisa",11),fg='gray')
-        self.labelNomImage.place(relx=0.4,rely=0.975)
-
-        ''' Labels pour les longueurs de la tête '''
-        # tk.Label(self,text="Longueurs caractéristiques de la tête : \n",justify=tk.LEFT,font=("Purisa",8,"bold","underline")).place(relx=.7,rely=.38)
-        tk.Label(self,text="\n",justify=tk.LEFT,font=("Purisa",8,"bold","underline")).grid(column=2,row=4)
-        self.labelLongueur = tk.Label(self,text="",justify=tk.LEFT)
-        self.labelLongueur.place(relx=0.7,rely=0.42)
-
-        ''' Labels pour les longueurs du corps '''
-        # tk.Label(self,text="Longueurs caractéristiques du corps : \n",justify=tk.LEFT,font=("Purisa",8,"bold","underline")).place(relx=.7,rely=.25)
-        self.labelLongueurBody = tk.Label(self,text="",justify=tk.LEFT)
-        self.labelLongueurBody.place(relx = .7,rely=.3)
-
-
-    def add_menu(self):
-        ''' Fenetre et menu'''
-        self.state('zoomed')
-        self.title("Sex Determination for Three Spined Stickleback")
-        menubar = tk.Menu(self)
-        menuFichier = tk.Menu(menubar,tearoff=0)
-        menuFichier.add_command(label="Importer", command=self.importImage,accelerator="(Ctrl+O)")
-        self.bind_all("<Control-o>",lambda e : self.importImage())
-        menuFichier.add_separator()
-        menuFichier.add_command(label="Quitter", command=self.destroy,accelerator="(Ctrl+Q)")
-        self.bind_all("<Control-q>",lambda e : self.destroy())
-        menubar.add_cascade(label="Fichier", menu=menuFichier)
-
-        menuOutils = tk.Menu(menubar,tearoff=0)
-        menuOutils.add_command(label="Prédire le sexe",command=self.Model_Sexage,accelerator="(Ctrl+P)")
-        self.bind_all("<Control-p>",lambda e : self.Model_Sexage())
-        menuOutils.add_command(label="Image suivante",command=self.nextImage,accelerator="(Ctrl+Entrée)")
-        self.bind_all("<Control-Return>",lambda e : self.nextImage())
-        menuOutils.add_command(label="Image précédente",command=self.previousImage,accelerator="(Ctrl+Backspace)")
-        self.bind_all("<Control-BackSpace>",lambda e : self.previousImage())
-
-        menuOutils.add_separator()
-        menuOutils.add_command(label="Ouvrir base de données",command=self.openDataBase,accelerator="(Ctrl+H)")
-        self.bind_all("<Control-h>",lambda e : self.openDataBase())
-        menubar.add_cascade(label="Outils",menu=menuOutils)
-
-        menuModeles = tk.Menu(menubar,tearoff=0)
-        menuModeles.add_command(label="Prépare MaJ Pointage",command=Interface.improveLandmarksModel)
-        menuModeles.add_command(label="MaJ Pointage 🔒",command=self.updatePointModel)
-        menuModeles.add_command(label="MaJ Sexage 🔒",command=self.updatePointModel1)
-        menubar.add_cascade(label="Modèles",menu=menuModeles)
-
-        menuAffichage = tk.Menu(menubar,tearoff=0)
-        menuAffichage.add_command(label="Vue pour petit écran",command=self.changeView,accelerator="(Ctrl+N)")
-        self.bind_all("<Control-n>",lambda e : self.changeView())
-        menubar.add_cascade(label="Affichage",menu=menuAffichage)
-
-        menuAide = tk.Menu(menubar, tearoff=0)
-        menuAide.add_command(label="A propos", command=self.help,accelerator="(Ctrl+I)")
-        self.bind_all("<Control-i>",lambda e : self.help())
-        menuAide.add_command(label="Version",command=Interface.getVersion)
-        menubar.add_cascade(label="Aide", menu=menuAide)
-        self.config(menu=menubar)
 
     def improveLandmarksModel():
         message = "Pour ajouter des données au modèle v1 de placement de points :"
@@ -919,7 +913,6 @@ class Interface(tk.Tk):
         BodyClass.pointsEchelle=[]
         BodyClass.distances_check=[0 for _ in range(20)]
         self.labelLongueurBody.config(text="")
-        self.labelInfoPoints.config(text="")
         self.labelSex.config(text="")
         Interface.canvasTete.delete('all')
         Interface.canvasCorps.delete('all')
@@ -1070,7 +1063,6 @@ class Interface(tk.Tk):
         if(self.numImageActuelle<len(self.listeImages)):
             self.blockButton(+1)
 
-
     def previousImage(self):
         """!
         Méthode permettant de revenir a l'image précédente
@@ -1146,10 +1138,5 @@ class Interface(tk.Tk):
         tk.messagebox.showinfo(title="Informations",message=message)
 
 
-
-
 app = Interface()
 app.mainloop()
-
-
-

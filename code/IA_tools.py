@@ -226,22 +226,14 @@ class utils():
         Returns:
             file_sz(array): original image dimensions
         '''
-        # print(os.path.splitext(file))
         img = cv2.imread(file)
         if img is None:
             print('File {} was ignored'.format(file))
         else:
-            
             file_sz= [img.shape[0],img.shape[1]]
-            # img = cv2.resize(img,(1200,900))
             img = cv2.resize(img,(1920,1440))
-
             cv2.imwrite(os.path.join(dir_path,name), img)
-            # print(os.path.join(dir_path,name))
             return file_sz
-    
-    
-    # Tools for predicting objects and shapes in new images
     
     def predictions_to_xml(predictor_name,img_path,ignore, out_file):
         '''
