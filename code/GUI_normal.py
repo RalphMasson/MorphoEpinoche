@@ -22,19 +22,8 @@ import xgboost as xgb
 
 ## Classes pour afficher les points sur les images
 
-class HeadClass():
-    """Variables globales pour export
-    id_polygons : liste des id des polygons (la tete et l'echelle)
-    pointsFish : liste des points de la tête [(x1,y1),(x2,y2)...]
-    distances_check : liste des distances caractéristiques affichées
-    distances_all : liste de toutes les distances sauvegardés pour le modèle
-    pointsEchelle : liste des points de l'echelle [(x1,y1),(x2,y2)]
-    """
-    id_polygons = []
-    pointsFish = []
-    distances_check = []
-    distances_all = []
-    pointsEchelle = []
+class Polygone():
+
     def __init__(self, canvas, points,color):
         """!
         Constructeur du polygone de la tête
@@ -44,40 +33,46 @@ class HeadClass():
         """
         self.previous_x = self.previous_y = self.selected = self.x = None
         self.points = points
+        self.id_polygons = []
+        self.distances_all = []
+        self.pointsEchelle = []
         listenode = [i for i in range(1,13)]
         num = 0
         if points!=None:
             if color=='red':outline='red'
             else: outline=''
             self.polygon = canvas.create_polygon(self.points,fill='',outline=outline,smooth=0,width=2,dash=(1,))
-            HeadClass.id_polygons.append(self.polygon)
+            self.id_polygons.append(self.polygon)
             canvas.tag_bind(self.polygon, '<ButtonPress-1>',   lambda event, tag=self.polygon: self.on_press_tag(event, 0, tag))
             canvas.tag_bind(self.polygon, '<ButtonRelease-1>', lambda event, tag=self.polygon: self.on_release_tag(event, 0, tag,canvas))
-            HeadClass.nodes = []
+            self.nodes = []
             self.nonodes = []
             for number, point in enumerate(self.points):
                 x, y = point
                 node = canvas.create_rectangle((x-3, y-3, x+3, y+3), fill=color)
                 label = canvas.create_text((x+15, y+6),text=str(listenode[num]),font=("Purisa", 12),fill='purple')
                 num+=1
-                HeadClass.nodes.append(node)
+                self.nodes.append(node)
                 self.nonodes.append(label)
                 canvas.tag_bind(node, '<ButtonPress-1>',   lambda event, number=number, tag=node: self.on_press_tag(event, number, tag))
                 canvas.tag_bind(node, '<ButtonRelease-1>', lambda event, number=number, tag=node: self.on_release_tag(event, number, tag,canvas))
                 canvas.tag_bind(node, '<B1-Motion>', lambda event, number=number: self.on_move_node(event, number,canvas))
 
-        HeadClass.update_points(canvas)
-        if(len(HeadClass.pointsEchelle)>0):
+        self.update_points(canvas)
+        print("len self pointsEchelle")
+        print(len(self.pointsEchelle))
+        if(len(self.pointsEchelle)>0):
              Interface.afficheLongueur()
 
-    def update_points(canvas):
+    def update_points(self,canvas):
         """!
         Methode de mise à jour de la position des points
         @param canvas tk.Canvas : cadre de l'image
         """
-        for id in HeadClass.id_polygons:
+        for id in self.id_polygons:
             liste = canvas.coords(id)
-            if(len(liste)==20):HeadClass.pointsFish=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
+            print(liste)
+            if(len(liste)==20):self.pointsFish=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
 
     def on_press_tag(self, event, number, tag):
         """!
@@ -98,7 +93,7 @@ class HeadClass():
         @param tag int : numero de l'id
         """
         self.selected = self.previous_x = self.previous_y = None
-        HeadClass.update_points(canvas)
+        self.update_points(canvas)
 
     def on_move_node(self, event, number,canvas):
         """!
@@ -111,140 +106,27 @@ class HeadClass():
             dx = event.x - self.previous_x
             dy = event.y - self.previous_y
             canvas.move(self.selected, dx, dy)
-            canvas.move(self.nonodes[HeadClass.nodes.index(self.selected)],dx,dy)
+            canvas.move(self.nonodes[self.nodes.index(self.selected)],dx,dy)
             self.points[number][0] += dx
             self.points[number][1] += dy
             coords = sum(self.points, [])
             canvas.coords(self.polygon, coords)
             self.previous_x = event.x
             self.previous_y = event.y
-        HeadClass.update_points(canvas)
+        self.update_points(canvas)
         Interface.afficheLongueur()
 
-    def calculDistances():
+    def calculDistances(self):
         """!
         Methode pour calculer certaines distances caractéristiques
         """
-        HeadClass.distances_check = XY_tools.Externes.calculDistances(HeadClass.pointsEchelle,HeadClass.pointsFish)
-        HeadClass.distances_all = XY_tools.Externes.calculDistancesv2(HeadClass.pointsEchelle, HeadClass.pointsFish)
-        return HeadClass.distances_check
+        self.distances_check = XY_tools.Externes.calculDistances(self.pointsEchelle,self.pointsFish)
+        print("calculDistances")
+        print(self.pointsEchelle)
+        print(self.pointsFish)
+        self.distances_all = XY_tools.Externes.calculDistancesv2(self.pointsEchelle, self.pointsFish)
+        return self.distances_check
 
-
-class BodyClass():
-    """Variables globales pour export
-    id_polygons : liste des id des polygons (le corps et l'echelle)
-    pointsFish : liste des points du corps [(x1,y1),(x2,y2)...]
-    pointsEchelle : liste des points de l'echelle [(x1,y1),(x2,y2)]
-    distances_check : liste des distances caractéristiques affichées
-    distances_all : liste de toutes les distances sauvegardés pour le modèle
-    """
-    id_polygons = []
-    pointsFish = []
-    pointsEchelle = []
-    distances_all = []
-    distances_check = []
-
-    def __init__(self, canvas1, points,color):
-        """!
-        Constructeur du polygone du corps
-        @param canvas tk.Canvas : cadre de l'image
-        @param points list : liste des points du polygone
-        @param color String : couleur du polygone
-        """
-        BodyClass.previous_x = None
-        BodyClass.previous_y = None
-        self.selected = None
-        self.x = None
-        BodyClass.points = points
-
-        if points!=None:
-            if color=='red':outline='red'
-            else: outline=''
-            BodyClass.polygon = canvas1.create_polygon(BodyClass.points,fill='',outline=outline,smooth=0,width=3,dash=())
-            BodyClass.id_polygons.append(BodyClass.polygon)
-            canvas1.tag_bind(BodyClass.polygon, '<ButtonPress-3>',   lambda event, tag=BodyClass.polygon: self.on_press_tag(event, 0, tag,canvas1))
-            canvas1.tag_bind(BodyClass.polygon, '<ButtonRelease-3>', lambda event, tag=BodyClass.polygon: self.on_release_tag(event, 0, tag,canvas1))
-            BodyClass.nodes = []
-            BodyClass.nonodes = []
-            for number, point in enumerate(BodyClass.points):
-                x, y = point
-                node = canvas1.create_rectangle((x-3, y-3, x+3, y+3), fill=color)
-                label = canvas1.create_text((x+15, y+6),text=str(node%15),font=("Purisa", 1),fill='green')
-                BodyClass.nodes.append(node)
-                BodyClass.nonodes.append(label)
-                canvas1.tag_bind(node, '<ButtonPress-3>',   lambda event, number=number, tag=node: self.on_press_tag(event, number, tag,canvas1))
-                canvas1.tag_bind(node, '<ButtonRelease-3>', lambda event, number=number, tag=node: self.on_release_tag(event, number, tag,canvas1))
-                canvas1.tag_bind(node, '<B3-Motion>', lambda event, number=number: self.on_move_node(event, number,canvas1))
-
-        BodyClass.update_points(canvas1)
-
-        if(len(BodyClass.pointsFish)>0):
-            Interface.afficheLongueurBody()
-
-    def update_points(canvas1):
-        """!
-        Methode de mise à jour de la position des points
-        @param canvas1 tk.Canvas : cadre de l'image
-        """
-        for id in BodyClass.id_polygons:
-            liste = canvas1.coords(id)
-            if(len(canvas1.coords(id))==8):BodyClass.pointsFish=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
-
-    def on_press_tag(self, event, number, tag,canvas1):
-        """!
-        Methode pour determiner l'item selectionné
-        @param event event : coordonnees de l'item
-        @param number int : numero de l'id
-        @param tag int : numero de l'id
-        """
-        self.selected = tag
-        BodyClass.previous_x = event.x
-        BodyClass.previous_y = event.y
-        BodyClass.update_points(canvas1)
-        Interface.afficheLongueurBody()
-
-    def on_release_tag(self, event, number, tag,canvas1):
-        """!
-        Methode pour determiner l'item selectionné
-        @param event event : coordonnees de l'item
-        @param number int : numero de l'id
-        @param tag int : numero de l'id
-        """
-        self.selected = None
-        BodyClass.previous_x = None
-        BodyClass.previous_y = None
-        BodyClass.update_points(canvas1)
-        Interface.afficheLongueurBody()
-
-    def on_move_node(self, event, number,canvas1):
-        """!
-        Methode pour deplacer un noeud du graphe
-        @param event event : coordonnees de l'item
-        @param number int : numero de l'id
-        @param tag int : numero de l'id
-        """
-        if self.selected:
-            dx = event.x - BodyClass.previous_x
-            dy = event.y - BodyClass.previous_y
-            canvas1.move(self.selected, dx, dy)
-            canvas1.move(self.nonodes[BodyClass.nodes.index(self.selected)],dx,dy)
-            BodyClass.points[number][0] += dx
-            BodyClass.points[number][1] += dy
-            coords = sum(self.points, [])
-            # change points in polygons
-            canvas1.coords(BodyClass.polygon, coords)
-            BodyClass.previous_x = event.x
-            BodyClass.previous_y = event.y
-
-        BodyClass.update_points(canvas1)
-        Interface.afficheLongueurBody()
-
-    def calculDistances():
-        """!
-        Methode pour calculer certaines distances caractéristiques
-        """
-        BodyClass.distances_check = XY_tools.Externes.calculDistances2(BodyClass.pointsFish[2:4],BodyClass.pointsFish[0:2])
-        return BodyClass.distances_check
 
 class ScaleClass():
     """Variables globales pour export
@@ -274,7 +156,7 @@ class ScaleClass():
             if color=='red':outline='white'
             else: outline=''
             self.polygon = canvas2.create_polygon(self.points,fill='',outline=outline,smooth=0,width=2,dash=(1,))
-            HeadClass.id_polygons.append(self.polygon)
+            Interface.PolygoneA.id_polygons.append(self.polygon)
             canvas2.tag_bind(self.polygon, '<ButtonPress-1>',   lambda event, tag=self.polygon: self.on_press_tag(event, 0, tag))
             canvas2.tag_bind(self.polygon, '<ButtonRelease-1>', lambda event, tag=self.polygon: self.on_release_tag(event, 0, tag,canvas2))
             self.nodes = []
@@ -296,7 +178,7 @@ class ScaleClass():
         Methode de mise à jour de la position des points
         @param canvas2 tk.Canvas : cadre de l'image
         """
-        for id in HeadClass.id_polygons:
+        for id in Interface.PolygoneA.id_polygons:
             liste = canvas2.coords(id)
             if(len(canvas2.coords(id))==4):ScaleClass.pointsEchelle=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
 
@@ -345,37 +227,35 @@ class ScaleClass():
             if self.selected==5:
                 Interface.canvasCorps.move(9,dx/3,dy/3)
                 Interface.canvasCorps.update()
-                Interface.canvasCorps.move(BodyClass.nonodes[BodyClass.nodes.index(9)],dx/3,dy/3)
+                Interface.canvasCorps.move(Interface.PolygoneB.nonodes[Interface.PolygoneB.nodes.index(9)],dx/3,dy/3)
                 Interface.canvasCorps.update()
-                BodyClass.points[3][0] += dx
-                BodyClass.points[3][1] += dy
-                coordes = sum(BodyClass.points, [])
-                Interface.canvasCorps.coords(BodyClass.polygon, coordes)
+                Interface.PolygoneB.points[3][0] += dx
+                Interface.PolygoneB.points[3][1] += dy
+                coordes = sum(Interface.PolygoneB.points, [])
+                Interface.canvasCorps.coords(Interface.PolygoneB.polygon, coordes)
                 Interface.canvasCorps.update()
-                BodyClass.previous_x = event.x
-                BodyClass.previous_y = event.y
-                BodyClass.update_points(Interface.canvasCorps)
+                Interface.PolygoneB.previous_x = event.x
+                Interface.PolygoneB.previous_y = event.y
+                Interface.PolygoneB.update_points(Interface.canvasCorps)
                 Interface.afficheLongueur()
-                app.labelLongueurBody.config(text="Longueur = "+str(round(Interface.lenBody*50/px50mm,3)))
                 Interface.allDist(Interface.lenBody)
 
             if self.selected==3:
                 Interface.canvasCorps.move(7,dx/3,dy/3)
                 Interface.canvasCorps.update()
-                Interface.canvasCorps.move(BodyClass.nonodes[BodyClass.nodes.index(7)],dx/3,dy/3)
+                Interface.canvasCorps.move(Interface.PolygoneB.nonodes[Interface.PolygoneB.nodes.index(7)],dx/3,dy/3)
                 Interface.canvasCorps.update()
-                BodyClass.points[2][0] += dx
-                BodyClass.points[2][1] += dy
-                coordes = sum(BodyClass.points, [])
-                Interface.canvasCorps.coords(BodyClass.polygon, coordes)
+                Interface.PolygoneB.points[2][0] += dx
+                Interface.PolygoneB.points[2][1] += dy
+                coordes = sum(Interface.PolygoneB.points, [])
+                Interface.canvasCorps.coords(Interface.PolygoneB.polygon, coordes)
                 Interface.canvasCorps.update()
-                BodyClass.previous_x = event.x
-                BodyClass.previous_y = event.y
-                BodyClass.update_points(Interface.canvasCorps)
+                Interface.PolygoneB.previous_x = event.x
+                Interface.PolygoneB.previous_y = event.y
+                Interface.PolygoneB.update_points(Interface.canvasCorps)
                 Interface.afficheLongueur()
                 Interface.allDist(Interface.lenBody)
 
-            app.labelLongueurBody.config(text="Longueur = "+str(round(Interface.lenBody*50/px50mm,3)))
             Interface.allDist(Interface.lenBody)
         ScaleClass.update_points(canvas2)
 
@@ -409,7 +289,7 @@ class ScaleClassBody():
             if color=='red':outline='white'
             else: outline=''
             self.polygon = canvas3.create_polygon(self.points,fill='',outline=outline,smooth=0,width=2,dash=(1,))
-            HeadClass.id_polygons.append(self.polygon)
+            Interface.PolygoneA.id_polygons.append(self.polygon)
             canvas3.tag_bind(self.polygon, '<ButtonPress-1>',   lambda event, tag=self.polygon: self.on_press_tag(event, 0, tag))
             canvas3.tag_bind(self.polygon, '<ButtonRelease-1>', lambda event, tag=self.polygon: self.on_release_tag(event, 0, tag,canvas3))
             self.nodes = []
@@ -434,7 +314,7 @@ class ScaleClassBody():
         Methode de mise à jour de la position des points
         @param canvas2 tk.Canvas : cadre de l'image
         """
-        for id in HeadClass.id_polygons:
+        for id in Interface.PolygoneA.id_polygons:
             liste = canvas3.coords(id)
             if(len(canvas3.coords(id))==4):ScaleClassBody.pointsEchelle=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
 
@@ -481,35 +361,32 @@ class ScaleClassBody():
             if self.selected==5:
                 Interface.canvasCorps.move(5,dx/3,dy/3)
                 Interface.canvasCorps.update()
-                Interface.canvasCorps.move(BodyClass.nonodes[BodyClass.nodes.index(5)],dx/3,dy/3)
+                Interface.canvasCorps.move(Interface.PolygoneB.nonodes[Interface.PolygoneB.nodes.index(5)],dx/3,dy/3)
                 Interface.canvasCorps.update()
-                BodyClass.points[1][0] += dx
-                BodyClass.points[1][1] += dy
-                coordes = sum(BodyClass.points, [])
-                Interface.canvasCorps.coords(BodyClass.polygon, coordes)
+                Interface.PolygoneB.points[1][0] += dx
+                Interface.PolygoneB.points[1][1] += dy
+                coordes = sum(Interface.PolygoneB.points, [])
+                Interface.canvasCorps.coords(Interface.PolygoneB.polygon, coordes)
                 Interface.canvasCorps.update()
-                BodyClass.previous_x = event.x
-                BodyClass.previous_y = event.y
-                BodyClass.update_points(Interface.canvasCorps)
+                Interface.PolygoneB.previous_x = event.x
+                Interface.PolygoneB.previous_y = event.y
+                Interface.PolygoneB.update_points(Interface.canvasCorps)
                 Interface.afficheLongueurBody()
 
             if self.selected==3:
                 Interface.canvasCorps.move(3,dx/3,dy/3)
                 Interface.canvasCorps.update()
-                Interface.canvasCorps.move(BodyClass.nonodes[BodyClass.nodes.index(3)],dx/3,dy/3)
+                Interface.canvasCorps.move(Interface.PolygoneB.nonodes[Interface.PolygoneB.nodes.index(3)],dx/3,dy/3)
                 Interface.canvasCorps.update()
-                BodyClass.points[0][0] += dx
-                BodyClass.points[0][1] += dy
-                coordes = sum(BodyClass.points, [])
-                Interface.canvasCorps.coords(BodyClass.polygon, coordes)
+                Interface.PolygoneB.points[0][0] += dx
+                Interface.PolygoneB.points[0][1] += dy
+                coordes = sum(Interface.PolygoneB.points, [])
+                Interface.canvasCorps.coords(Interface.PolygoneB.polygon, coordes)
                 Interface.canvasCorps.update()
-                BodyClass.previous_x = event.x
-                BodyClass.previous_y = event.y
-                BodyClass.update_points(Interface.canvasCorps)
+                Interface.PolygoneB.previous_x = event.x
+                Interface.PolygoneB.previous_y = event.y
+                Interface.PolygoneB.update_points(Interface.canvasCorps)
                 Interface.afficheLongueurBody()
-
-
-
         ScaleClassBody.update_points(canvas3)
 
 ## Canvas pour les images
@@ -651,24 +528,13 @@ class Interface(tk.Tk):
 
         self.labelSex = tk.Label(self,text="")
         self.labelSex.place(relx=0.55,rely=0.12)
-
         tk.Label(self,text=" ").grid(column=0,row=3)
 
         self.labelNumImage = tk.Label(self,text="",font=("Purisa",11),fg='gray')
         self.labelNumImage.place(relx=0.35,rely=0.975)
         self.labelNomImage = tk.Label(self,text="",font=("Purisa",11),fg='gray')
         self.labelNomImage.place(relx=0.4,rely=0.975)
-
-        ''' Labels pour les longueurs de la tête '''
-        # tk.Label(self,text="Longueurs caractéristiques de la tête : \n",justify=tk.LEFT,font=("Purisa",8,"bold","underline")).place(relx=.7,rely=.38)
         tk.Label(self,text="\n",justify=tk.LEFT,font=("Purisa",8,"bold","underline")).grid(column=2,row=4)
-        self.labelLongueur = tk.Label(self,text="",justify=tk.LEFT)
-        self.labelLongueur.place(relx=0.7,rely=0.42)
-
-        ''' Labels pour les longueurs du corps '''
-        # tk.Label(self,text="Longueurs caractéristiques du corps : \n",justify=tk.LEFT,font=("Purisa",8,"bold","underline")).place(relx=.7,rely=.25)
-        self.labelLongueurBody = tk.Label(self,text="",justify=tk.LEFT)
-        self.labelLongueurBody.place(relx = .7,rely=.3)
 
     def add_menu(self):
         ''' Fenetre et menu'''
@@ -889,30 +755,26 @@ class Interface(tk.Tk):
         """!
         Méthode permettant de mettre à jour l'affichage des longueurs dans l'interface
         """
-        HeadClass.calculDistances()
-        # app.labelLongueur.config(text=XY_tools.Externes.Longueur(HeadClass.calculDistances()))
+        Interface.PolygoneA.calculDistances()
 
     def afficheLongueurBody():
         """!
         Méthode permettant de mettre à jour l'affichage des longueurs du corps dans l'interface
         """
-        BodyClass.calculDistances()
-        # app.labelLongueurBody.config(text=XY_tools.Externes.LongueurBody(BodyClass.calculDistances()))
+        Interface.PolygoneB.calculDistances()
 
     def clearAllCanvas(self):
         """!
         Méthode permettant de remettre à zero l'interface
         """
-        HeadClass.id_polygons=[]
-        HeadClass.pointsFish=[]
-        HeadClass.pointsEchelle=[]
-        HeadClass.distances_check=[0 for _ in range(20)]
-        self.labelLongueur.config(text="")
-        BodyClass.id_polygons=[]
-        BodyClass.pointsFish=[]
-        BodyClass.pointsEchelle=[]
-        BodyClass.distances_check=[0 for _ in range(20)]
-        self.labelLongueurBody.config(text="")
+        Interface.PolygoneA.id_polygons=[]
+        Interface.PolygoneA.pointsFish=[]
+        Interface.PolygoneA.pointsEchelle=[]
+        Interface.PolygoneA.distances_check=[0 for _ in range(20)]
+        Interface.PolygoneB.id_polygons=[]
+        Interface.PolygoneB.pointsFish=[]
+        Interface.PolygoneB.pointsEchelle=[]
+        Interface.PolygoneB.distances_check=[0 for _ in range(20)]
         self.labelSex.config(text="")
         Interface.canvasTete.delete('all')
         Interface.canvasCorps.delete('all')
@@ -949,20 +811,13 @@ class Interface(tk.Tk):
 
 
     def allDist(lenBody):
-        listepoints = []
-        for i in HeadClass.nodes:
-            listepoints.append([Interface.canvasTete.coords(i)[0]+3,Interface.canvasTete.coords(i)[1]+3])
         px50mm = XY_tools.Externes.euclide(Interface.canvasEchelle.coords(3),Interface.canvasEchelle.coords(5))
-
         listedistances2 = []
         listedistances2.append(round(lenBody*50/px50mm,5))
-
-        for x in HeadClass.distances_all:
+        print(Interface.PolygoneA.distances_all)
+        for x in Interface.PolygoneA.distances_all:
             listedistances2.append(x)
         Interface.modeleDistances = listedistances2
-
-    def correctListPoint(self,liste4cord):
-        return [[liste4cord[0],liste4cord[1]],[liste4cord[2],liste4cord[3]]]
 
     def importImage(self,event=' '):
         """!
@@ -1019,14 +874,18 @@ class Interface(tk.Tk):
         corpsStandard.extend([[points_echelle_copy[0][0]/3,points_echelle_copy[0][1]/3],[points_echelle_copy[1][0]/3,points_echelle_copy[1][1]/3]])
 
         #Affichage des points sur l'image entière
-        BodyClass(Interface.canvasCorps,corpsStandard,'cyan')
+        # BodyClass(Interface.canvasCorps,corpsStandard,'cyan')
+        Interface.PolygoneB = Polygone(Interface.canvasCorps,corpsStandard,'cyan')
         Interface.canvasCorps.update()
 
         #Affichage des points sur la tête
         pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19,pt21 = points_tete_copy
         points_tete_copy = XY_tools.Externes.centerPoints([pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19,pt21],HeadFish.oeilXY)
-        HeadClass.pointsEchelle = points_echelle
-        HeadClass(self.canvasTete, points_tete_copy,'#ff00f2')
+
+        # HeadClass(self.canvasTete, points_tete_copy,'#ff00f2')
+        Interface.PolygoneA = Polygone(self.canvasTete,points_tete_copy,'#ff00f2')
+        Interface.PolygoneA.pointsEchelle = points_echelle
+        Interface.PolygoneA.calculDistances()
         self.canvasTete.update()
 
         #Image de l'échelle
