@@ -59,8 +59,8 @@ class Polygone():
                 canvas.tag_bind(node, '<B1-Motion>', lambda event, number=number: self.on_move_node(event, number,canvas))
 
         self.update_points(canvas)
-        print("len self pointsEchelle")
-        print(len(self.pointsEchelle))
+        # print("len self pointsEchelle")
+        # print(len(self.pointsEchelle))
         if(len(self.pointsEchelle)>0):
              Interface.afficheLongueur()
 
@@ -71,7 +71,7 @@ class Polygone():
         """
         for id in self.id_polygons:
             liste = canvas.coords(id)
-            print(liste)
+            # print(liste)
             if(len(liste)==20):self.pointsFish=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
 
     def on_press_tag(self, event, number, tag):
@@ -122,8 +122,8 @@ class Polygone():
         """
         self.distances_check = XY_tools.Externes.calculDistances(self.pointsEchelle,self.pointsFish)
         print("calculDistances")
-        print(self.pointsEchelle)
-        print(self.pointsFish)
+        # print(self.pointsEchelle)
+        # print(self.pointsFish)
         self.distances_all = XY_tools.Externes.calculDistancesv2(self.pointsEchelle, self.pointsFish)
         return self.distances_check
 
@@ -598,10 +598,13 @@ class Interface(tk.Tk):
     def verbose_intro(self):
         message = "Rapport généré le "+datetime.now().strftime("%d/%m/%Y")+" à "+datetime.now().strftime("%H:%M:%S")+"\n"
         message += "# Morphométrie Ineris v"+str(Interface.version)+"\n\n"
-        message += "# ML_morph version\n"
+        message += "# Langage et bibliothèques utilisés : \n"
+        message += "- Python 3.8.6 \n"
+        message += "- sklearn 0.23.2 - numpy 1.18.5 - scipy 1.5.2 - dlib 19.22.0 - xgboost 1.4.2 \n\n"
+        message += "# ML_morph\n"
         message += "\t - Algorithme utilisé : Regression trees (gradient boosting) \n"
         message += "\t - Performances : erreur de placement moyenne de 4 pixels (0.25% de la longueur standard) \n\n"
-        message += "# ML_gender version\n"
+        message += "# ML_gender\n"
         message += "\t - Algorithmes utilisés : Gradient Boosting, SVM, Random Forest (consensus) \n"
         message += "\t - Performances : 0.9% \n"
 
@@ -612,30 +615,32 @@ class Interface(tk.Tk):
     def verbose_photo(self):
         message = "\n# Photos importées pour la prédiction :\n"
         for x in self.listeImages:
-            message += "\t"+x+"\n"
+            message += "\t - "+x+"\n"
         f = open(self.finalname,"a")
         f.write(message)
         f.close()
 
     def verbose_points(self,listepoints):
-        message = XY_tools.Externes.verbose_points(listepoints,self.listeImages)
+        message = XY_tools.Externes.verbose_points(listepoints,self.listeImages, self.numImageActuelle)
         f = open(self.finalname,"a")
         f.write(message)
         f.close()
 
     def verbose_distances(self,df_distance):
-        message = "\n# Distances utilisées pour la prédiction du sexe :\n"
-        for j in range(1,len(self.listeImages)+1):
-            message += df_distance
+        # message = "\n# Distances utilisées pour la prédiction du sexe :\n"
+        # for j in range(1,len(self.listeImages)+1):
+        #     message += df_distance
+        message = "\t Distances : "+str(list(df_distance.values[0]))[1:-1]
         message += "\n"
         f = open(self.finalname,"a")
         f.write(message)
         f.close()
 
     def verbose_sexe(self,text,proba):
-        message = "\n# Sexe finalement prédit :\n"
-        for i in range(1,len(self.listeImages)+1):
-            message += "\t - image n°"+str(i)+": "+text+"  (p="+str(proba)+"....)\n"
+        # message = "\n# Sexe finalement prédit :\n"
+        # for i in range(1,len(self.listeImages)+1):
+        #     message += "\t - image n°"+str(i)+": "+text+"  (p="+str(proba)+"....)\n"
+        message = "\t Sexe : "+text+"  (p="+str(proba)+"....)\n"
         f = open(self.finalname,"a")
         f.write(message)
         f.close()
@@ -663,6 +668,7 @@ class Interface(tk.Tk):
             a.predict(pathimage,pypath2+"\models\\","predictor_head.dat")
             listepoints = ML.ML_pointage.xmltolistY(pypath2+"\models\\"+"output.xml",0)
 
+        print(listepoints)
         self.verbose_points(listepoints)
         return listepoints
 
@@ -705,11 +711,15 @@ class Interface(tk.Tk):
         print("classification")
         Interface.lenBody = XY_tools.Externes.euclide(Interface.canvasEchelle2.coords(3),Interface.canvasEchelle2.coords(5))
         Interface.allDist(Interface.lenBody)
+        # print(Interface.modeleDistances)
         text,ae,proba = IA_sexage.Prediction.load_models(Interface.modeleDistances)
+        # print(ae)
+        print(text)
         app.labelSex.config(text = text)
-        self.verbose_distances(str(ae))
+        self.verbose_distances(ae)
         self.verbose_sexe(text,proba)
-        self.verbose_conclusion()
+        if(self.numImageActuelle==len(self.listeImages)):
+            self.verbose_conclusion()
 
     def afficheScale(self):
         Interface.canvasEchelle.itemconfig(ScaleFish.poisson,state='normal')
@@ -814,7 +824,7 @@ class Interface(tk.Tk):
         px50mm = XY_tools.Externes.euclide(Interface.canvasEchelle.coords(3),Interface.canvasEchelle.coords(5))
         listedistances2 = []
         listedistances2.append(round(lenBody*50/px50mm,5))
-        print(Interface.PolygoneA.distances_all)
+        # print(Interface.PolygoneA.distances_all)
         for x in Interface.PolygoneA.distances_all:
             listedistances2.append(x)
         Interface.modeleDistances = listedistances2
@@ -833,11 +843,11 @@ class Interface(tk.Tk):
         """!
         Méthode permettant de calculer les points et de les disposer sur l'image
         """
-        print("\n liste images selectionnées")
-        print(self.listeImages)
-        print("\n image actuelle")
-        print(self.listeImages[self.numImageActuelle])
-        print("\n")
+        # print("\n liste images selectionnées")
+        # print(self.listeImages)
+        # print("\n image actuelle")
+        # print(self.listeImages[self.numImageActuelle])
+        # print("\n")
         path_global = '/'.join(self.listeImages[self.numImageActuelle].split('/')[:-1])
 
         #Points de la tête

@@ -86,7 +86,7 @@ class Prediction():
         pd.set_option('display.expand_frame_repr', False)
         pd.set_option('max_colwidth', None)
         ae = pd.DataFrame(modeleDistances).T
-        print(ae)
+        # print(ae)
         prediction = clf.predict(ae)
         prediction1 = clf1.predict(ae)
         prediction2 = clf2.predict(ae)
@@ -113,5 +113,5 @@ class Prediction():
         text = ""
         for i in range(3):
             text += listePredictionStr[i]+" "+str(listeProba[i][listePredictionInt[i]])+";"
-        text+="\n\n Sex classification : "+consensusStr
+        text+="--> "+consensusStr
         return text,ae,proba

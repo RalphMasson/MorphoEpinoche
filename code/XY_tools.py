@@ -335,15 +335,13 @@ class Externes():
         version = response
         return version
 
-    def verbose_points(listepoints,listeImages):
-        message = "\n# Coordonnées des points détectés :\n"
+    def verbose_points(listepoints,listeImages,numImage):
+        message = "\n# Détails de l'image n°"+str(numImage)+":\n"
         listepoints = listepoints[0]
-        for i in range(1,10):
-            message += "\t -"
-            for j in range(1,len(listeImages)+1):
-                message += "point n°"+str(i)+": "+"X = "+str(listepoints[i][0])+" Y = " +str(listepoints[i][1])+"\t"
-            message += "\n"
-            return message
+        message += "\t Points :"+str(listepoints)
+        # message += "point n°"+str(i)+": "+"X = "+str(listepoints[i][0])+" Y = " +str(listepoints[i][1])+"\t"
+        message += "\n"
+        return message
 
     def cheminAvant(aaa):
         return "\\".join(aaa.split("\\")[:-1])+"\\"
