@@ -19,7 +19,7 @@ import IA_morph as ML
 from datetime import datetime
 import numpy as np
 import xgboost as xgb
-
+import pandas as pd
 ## Classes pour afficher les points sur les images
 
 class Polygone():
@@ -59,8 +59,6 @@ class Polygone():
                 canvas.tag_bind(node, '<B1-Motion>', lambda event, number=number: self.on_move_node(event, number,canvas))
 
         self.update_points(canvas)
-        # print("len self pointsEchelle")
-        # print(len(self.pointsEchelle))
         if(len(self.pointsEchelle)>0):
              Interface.afficheLongueur()
 
@@ -71,7 +69,6 @@ class Polygone():
         """
         for id in self.id_polygons:
             liste = canvas.coords(id)
-            # print(liste)
             if(len(liste)==20):self.pointsFish=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
 
     def on_press_tag(self, event, number, tag):
@@ -121,9 +118,6 @@ class Polygone():
         Methode pour calculer certaines distances caractéristiques
         """
         self.distances_check = XY_tools.Externes.calculDistances(self.pointsEchelle,self.pointsFish)
-        print("calculDistances")
-        # print(self.pointsEchelle)
-        # print(self.pointsFish)
         self.distances_all = XY_tools.Externes.calculDistancesv2(self.pointsEchelle, self.pointsFish)
         return self.distances_check
 
@@ -192,7 +186,6 @@ class ScaleClass():
         self.selected = tag
         self.previous_x = event.x
         self.previous_y = event.y
-        # print(self.selected,event,tag)
 
     def on_release_tag(self, event, number, tag,canvas2):
         """!
@@ -222,7 +215,7 @@ class ScaleClass():
             canvas2.coords(self.polygon, coords)
             self.previous_x = event.x
             self.previous_y = event.y
-            px50mm = XY_tools.Externes.euclide(Interface.canvasEchelle.coords(3),Interface.canvasEchelle.coords(5))
+            px50mm = XY_tools.Externes.euclide(Interface.canvasEchelle.coords(Interface.PolygoneC.nodes[0]),Interface.canvasEchelle.coords(Interface.PolygoneC.nodes[1]))
 
             if self.selected==5:
                 Interface.canvasCorps.move(9,dx/3,dy/3)
@@ -317,7 +310,6 @@ class ScaleClassBody():
         for id in Interface.PolygoneA.id_polygons:
             liste = canvas3.coords(id)
             if(len(canvas3.coords(id))==4):ScaleClassBody.pointsEchelle=[(liste[i],liste[i+1]) for i in range(0,len(liste),2)]
-
     def on_press_tag(self, event, number, tag):
         """!
         Methode pour determiner l'item relaché
@@ -387,6 +379,7 @@ class ScaleClassBody():
                 Interface.PolygoneB.previous_y = event.y
                 Interface.PolygoneB.update_points(Interface.canvasCorps)
                 Interface.afficheLongueurBody()
+        Interface.afficheLongueurBody()
         ScaleClassBody.update_points(canvas3)
 
 ## Canvas pour les images
@@ -587,17 +580,30 @@ class Interface(tk.Tk):
             date = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
             filename = "rapport" + "_" + date
             f = open(pathname+filename+".txt","w+")
+            f.close()
+            f = open(self.finalname2,"w+")
+            f.close()
         if os.path.exists(os.getcwd()+"/log"):
             pathname = os.getcwd()+"/log/"
             date = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
-            filename = "rapport" + "_" + date
+            filename = date+"_"+"rapport"
+            filename2 = date+"_"+"resultats"
             self.finalname = pathname+filename+".txt"
+            self.finalname2 = pathname+filename2+".csv"
             f = open(self.finalname,"w+")
             f.close()
+        self.data_result = pd.DataFrame()
+        self.NomImages = []
+        self.data_distances = []
+        self.LS = []
+        self.sexe = []
+        self.NumImages = []
 
     def verbose_intro(self):
-        message = "Rapport généré le "+datetime.now().strftime("%d/%m/%Y")+" à "+datetime.now().strftime("%H:%M:%S")+"\n"
-        message += "# Morphométrie Ineris v"+str(Interface.version)+"\n\n"
+        message = "Rapport généré le "+datetime.now().strftime("%d/%m/%Y")+" à "+datetime.now().strftime("%H:%M:%S")+"\n\n"
+        message += "# Morphométrie Epinoche Ineris v"+str(Interface.version)+"\n"
+        message += "- Développé par Ralph MASSON pour l'unité ESMI \n"
+        message += "- Contact : ralph.masson@gmail.com \n\n"
         message += "# Langage et bibliothèques utilisés : \n"
         message += "- Python 3.8.6 \n"
         message += "- sklearn 0.23.2 - numpy 1.18.5 - scipy 1.5.2 - dlib 19.22.0 - xgboost 1.4.2 \n\n"
@@ -605,8 +611,8 @@ class Interface(tk.Tk):
         message += "\t - Algorithme utilisé : Regression trees (gradient boosting) \n"
         message += "\t - Performances : erreur de placement moyenne de 4 pixels (0.25% de la longueur standard) \n\n"
         message += "# ML_gender\n"
-        message += "\t - Algorithmes utilisés : Gradient Boosting, SVM, Random Forest (consensus) \n"
-        message += "\t - Performances : 0.9% \n"
+        message += "\t - Algorithmes utilisés : Gradient Boosting, SVM, XGBoost (consensus) \n"
+        message += "\t - Performances : 100% de bonne classification (10% d'indéterminé en moyenne) par consensus stricte de 3 modèles \n"
 
         f = open(self.finalname,"a")
         f.write(message)
@@ -619,7 +625,6 @@ class Interface(tk.Tk):
         f = open(self.finalname,"a")
         f.write(message)
         f.close()
-
     def verbose_points(self,listepoints):
         message = XY_tools.Externes.verbose_points(listepoints,self.listeImages, self.numImageActuelle)
         f = open(self.finalname,"a")
@@ -627,20 +632,16 @@ class Interface(tk.Tk):
         f.close()
 
     def verbose_distances(self,df_distance):
-        # message = "\n# Distances utilisées pour la prédiction du sexe :\n"
-        # for j in range(1,len(self.listeImages)+1):
-        #     message += df_distance
         message = "\t Distances : "+str(list(df_distance.values[0]))[1:-1]
         message += "\n"
         f = open(self.finalname,"a")
         f.write(message)
         f.close()
 
+
+
     def verbose_sexe(self,text,proba):
-        # message = "\n# Sexe finalement prédit :\n"
-        # for i in range(1,len(self.listeImages)+1):
-        #     message += "\t - image n°"+str(i)+": "+text+"  (p="+str(proba)+"....)\n"
-        message = "\t Sexe : "+text+"  (p="+str(proba)+"....)\n"
+        message = "\t Sexe : "+text+"\n"
         f = open(self.finalname,"a")
         f.write(message)
         f.close()
@@ -668,7 +669,6 @@ class Interface(tk.Tk):
             a.predict(pathimage,pypath2+"\models\\","predictor_head.dat")
             listepoints = ML.ML_pointage.xmltolistY(pypath2+"\models\\"+"output.xml",0)
 
-        print(listepoints)
         self.verbose_points(listepoints)
         return listepoints
 
@@ -708,18 +708,29 @@ class Interface(tk.Tk):
 
 
     def Model_Sexage(self):
-        print("classification")
-        Interface.lenBody = XY_tools.Externes.euclide(Interface.canvasEchelle2.coords(3),Interface.canvasEchelle2.coords(5))
+        Interface.lenBody = XY_tools.Externes.euclide(Interface.canvasEchelle2.coords(Interface.PolygoneD.nodes[0]),Interface.canvasEchelle2.coords(Interface.PolygoneD.nodes[1]))
         Interface.allDist(Interface.lenBody)
-        # print(Interface.modeleDistances)
         text,ae,proba = IA_sexage.Prediction.load_models(Interface.modeleDistances)
-        # print(ae)
-        print(text)
-        app.labelSex.config(text = text)
+
         self.verbose_distances(ae)
         self.verbose_sexe(text,proba)
-        if(self.numImageActuelle==len(self.listeImages)):
+
+        app.labelSex.config(text = text)
+        nomImage = "".join(self.listeImages[self.numImageActuelle].split("/")[-1])
+        self.NomImages.append(nomImage)
+        self.NumImages.append(self.numImageActuelle+1)
+        self.LS.append(list(ae.values[0])[0])
+        self.sexe.append(text.split(">")[-1])
+
+        if(self.numImageActuelle==len(self.listeImages)-1):
             self.verbose_conclusion()
+
+            self.data_result['ID'] = self.NumImages
+            self.data_result['Nom'] = self.NomImages
+            self.data_result['LS'] = self.LS
+            self.data_result['Sexe'] = self.sexe
+            self.data_result = self.data_result.drop_duplicates()
+            self.data_result.to_csv(self.finalname2,index=False,sep=";",encoding="UTF-8")
 
     def afficheScale(self):
         Interface.canvasEchelle.itemconfig(ScaleFish.poisson,state='normal')
@@ -788,6 +799,10 @@ class Interface(tk.Tk):
         self.labelSex.config(text="")
         Interface.canvasTete.delete('all')
         Interface.canvasCorps.delete('all')
+        Interface.canvasEchelle2.delete('all')
+        Interface.canvasEchelle.delete('all')
+
+        ScaleClassBody.pointsEchelle = []
         self.labelNomImage.config(text="")
 
     def resetListeImages(self):
@@ -821,10 +836,9 @@ class Interface(tk.Tk):
 
 
     def allDist(lenBody):
-        px50mm = XY_tools.Externes.euclide(Interface.canvasEchelle.coords(3),Interface.canvasEchelle.coords(5))
+        px50mm = XY_tools.Externes.euclide(Interface.canvasEchelle.coords(Interface.PolygoneC.nodes[0]),Interface.canvasEchelle.coords(Interface.PolygoneC.nodes[1]))
         listedistances2 = []
         listedistances2.append(round(lenBody*50/px50mm,5))
-        # print(Interface.PolygoneA.distances_all)
         for x in Interface.PolygoneA.distances_all:
             listedistances2.append(x)
         Interface.modeleDistances = listedistances2
@@ -843,11 +857,6 @@ class Interface(tk.Tk):
         """!
         Méthode permettant de calculer les points et de les disposer sur l'image
         """
-        # print("\n liste images selectionnées")
-        # print(self.listeImages)
-        # print("\n image actuelle")
-        # print(self.listeImages[self.numImageActuelle])
-        # print("\n")
         path_global = '/'.join(self.listeImages[self.numImageActuelle].split('/')[:-1])
 
         #Points de la tête
@@ -902,18 +911,17 @@ class Interface(tk.Tk):
         ImagePIL = Image.open(self.listeImages[self.numImageActuelle])
         tete2 = points_tete
         ScaleFish(Interface.canvasEchelle,ImagePIL,(1920,1440))
-        ScaleClass(Interface.canvasEchelle,points_echelle,'#ffffff')
+        Interface.PolygoneC = ScaleClass(Interface.canvasEchelle,points_echelle,'#ffffff')
 
         # Calcul des points  du corps Bis
         points_longueur = self.Model_Longueur('/'.join(self.listeImages[0].split('/')[:-1]))[0]
         pt1,pt2 = [points_longueur[0][0],points_longueur[0][1]],[points_longueur[1][0],points_longueur[1][1]]
         ScaleFishBody.left = [points_longueur[0][0],points_longueur[0][1]]
         points_longueur = XY_tools.Externes.centerPoints3([pt1,pt2],ScaleFishBody.left)
-
         # Image du corps
         ImagePIL = Image.open(self.listeImages[self.numImageActuelle])
         ScaleFishBody(Interface.canvasEchelle2,ImagePIL,(1920,1440))
-        ScaleClassBody(Interface.canvasEchelle2,points_longueur,'#ffffff')
+        Interface.PolygoneD = ScaleClassBody(Interface.canvasEchelle2,points_longueur,'#ffffff')
 
 
     def affichePrediction(self):
