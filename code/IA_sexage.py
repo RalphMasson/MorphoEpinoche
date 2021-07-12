@@ -110,6 +110,41 @@ class Prediction():
         if y_consensus==0.5:
             consensusStr = "Undetermined"
 
+            #get minority vote
+            majorityVote = max(set(listePredictionInt), key = listePredictionInt.count)
+            if majorityVote==0:
+                majorityVoteStr = "F"
+            if majorityVote==1:
+                majorityVoteStr = "M"
+
+            minorityVote = min(set(listePredictionInt), key = listePredictionInt.count)
+            indexMinorityVote = listePredictionInt.index(min(set(listePredictionInt), key = listePredictionInt.count))
+
+            if minorityVote==0:
+                minorityVoteStr = "F"
+            if minorityVote==1:
+                minorityVoteStr = "M"
+
+            probaMinMajority = []
+            for i in range(len(listePredictionInt)):
+                if (listePredictionInt[i]==majorityVote):
+                    probaMinMajority.append(listeProba[i][majorityVote])
+            probaMinMajority = min(probaMinMajority)>0.8
+
+
+            if majorityVote==0:
+                consensusStr = "F"
+            else:
+                if (listeProba[indexMinorityVote][minorityVote]<0.67):
+                    if probaMinMajority:
+                        consensusStr = "Undetermined (possibly "+majorityVoteStr+" )"
+                else:
+                    consensusStr = "Undetermined"
+
+
+
+
+
         text = ""
         for i in range(3):
             text += listePredictionStr[i]+" "+str(listeProba[i][listePredictionInt[i]])+";"
