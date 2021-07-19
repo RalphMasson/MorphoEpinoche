@@ -461,7 +461,7 @@ class Interface(tk.Tk):
     def add_canvas(self):
         ''' Canvas pour la tête '''
         Interface.canvasTete = tk.Canvas(self,bg='#f0f0f0',bd=0,highlightthickness=1, highlightbackground="black")
-        Interface.canvasTete.config(width=450, height=400)
+        Interface.canvasTete.config(width=500, height=400)
         Interface.canvasTete.grid(column=0,row=8)
 
         ''' Canvas pour le corps '''
