@@ -442,7 +442,7 @@ class ModelPoints():
 
 class Interface(tk.Tk):
     sexModele = None
-    version = 1.8
+    version = 1.9
     canvasTete = None
     def __init__(self):
         """!
@@ -578,11 +578,13 @@ class Interface(tk.Tk):
             os.mkdir(os.getcwd()+"/log")
             pathname = os.getcwd()+"/log/"
             date = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
-            filename = "rapport" + "_" + date
-            f = open(pathname+filename+".txt","w+")
+            filename = date+"_"+"rapport"
+            filename2 = date+"_"+"resultats"
+            self.finalname = pathname+filename+".txt"
+            self.finalname2 = pathname+filename2+".csv"
+            f = open(self.finalname,"w+")
             f.close()
-            f = open(self.finalname2,"w+")
-            f.close()
+
         if os.path.exists(os.getcwd()+"/log"):
             pathname = os.getcwd()+"/log/"
             date = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
@@ -677,15 +679,15 @@ class Interface(tk.Tk):
             @param pathimage dossier de l'image
         """
         try:
-            pathPredictor = os.path.join(sys._MEIPASS, 'predictor_scale.dat')
+            pathPredictor = os.path.join(sys._MEIPASS, 'predictor_scale2.dat')
             a = ModelPoints(os.path.join(sys._MEIPASS,''),"")
-            a.predict(pathimage,os.path.join(sys._MEIPASS,''),"predictor_scale.dat")
+            a.predict(pathimage,os.path.join(sys._MEIPASS,''),"predictor_scale2.dat")
             listepoints = ML.ML_pointage.xmltolistY(os.path.join(sys._MEIPASS,"output.xml"),0)
 
         except:
             pathPredictor = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\predictor_scale.dat'
             a = ModelPoints(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\',"")
-            a.predict(pathimage,pypath2+"\models\\","predictor_scale.dat")
+            a.predict(pathimage,pypath2+"\models\\","predictor_scale2.dat")
             listepoints = ML.ML_pointage.xmltolistY(pypath2+"\models\\"+"output.xml",0)
 
         return listepoints

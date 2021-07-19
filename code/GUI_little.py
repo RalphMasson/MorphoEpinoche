@@ -1124,9 +1124,9 @@ class Interface(tk.Frame):
         """
         print("points echelle")
         try:
-            pathPredictor = os.path.join(sys._MEIPASS, 'predictor_scale.dat')
+            pathPredictor = os.path.join(sys._MEIPASS, 'predictor_scale2.dat')
         except:
-            pathPredictor = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\predictor_scale.dat'
+            pathPredictor = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\predictor_scale2.dat'
 
         try:
             a = ModelPoints(os.path.join(sys._MEIPASS,''),"")
@@ -1134,9 +1134,9 @@ class Interface(tk.Frame):
             a = ModelPoints(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\',"")
 
         try:
-            a.predict(pathimage,os.path.join(sys._MEIPASS,''),"predictor_scale.dat")
+            a.predict(pathimage,os.path.join(sys._MEIPASS,''),"predictor_scale2.dat")
         except:
-            a.predict(pathimage,Temp.ppath2+"\models\\","predictor_scale.dat")
+            a.predict(pathimage,Temp.ppath2+"\models\\","predictor_scale2.dat")
 
         try:
             listepoints = ML.ML_pointage.xmltolistY(Temp.ppath2+"\models\\"+"output.xml",0)
