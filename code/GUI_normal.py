@@ -685,7 +685,7 @@ class Interface(tk.Tk):
             listepoints = ML.ML_pointage.xmltolistY(os.path.join(sys._MEIPASS,"output.xml"),0)
 
         except:
-            pathPredictor = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\predictor_scale_2.dat'
+            pathPredictor = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\predictor_scale2.dat'
             a = ModelPoints(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\',"")
             a.predict(pathimage,pypath2+"\models\\","predictor_scale2.dat")
             listepoints = ML.ML_pointage.xmltolistY(pypath2+"\models\\"+"output.xml",0)

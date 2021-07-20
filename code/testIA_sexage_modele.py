@@ -113,11 +113,11 @@ plt.show()
 
 ## SVM
 
-# param_grid = {'C': [1, 10, 100, 1000,10000],
-#               'gamma': [10,1,0.1, 0.01, 0.001, 0.0001],
-#               'kernel': ['rbf','poly','sigmoid']}
-#
-# clf01 = GridSearchCV(SVC(), param_grid, cv=5, verbose = 3).fit(X_train,y_train)
+param_grid = {'C': [1, 10, 100, 1000,10000],
+              'gamma': [10,1,0.1, 0.01, 0.001, 0.0001],
+              'kernel': ['rbf','poly','sigmoid']}
+
+clf01 = GridSearchCV(SVC(probability=True), param_grid, cv=5, verbose = 3).fit(X_train,y_train)
 
 
 
@@ -137,35 +137,35 @@ plt.show()
 # dump(clf_svc, r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\rapports\SVCClassifierFinal.joblib')
 
 # clf001 = load(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\SVCClassifierFinal.joblib')
-# dump(clf01,r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\SVCClassifierFinal2.joblib')
+dump(clf01,r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\SVCClassifierFinal2.joblib')
 
 ## XGBoost
-
-import xgboost as xgb
-from sklearn.model_selection import StratifiedKFold
-from sklearn.model_selection import RandomizedSearchCV
-
-xgb_model = xgb.XGBClassifier(objective="binary:logistic",eval_metric='mlogloss', random_state=42,nthread=4)
-# xgb_model.fit(X_train, y_train, early_stopping_rounds=5, eval_set=[(X_test, y_test)])
-# titles_options = [("Normalized confusion matrix", 'true')]
-# for title, normalize in titles_options:
-#     disp = plot_confusion_matrix(xgb_model, X_test, y_test,
-#                                  display_labels=[0,1],
-#                                  cmap=plt.cm.Blues,
-#                                  normalize=normalize)
-#     disp.ax_.set_title(title)
-# plt.show()
-#
-# dump(xgb_model, r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\rapports\XGBClassifierFinal.joblib')
-params = {
-        'n_estimators' : [250, 500, 1000],
-        'min_child_weight': [1, 5, 10],
-        'gamma': [0.5, 1, 1.5, 2, 5],
-        'subsample': [0.6, 0.8, 1.0],
-        'colsample_bytree': [0.6, 0.8, 1.0],
-        'max_depth': [3, 4, 5]
-        }
-clf_xgb0 = GridSearchCV(xgb_model, params, cv=10, n_jobs=-1,verbose=3).fit(X_train,y_train).fit(X_train,y_train)
-
-dump(clf_xgb0, r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\rapports\XGBClassifierFinal2.joblib')
-
+# # # #
+# # # # import xgboost as xgb
+# # # # from sklearn.model_selection import StratifiedKFold
+# # # # from sklearn.model_selection import RandomizedSearchCV
+# # # #
+# # # # xgb_model = xgb.XGBClassifier(objective="binary:logistic",eval_metric='mlogloss', random_state=42,nthread=4)
+# # # # # xgb_model.fit(X_train, y_train, early_stopping_rounds=5, eval_set=[(X_test, y_test)])
+# # # # # titles_options = [("Normalized confusion matrix", 'true')]
+# # # # # for title, normalize in titles_options:
+# # # # #     disp = plot_confusion_matrix(xgb_model, X_test, y_test,
+# # # # #                                  display_labels=[0,1],
+# # # # #                                  cmap=plt.cm.Blues,
+# # # # #                                  normalize=normalize)
+# # # # #     disp.ax_.set_title(title)
+# # # # # plt.show()
+# # # # #
+# # # # # dump(xgb_model, r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\rapports\XGBClassifierFinal.joblib')
+# # # # params = {
+# # # #         'n_estimators' : [250, 500, 1000],
+# # # #         'min_child_weight': [1, 5, 10],
+# # # #         'gamma': [0.5, 1, 1.5, 2, 5],
+# # # #         'subsample': [0.6, 0.8, 1.0],
+# # # #         'colsample_bytree': [0.6, 0.8, 1.0],
+# # # #         'max_depth': [3, 4, 5]
+# # # #         }
+# # # # clf_xgb0 = GridSearchCV(xgb_model, params, cv=10, n_jobs=-1,verbose=3).fit(X_train,y_train).fit(X_train,y_train)
+# # # #
+# # # # dump(clf_xgb0, r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\rapports\XGBClassifierFinal2.joblib')
+# # # #
