@@ -7,7 +7,7 @@ The purpose of this project is to classify the gender of a Three Spined Stickleb
 Specific landmarks are first computed through image processing : body length, body depth, head length, head depth...
 
 <p align="center">
-<img src="https://github.com/RalphMasson/MorphoEpinoche/blob/master/images/illustration.jpg" width="250">
+<img src="https://github.com/RalphMasson/MorphoEpinoche/blob/master/images/illustration.jpg" width="350">
 </p>
 
 Then, they are detected with regression trees according to [1],[2],[3] :   
