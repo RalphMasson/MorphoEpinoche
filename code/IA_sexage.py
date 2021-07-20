@@ -74,13 +74,13 @@ class Prediction():
         import pandas as pd
         import numpy as np
         try:
-            clf = load(os.path.join(sys._MEIPASS,"GBClassifierFinal.joblib"))
-            clf1 = load(os.path.join(sys._MEIPASS,"SVCClassifierFinal.joblib"))
-            clf2 = load(os.path.join(sys._MEIPASS,"XGBClassifierFinal.joblib"))
+            clf = load(os.path.join(sys._MEIPASS,"GBClassifierFinal2.joblib"))
+            clf1 = load(os.path.join(sys._MEIPASS,"SVCClassifierFinal2.joblib"))
+            clf2 = load(os.path.join(sys._MEIPASS,"XGBClassifierFinal2.joblib"))
         except:
-            clf = load(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\GBClassifierFinal.joblib')
-            clf1 = load(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\SVCClassifierFinal.joblib')
-            clf2 = load(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\XGBClassifierFinal.joblib')
+            clf = load(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\GBClassifierFinal2.joblib')
+            clf1 = load(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\SVCClassifierFinal2.joblib')
+            clf2 = load(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\XGBClassifierFinal2.joblib')
 
         pd.set_option('display.max_columns', None)
         pd.set_option('display.expand_frame_repr', False)

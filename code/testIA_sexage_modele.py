@@ -32,8 +32,8 @@ X = bdd.drop(bdd.columns[0],axis=1)
 X2 = bdd.drop(bdd.columns[0],axis=1)
 X2[X2.columns[1:]] = X2[X2.columns[1:]].div(X2['LS'].values,axis=0)
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3,stratify=y)
-X_train2, X_test2, y_train2, y_test2 = train_test_split(X2, y, test_size=0.3,stratify=y)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2,stratify=y)
+X_train2, X_test2, y_train2, y_test2 = train_test_split(X2, y, test_size=0.2,stratify=y)
 
 
 ###### Gradient Boosting Classifier
@@ -44,21 +44,21 @@ X_train2, X_test2, y_train2, y_test2 = train_test_split(X2, y, test_size=0.3,str
 {'criterion': 'friedman_mse', 'learning_rate': 0.075, 'loss': 'deviance', 'max_depth': 5, 'max_features': 'sqrt', 'n_estimators': 1000, 'subsample': 0.618}
 """
 
-# # # print("Gradient Boosting Classifier")
-# # # parameters = {
-# # #     "loss":["deviance"],
-# # #     "learning_rate": [0.01, 0.025, 0.05, 0.075, 0.1],
-# # #     "max_depth":[3,5,8],
-# # #     "max_features":["log2","sqrt"],
-# # #     "criterion": ["friedman_mse",  "mae"],
-# # #     "subsample":[0.5, 0.618, 0.95, 1.0],
-# # #     "n_estimators":[200,500,1000]
-# # #     }
-# # #
-# # # clf0 = GridSearchCV(GradientBoostingClassifier(), parameters, cv=10, n_jobs=-1,verbose=2).fit(X_train,y_train)
-# # # print(clf0.score(X_train,y_train))
-# # # print(clf0.score(X_test,y_test))
 
+"""! Grid Search
+print("Gradient Boosting Classifier")
+parameters = {
+    "loss":["deviance"],
+    "learning_rate": [0.01, 0.02, 0.03],
+    "max_depth":[4,6,8],
+    "subsample":[0.5, 0.618, 0.9],
+    "n_estimators":[100,500,1000]
+    }
+
+clf0 = GridSearchCV(GradientBoostingClassifier(), parameters, cv=10, n_jobs=-1,verbose=2).fit(X_train,y_train)
+print(clf0.score(X_train,y_train))
+print(clf0.score(X_test,y_test))
+"""
 
 
 # listeGradientBoosting = []
@@ -84,46 +84,44 @@ X_train2, X_test2, y_train2, y_test2 = train_test_split(X2, y, test_size=0.3,str
 # # plot_learning_curve(clf, "Learning curves", X, y, axes=axes[:, 0], ylim=(0.7, 1.01),cv=cv, n_jobs=4)
 
 #
-# clf = GradientBoostingClassifier(criterion = "friedman_mse",learning_rate = 0.075,n_estimators=1000,max_depth=5,max_features="sqrt",subsample=0.618,loss="deviance")
+# clf = GradientBoostingClassifier(criterion = "friedman_mse",learning_rate = 0.070,n_estimators=1000,max_depth=5,max_features="sqrt",subsample=0.618,loss="deviance")
 # clf.fit(X_train,y_train)
 #
 from joblib import dump, load
-# dump(clf, r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\rapports\GBClassifierFinal.joblib')
-# #
-#
-#
-# clf = load(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\rapports\GBClassifierFinal.joblib')
-#
-# y_pred = clf.predict(X_test)
-# #
-# print(pd.DataFrame(classification_report(y_test , y_pred, target_names=["femelle","male"],output_dict=True)).transpose()['recall'])
-# # # #
-# # # # titles_options = [("Normalized confusion matrix", 'true')]
-# # # # for title, normalize in titles_options:
-# # # #     disp = plot_confusion_matrix(clf, X_test, y_test,
-# # # #                                  display_labels=[0,1],
-# # # #                                  cmap=plt.cm.Blues,
-# # # #                                  normalize=normalize)
-# # # #     disp.ax_.set_title(title)
-# # # # plt.show()
+# dump(clf, r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\rapports\GBClassifierFinal2.joblib')
+# dump(clf0, r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\rapports\GBClassifierFinal2.joblib')
 
 
-# clf = GradientBoostingClassifier()
+"""!matrix confusion
+
+clf = load(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\rapports\GBClassifierFinal.joblib')
+
+y_pred = clf.predict(X_test)
+
+print(pd.DataFrame(classification_report(y_test , y_pred, target_names=["femelle","male"],output_dict=True)).transpose()['recall'])
+
+titles_options = [("Normalized confusion matrix", 'true')]
+for title, normalize in titles_options:
+    disp = plot_confusion_matrix(clf, X_test, y_test,
+                                 display_labels=[0,1],
+                                 cmap=plt.cm.Blues,
+                                 normalize=normalize)
+    disp.ax_.set_title(title)
+plt.show()
+"""
+
+
+## SVM
+
+# param_grid = {'C': [1, 10, 100, 1000,10000],
+#               'gamma': [10,1,0.1, 0.01, 0.001, 0.0001],
+#               'kernel': ['rbf','poly','sigmoid']}
 #
-# parameters = {
-#     "loss":["deviance"],
-#     "learning_rate": [0.01, 0.025, 0.05, 0.075, 0.1],
-#     "max_depth":[3,5,8],
-#     "max_features":["log2","sqrt"],
-#     "criterion": ["friedman_mse",  "mae"],
-#     "subsample":[0.5, 0.618, 0.95, 1.0],
-#     "n_estimators":[200,500,1000]
-#     }
-#
-# grid_search_clf = testIA_sexage.Model.grid_search_wrapper(X_train2,y_train2,clf,parameters,refit_score='recall_score')
-#
-#
-#
+# clf01 = GridSearchCV(SVC(), param_grid, cv=5, verbose = 3).fit(X_train,y_train)
+
+
+
+
 # clf_svc = SVC(C=100,gamma=0.01,kernel="poly",probability=True)
 # clf_svc.fit(X_train,y_train)
 #
@@ -137,9 +135,17 @@ from joblib import dump, load
 # plt.show()
 #
 # dump(clf_svc, r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\rapports\SVCClassifierFinal.joblib')
-# import xgboost as xgb
-#
-# xgb_model = xgb.XGBClassifier(objective="binary:logistic", random_state=42, eval_metric="auc",nthread=4)
+
+# clf001 = load(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\SVCClassifierFinal.joblib')
+# dump(clf01,r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\SVCClassifierFinal2.joblib')
+
+## XGBoost
+
+import xgboost as xgb
+from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection import RandomizedSearchCV
+
+xgb_model = xgb.XGBClassifier(objective="binary:logistic",eval_metric='mlogloss', random_state=42,nthread=4)
 # xgb_model.fit(X_train, y_train, early_stopping_rounds=5, eval_set=[(X_test, y_test)])
 # titles_options = [("Normalized confusion matrix", 'true')]
 # for title, normalize in titles_options:
@@ -151,3 +157,15 @@ from joblib import dump, load
 # plt.show()
 #
 # dump(xgb_model, r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\rapports\XGBClassifierFinal.joblib')
+params = {
+        'n_estimators' : [250, 500, 1000],
+        'min_child_weight': [1, 5, 10],
+        'gamma': [0.5, 1, 1.5, 2, 5],
+        'subsample': [0.6, 0.8, 1.0],
+        'colsample_bytree': [0.6, 0.8, 1.0],
+        'max_depth': [3, 4, 5]
+        }
+clf_xgb0 = GridSearchCV(xgb_model, params, cv=10, n_jobs=-1,verbose=3).fit(X_train,y_train).fit(X_train,y_train)
+
+dump(clf_xgb0, r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\rapports\XGBClassifierFinal2.joblib')
+
