@@ -15,7 +15,9 @@ The purpose of this project is to classify the gender of a Three Spined Stickleb
 <p align="center">
 <img src="https://github.com/RalphMasson/MorphoEpinoche/blob/master/images/illustration.jpg" width="450">
 </p>
-  
+<p align="center">
+<img src="https://github.com/RalphMasson/MorphoEpinoche/blob/master/images/schema3.png" width="450">
+</p>  
    
 # Distances calculation #
 
