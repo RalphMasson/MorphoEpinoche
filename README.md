@@ -23,7 +23,6 @@ Once points are detected, collection of 46 distances are calculated : body lengt
 
 <p align="center">
   <img src="https://github.com/RalphMasson/MorphoEpinoche/blob/master/images/schema4.png" width="400" />
-  <img src="https://github.com/RalphMasson/MorphoEpinoche/blob/master/images/illustration3.jpg" width="400" /> 
 </p>
 
 # Sex prediction #
