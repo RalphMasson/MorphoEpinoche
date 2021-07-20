@@ -22,7 +22,7 @@ The purpose of this project is to classify the gender of a Three Spined Stickleb
 Once points are detected, collection of 46 distances are calculated : body length, head length, jaw length...
 
 <p align="center">
-  <img src="https://github.com/RalphMasson/MorphoEpinoche/blob/master/images/illustration2.jpg" width="200" />
+  <img src="https://github.com/RalphMasson/MorphoEpinoche/blob/master/images/schema4.png" width="200" />
   <img src="https://github.com/RalphMasson/MorphoEpinoche/blob/master/images/illustration3.jpg" width="400" /> 
 </p>
 
