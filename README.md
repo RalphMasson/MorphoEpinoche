@@ -29,6 +29,6 @@ Once points are detected, collection of 46 distances are calculated : body lengt
 
 Finally, a machine learning model predicts the gender of the Three Spined Stickleback :  
 <p align="center">
-  <img src="https://github.com/RalphMasson/MorphoEpinoche/blob/master/images/gui2.png" width="600" />
+  <img src="https://github.com/RalphMasson/MorphoEpinoche/blob/master/images/gui2.png" width="800" />
 </p>
 
