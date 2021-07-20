@@ -11,13 +11,11 @@ The purpose of this project is to classify the gender of a Three Spined Stickleb
 [3] *Porto, Voje "ML-morph: [...] automated [...] landmarking of biological structures in images" 10.1111/2041-210X.13373      2020*  
 [4] *Irani, Allada.. "Highly versatile facial landmarks detection models using ensemble of regression trees with application"  2019*  
 
-
 <p align="center">
-<img src="https://github.com/RalphMasson/MorphoEpinoche/blob/master/images/illustration.jpg" width="450">
+  <img src="https://github.com/RalphMasson/MorphoEpinoche/blob/master/images/illustration.jpg" width="450" />
+  <img src="https://github.com/RalphMasson/MorphoEpinoche/blob/master/images/schema3.png" width="200" /> 
 </p>
-<p align="center">
-<img src="https://github.com/RalphMasson/MorphoEpinoche/blob/master/images/schema3.png" width="450">
-</p>  
+
    
 # Distances calculation #
 
