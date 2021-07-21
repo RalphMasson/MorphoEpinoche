@@ -502,7 +502,10 @@ class Interface(tk.Tk):
 
         # self.boutonImport = tk.Button(self,text = "Import images",command = self.importImage,fg='purple')
         self.boutonImport = ttk.Button(self,text = "Importer les images",command = self.importImage)
-        self.logo = tk.PhotoImage(file = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\images\logo_import.png')
+        try:
+            self.logo = tk.PhotoImage(file = os.path.join(sys._MEIPASS, 'logo_import.png'))
+        except:
+            self.logo = tk.PhotoImage(file = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\images\logo_import.png')
         self.boutonImport.config(image=self.logo, compound=tk.LEFT)
         self.small_logo = self.logo.subsample(7,7)
         self.boutonImport.config(image = self.small_logo)
@@ -512,7 +515,10 @@ class Interface(tk.Tk):
 
         # self.boutonPredict = tk.Button(self,text = "Predict",command = self.Model_Sexage,fg='purple')
         self.boutonPredict = ttk.Button(self,text = "Predire",command = self.Model_Sexage)
-        self.logo2 = tk.PhotoImage(file = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\images\logo_predict.png')
+        try:
+            self.logo2 = tk.PhotoImage(file = os.path.join(sys._MEIPASS, 'logo_predict.png'))
+        except:
+            self.logo2 = tk.PhotoImage(file = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\images\logo_predict.png')
         self.boutonPredict.config(image=self.logo2, compound=tk.LEFT)
         self.small_logo2 = self.logo2.subsample(15,15)
         self.boutonPredict.config(image = self.small_logo2)
@@ -523,7 +529,10 @@ class Interface(tk.Tk):
 
         # self.boutonPrevious = tk.Button(self,text='<--',fg='red',command = self.previousImage)
         self.boutonPrevious = ttk.Button(self,text="",command = self.previousImage)
-        self.logo3 = tk.PhotoImage(file = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\images\logo_left_arrow.png')
+        try:
+            self.logo3 = tk.PhotoImage(file = os.path.join(sys._MEIPASS, 'logo_left_arrow.png'))
+        except:
+            self.logo3 = tk.PhotoImage(file = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\images\logo_left_arrow.png')
         self.boutonPrevious.config(image=self.logo3, compound=tk.LEFT)
         self.small_logo3 = self.logo3.subsample(15,15)
         self.boutonPrevious.config(image = self.small_logo3)
@@ -532,7 +541,10 @@ class Interface(tk.Tk):
 
         # self.boutonNext = tk.Button(self,text='-->',fg='red',command = self.nextImage)
         self.boutonNext = ttk.Button(self,text="",command = self.nextImage)
-        self.logo4 = tk.PhotoImage(file = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\images\logo_right_arrow.png')
+        try:
+            self.logo4 = tk.PhotoImage(file = os.path.join(sys._MEIPASS, 'logo_right_arrow.png'))
+        except:
+            self.logo4 = tk.PhotoImage(file = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\images\logo_right_arrow.png')
         self.boutonNext.config(image=self.logo4, compound=tk.LEFT)
         self.small_logo4 = self.logo4.subsample(15,15)
         self.boutonNext.config(image = self.small_logo4)
