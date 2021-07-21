@@ -7,8 +7,11 @@ The purpose of this project is to classify the gender of a Three Spined Stickleb
 10 Specific landmarks are computed through Machine Learning (regression trees) according to Kazemi method adapted to biological research [1,2,3,4] :
  
 [1] *Kazemi,Sullivan, "One millisecond face alignment with an ensemble of regression trees," 2014*  
+
 [2] *Perrot,Bourdon,Helbert "Implementing cascaded regression tree-based face landmarking" 2020*  
+
 [3] *Porto, Voje "ML-morph: A fast, accurate and general approach for automated detection and landmarking of biological structures in images" 2020* 
+
 [4] *Irani, Allada.. "Highly versatile facial landmarks detection models using ensemble of regression trees with application" 2019*  
 
 <p align="center">
