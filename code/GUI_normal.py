@@ -11,6 +11,7 @@ sys.path.insert(0,pypath1)
 
 # Import des bibliothèques (s'assurer qu'elles soient installées)
 import tkinter as tk
+from tkinter import ttk
 from tkinter import messagebox
 from PIL import Image, ImageTk
 import math,os,cv2,webbrowser
@@ -497,36 +498,65 @@ class Interface(tk.Tk):
 
 
     def add_buttons(self):
-        self.boutonImport = tk.Button(self,text = "Import images",command = self.importImage,fg='purple')
-        self.boutonImport.place(relx=0.25,rely=0.12)
-        self.boutonImport.bind('<Control-o>',self.importImage)
-        self.boutonPredict = tk.Button(self,text = "Predict",command = self.Model_Sexage,fg='purple')
-        self.boutonPredict.place(relx=0.35,rely=0.12)
-        self.boutonPredict.bind('<Control-p>',self.Model_Sexage)
-        self.boutonPrevious = tk.Button(self,text='<--',fg='red',command = self.previousImage)
-        self.boutonPrevious.place(relx=0.45,rely=0.12)
-        self.boutonNext = tk.Button(self,text='-->',fg='red',command = self.nextImage)
-        self.boutonNext.place(relx=0.5,rely=0.12)
 
-        tk.Button(self,text="1) Réglage corps", fg='gray', command = self.afficheCorps).place(relx = 0.7,rely=0.6)
-        tk.Button(self,text="2) Réglage échelle",fg='gray',command = self.hideCorps).place(relx=0.77,rely=0.6)
-        tk.Button(self,text="3) Cacher",fg='gray',command = self.hideScale).place(relx = 0.84,rely=0.6)
+
+        # self.boutonImport = tk.Button(self,text = "Import images",command = self.importImage,fg='purple')
+        self.boutonImport = ttk.Button(self,text = "Importer les images",command = self.importImage)
+        self.logo = tk.PhotoImage(file = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\images\logo_import.png')
+        self.boutonImport.config(image=self.logo, compound=tk.LEFT)
+        self.small_logo = self.logo.subsample(7,7)
+        self.boutonImport.config(image = self.small_logo)
+        self.boutonImport.place(relx=0.20,rely=0.12)
+        self.boutonImport.bind('<Control-o>',self.importImage)
+
+
+        # self.boutonPredict = tk.Button(self,text = "Predict",command = self.Model_Sexage,fg='purple')
+        self.boutonPredict = ttk.Button(self,text = "Predire",command = self.Model_Sexage)
+        self.logo2 = tk.PhotoImage(file = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\images\logo_predict.png')
+        self.boutonPredict.config(image=self.logo2, compound=tk.LEFT)
+        self.small_logo2 = self.logo2.subsample(15,15)
+        self.boutonPredict.config(image = self.small_logo2)
+        self.boutonPredict.place(relx=0.31,rely=0.12)
+        self.boutonPredict.bind('<Control-p>',self.Model_Sexage)
+
+
+
+        # self.boutonPrevious = tk.Button(self,text='<--',fg='red',command = self.previousImage)
+        self.boutonPrevious = ttk.Button(self,text="",command = self.previousImage)
+        self.logo3 = tk.PhotoImage(file = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\images\logo_left_arrow.png')
+        self.boutonPrevious.config(image=self.logo3, compound=tk.LEFT)
+        self.small_logo3 = self.logo3.subsample(15,15)
+        self.boutonPrevious.config(image = self.small_logo3)
+        self.boutonPrevious.place(relx=0.40,rely=0.12)
+
+
+        # self.boutonNext = tk.Button(self,text='-->',fg='red',command = self.nextImage)
+        self.boutonNext = ttk.Button(self,text="",command = self.nextImage)
+        self.logo4 = tk.PhotoImage(file = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\images\logo_right_arrow.png')
+        self.boutonNext.config(image=self.logo4, compound=tk.LEFT)
+        self.small_logo4 = self.logo4.subsample(15,15)
+        self.boutonNext.config(image = self.small_logo4)
+        self.boutonNext.place(relx=0.47,rely=0.12)
+
+        ttk.Button(self,text="1) Réglage corps", command = self.afficheCorps).place(relx = 0.75,rely=0.5)
+        ttk.Button(self,text="2) Réglage échelle",command = self.hideCorps).place(relx=0.75,rely=0.55)
+        ttk.Button(self,text="3) Cacher l'image",command = self.hideScale).place(relx = 0.75,rely=0.6)
 
     def add_labels(self):
         ''' Label Intro de presentation'''
-        tk.Label(self, text = 'PREDICTION',font=("Purisa",12,"bold"),fg='purple').place(relx=0.25,rely=0.08)
+        # tk.Label(self, text = 'PREDICTION',font=("Purisa",12,"bold"),fg='purple').place(relx=0.25,rely=0.08)
         tk.Label(self,text=" ",font=("Purisa",12,"bold")).grid(ipadx=2)
-        tk.Label(self,text=" Sexing procedure of three-spined stickleback \n",font=("Andalus",16,"bold")).place(relx=0.35,rely=0.01)
+        tk.Label(self,text=" Procédure de sexage de l'épinoche à trois épines \n",font=("Andalus",16,"bold")).place(relx=0.3,rely=0.01)
         tk.Label(self,text="\n \n \n \n ").grid(column=0,row=1)
 
         self.labelSex = tk.Label(self,text="")
-        self.labelSex.place(relx=0.55,rely=0.12)
+        self.labelSex.place(relx=0.55,rely=0.13)
         tk.Label(self,text=" ").grid(column=0,row=3)
 
         self.labelNumImage = tk.Label(self,text="",font=("Purisa",11),fg='gray')
-        self.labelNumImage.place(relx=0.35,rely=0.975)
+        self.labelNumImage.place(relx=0.05,rely=0.975)
         self.labelNomImage = tk.Label(self,text="",font=("Purisa",11),fg='gray')
-        self.labelNomImage.place(relx=0.4,rely=0.975)
+        self.labelNomImage.place(relx=0.1,rely=0.975)
         tk.Label(self,text="\n",justify=tk.LEFT,font=("Purisa",8,"bold","underline")).grid(column=2,row=4)
 
     def add_menu(self):
