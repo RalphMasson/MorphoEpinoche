@@ -118,9 +118,13 @@ class Polygone():
         """!
         Methode pour calculer certaines distances caractéristiques
         """
-        self.distances_check = XY_tools.Externes.calculDistances(self.pointsEchelle,self.pointsFish)
-        self.distances_all = XY_tools.Externes.calculDistancesv2(self.pointsEchelle, self.pointsFish)
-        return self.distances_check
+        print("PointsEchelle")
+        print(self.pointsEchelle)
+        print("points")
+        print(self.points)
+        # self.distances_check = XY_tools.Externes.calculDistances(self.pointsEchelle,self.points)
+        self.distances_all = XY_tools.Externes.calculDistancesv2(self.pointsEchelle, self.points)
+        return self.distances_all
 
 
 class ScaleClass():
@@ -380,7 +384,7 @@ class ScaleClassBody():
                 Interface.PolygoneB.previous_y = event.y
                 Interface.PolygoneB.update_points(Interface.canvasCorps)
                 Interface.afficheLongueurBody()
-        Interface.afficheLongueurBody()
+        # Interface.afficheLongueurBody()
         ScaleClassBody.update_points(canvas3)
 
 ## Canvas pour les images
@@ -767,14 +771,18 @@ class Interface(tk.Tk):
         self.sexe.append(text.split(">")[-1])
 
         if(self.numImageActuelle==len(self.listeImages)-1):
-            self.verbose_conclusion()
 
-            self.data_result['ID'] = self.NumImages
-            self.data_result['Nom'] = self.NomImages
-            self.data_result['LS'] = self.LS
-            self.data_result['Sexe'] = self.sexe
-            self.data_result = self.data_result.drop_duplicates()
-            self.data_result.to_csv(self.finalname2,index=False,sep=";",encoding="UTF-8")
+            try:
+                self.verbose_conclusion()
+                self.data_result['ID'] = self.NumImages
+                self.data_result['Nom'] = self.NomImages
+                self.data_result['LS'] = self.LS
+                self.data_result['Sexe'] = self.sexe
+                self.data_result = self.data_result.drop_duplicates()
+                self.data_result.to_csv(self.finalname2,index=False,sep=";",encoding="UTF-8")
+
+            except:
+                pass
 
     def afficheScale(self):
         Interface.canvasEchelle.itemconfig(ScaleFish.poisson,state='normal')
@@ -940,7 +948,10 @@ class Interface(tk.Tk):
         # BodyClass(Interface.canvasCorps,corpsStandard,'cyan')
         Interface.PolygoneB = Polygone(Interface.canvasCorps,corpsStandard,'cyan')
         Interface.canvasCorps.update()
-
+        print("Points Polygone B")
+        print(Interface.PolygoneB.points)
+        print("Points Echelle Polygone B")
+        print(Interface.PolygoneB.pointsEchelle)
         #Affichage des points sur la tête
         pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19,pt21 = points_tete_copy
         points_tete_copy = XY_tools.Externes.centerPoints([pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19,pt21],HeadFish.oeilXY)
