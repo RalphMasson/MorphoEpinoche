@@ -35,3 +35,15 @@ Finally, a machine learning model predicts the gender of the Three Spined Stickl
   <img src="https://github.com/RalphMasson/MorphoEpinoche/blob/master/images/gui2.png" width="800" />
 </p>
 
+# Dependencies #
+
+No dependencies required, everything is inside the exe file. Just launch the GUI 
+
+# Python dependencies in order to launch GUI_normal.py #
+
+- python==3.8.6 
+- sklearn==0.23.2 
+- numpy==1.18.5 
+- scipy==1.5.2
+- dlib==19.22.0
+- xgboost==1.4.2 
