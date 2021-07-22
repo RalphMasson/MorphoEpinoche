@@ -235,32 +235,19 @@ class Externes():
         # texte += " 13 <-> 15 : Largeur corps : "+str(distance[1])+" mm \n"
         return texte
 
-    def centerPoint(pt,eye):
+    def centerPoint(pt,eye,dx,dy):
         """!
         Methode pour centrer un point sur l'interface
         @param pt tuple : point à décaler
         @return tuple : point décalé
+        HeadFish : -200, -200
+        ScaleFish : -25 -50
+        ScaleFishBody : -25 - 125
         """
-        return [pt[0]-(eye[0]-200),pt[1]-(eye[1]-200)]
+        return [pt[0]-(eye[0]-dx),pt[1]-(eye[1]-dy)]
 
 
-    def centerPoint2(pt,eye):
-        """!
-        Methode pour centrer un point sur l'interface
-        @param pt tuple : point à décaler
-        @return tuple : point décalé
-        """
-        return [pt[0]-(eye[0]-25),pt[1]-(eye[1]-50)]
-
-    def centerPoint3(pt,eye):
-        """!
-        Methode pour centrer un point sur l'interface
-        @param pt tuple : point à décaler
-        @return tuple : point décalé
-        """
-        return [pt[0]-(eye[0]-25),pt[1]-(eye[1]-125)]
-
-    def centerPoints(lstpt,eye):
+    def centerPoints(lstpt,eye,dx,dy):
         """!
         Methode pour centrer des points sur l'interface
         @param lstpt tuple : liste de points à décaler
@@ -268,30 +255,9 @@ class Externes():
         """
         new_lstpt = []
         for x in lstpt:
-            new_lstpt.append(Externes.centerPoint(x,eye))
+            new_lstpt.append(Externes.centerPoint(x,eye,dx,dy))
         return new_lstpt
 
-    def centerPoints2(lstpt,eye):
-        """!
-        Methode pour centrer des points sur l'interface
-        @param lstpt tuple : liste de points à décaler
-        @return new_lstpt : liste de points décalés
-        """
-        new_lstpt = []
-        for x in lstpt:
-            new_lstpt.append(Externes.centerPoint2(x,eye))
-        return new_lstpt
-
-    def centerPoints3(lstpt,eye):
-        """!
-        Methode pour centrer des points sur l'interface
-        @param lstpt tuple : liste de points à décaler
-        @return new_lstpt : liste de points décalés
-        """
-        new_lstpt = []
-        for x in lstpt:
-            new_lstpt.append(Externes.centerPoint3(x,eye))
-        return new_lstpt
 
 
     def resource_path(relative_path):

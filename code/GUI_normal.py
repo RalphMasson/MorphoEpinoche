@@ -24,7 +24,7 @@ import pandas as pd
 ## Classes pour afficher les points sur les images
 
 class Polygone():
-
+    # classe polygone pour les 2 images principales
     def __init__(self, canvas, points,color):
         """!
         Constructeur du polygone de la tête
@@ -406,6 +406,7 @@ class BodyFish():
     def __init__(self, canvas1,PIL_image,size):
         BodyFish.img = ImageTk.PhotoImage(PIL_image.resize(size, Image.ANTIALIAS))
         BodyFish.poisson = canvas1.create_image(0, 0, anchor=tk.NW, image=BodyFish.img)
+        canvas1.move(BodyFish.poisson, -(BodyFish.left[0]-50),-(BodyFish.left[1]-150))
 
 class ScaleFish():
     poisson = None
@@ -718,7 +719,7 @@ class Interface(tk.Tk):
             listepoints = ML.ML_pointage.xmltolistY(pypath2+"\models\\"+"output.xml",0)
 
         self.verbose_points(listepoints)
-        return listepoints
+        return listepoints[0]
 
     def Model_Echelle(self,pathimage):
         """!
@@ -736,7 +737,7 @@ class Interface(tk.Tk):
             a.predict(pathimage,pypath2+"\models\\","predictor_scale2.dat")
             listepoints = ML.ML_pointage.xmltolistY(pypath2+"\models\\"+"output.xml",0)
 
-        return listepoints
+        return listepoints[0]
 
 
     def Model_Longueur(self,pathimage):
@@ -752,7 +753,7 @@ class Interface(tk.Tk):
             a.predict(pathimage,pypath2+"\models\\","predictor_LS.dat")
             listepoints = ML.ML_pointage.xmltolistY(pypath2+"\models\\"+"output.xml",0)
 
-        return listepoints
+        return listepoints[0]
 
 
     def Model_Sexage(self):
@@ -910,72 +911,50 @@ class Interface(tk.Tk):
         Méthode permettant de calculer les points et de les disposer sur l'image
         """
         path_global = '/'.join(self.listeImages[self.numImageActuelle].split('/')[:-1])
-
-        #Points de la tête
-        points_tete = self.Model_Tete(self.listeImages[self.numImageActuelle])[0]
-        points_tete_copy = points_tete
-
-        #Oeil du poisson
-        HeadFish.oeilXY = [0.5*(points_tete_copy[1][0]+points_tete_copy[2][0]),0.5*(points_tete_copy[1][1]+points_tete_copy[2][1])]
-
-        #Points de l'échelle calculés par le modèle 2
-        points_echelle = self.Model_Echelle(self.listeImages[self.numImageActuelle])[0]
-        points_echelle_copy = points_echelle
-        ScaleFish.left = points_echelle[0]
-
-        #Placement des points de l'echelle au bon endroit
-        points_echelle = XY_tools.Externes.centerPoints2([points_echelle[0],points_echelle[1]],ScaleFish.left)
-        app.labelNomImage.config(text=self.listeImages[self.numImageActuelle])
+        self.imgActuelle = self.listeImages[self.numImageActuelle]
+        app.labelNomImage.config(text=self.imgActuelle)
         app.labelNumImage.config(text=str(self.numImageActuelle+1)+"/"+str(len(self.listeImages)))
 
-        #Image de la tête
-        self.ImagePIL = Image.open(self.listeImages[self.numImageActuelle])
-        HeadFish(self.canvasTete,self.ImagePIL,cv2.imread(self.listeImages[self.numImageActuelle]),(1920,1440))
+        # ScaleFish Model_Echelle
+        ScaleFish.left = self.Model_Echelle(self.imgActuelle)[0]
+        points_echelle = self.Model_Echelle(self.imgActuelle)
+        points_echelle = XY_tools.Externes.centerPoints(points_echelle[0:2],ScaleFish.left,25,50)
 
-        #Image entière
-        self.ImagePIL2 = Image.open(self.listeImages[self.numImageActuelle])
-        BodyFish(Interface.canvasCorps,self.ImagePIL2,(640,480))
+        # HeadFish Model_Tete
+        points_tete = self.Model_Tete(self.imgActuelle)
+        HeadFish.oeilXY = [np.mean(np.array(points_tete).T[0][1:3])]
+        HeadFish.oeilXY.append(np.mean(np.array(points_tete).T[1][1:3]))
+        points_tete = XY_tools.Externes.centerPoints(points_tete[0:10],HeadFish.oeilXY,200,200)
 
-        #Calcul des points du corps
-        listePoints3 = self.Model_Longueur(self.listeImages[self.numImageActuelle])[0]
-        listePoints3 = [[listePoints3[0][0]/3,listePoints3[0][1]/3],[listePoints3[1][0]/3,listePoints3[1][1]/3]]
-        corpsStandard = listePoints3
+        # BodyFish Model Longueur + Model_Echelle
+        corpsStandard = self.Model_Longueur(self.imgActuelle)
+        corpsStandard = [list(np.array(corpsStandard[0])/3),list(np.array(corpsStandard[1])/3)]
+        BodyFish.left = corpsStandard[0]
+        points_echelle2 = self.Model_Echelle(self.imgActuelle)
+        corpsStandard.extend([list(np.array(points_echelle2[0])/3),list(np.array(points_echelle2[1])/3)])
+        corpsStandard = XY_tools.Externes.centerPoints(corpsStandard[0:4],BodyFish.left,50,150)
 
-        #Ajout de l'echelle
-        corpsStandard.extend([[points_echelle_copy[0][0]/3,points_echelle_copy[0][1]/3],[points_echelle_copy[1][0]/3,points_echelle_copy[1][1]/3]])
+        # ScaleFishBody Model_Longueur
+        points_longueur = self.Model_Longueur(self.imgActuelle)
+        pt1,pt2 = points_longueur[0],points_longueur[1]
+        ScaleFishBody.left = pt1
+        points_longueur = XY_tools.Externes.centerPoints([pt1,pt2],ScaleFishBody.left,25,125)
 
-        #Affichage des points sur l'image entière
-        # BodyClass(Interface.canvasCorps,corpsStandard,'cyan')
-        Interface.PolygoneB = Polygone(Interface.canvasCorps,corpsStandard,'cyan')
-        Interface.canvasCorps.update()
-        print("Points Polygone B")
-        print(Interface.PolygoneB.points)
-        print("Points Echelle Polygone B")
-        print(Interface.PolygoneB.pointsEchelle)
-        #Affichage des points sur la tête
-        pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19,pt21 = points_tete_copy
-        points_tete_copy = XY_tools.Externes.centerPoints([pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19,pt21],HeadFish.oeilXY)
+        # Images
+        HeadFish(self.canvasTete,Image.open(self.imgActuelle),cv2.imread(self.imgActuelle),(1920,1440))
+        BodyFish(Interface.canvasCorps,Image.open(self.imgActuelle),(640,480))
+        ScaleFish(Interface.canvasEchelle,Image.open(self.imgActuelle),(1920,1440))
+        ScaleFishBody(Interface.canvasEchelle2,Image.open(self.imgActuelle),(1920,1440))
 
-        # HeadClass(self.canvasTete, points_tete_copy,'#ff00f2')
-        Interface.PolygoneA = Polygone(self.canvasTete,points_tete_copy,'#ff00f2')
+        # Points
+        Interface.PolygoneA = Polygone(self.canvasTete,points_tete,'#ff00f2')
         Interface.PolygoneA.pointsEchelle = points_echelle
         Interface.PolygoneA.calculDistances()
-        self.canvasTete.update()
 
-        #Image de l'échelle
-        ImagePIL = Image.open(self.listeImages[self.numImageActuelle])
-        tete2 = points_tete
-        ScaleFish(Interface.canvasEchelle,ImagePIL,(1920,1440))
+        Interface.PolygoneB = Polygone(Interface.canvasCorps,corpsStandard,'cyan')
+
         Interface.PolygoneC = ScaleClass(Interface.canvasEchelle,points_echelle,'#ffffff')
 
-        # Calcul des points  du corps Bis
-        points_longueur = self.Model_Longueur('/'.join(self.listeImages[0].split('/')[:-1]))[0]
-        pt1,pt2 = [points_longueur[0][0],points_longueur[0][1]],[points_longueur[1][0],points_longueur[1][1]]
-        ScaleFishBody.left = [points_longueur[0][0],points_longueur[0][1]]
-        points_longueur = XY_tools.Externes.centerPoints3([pt1,pt2],ScaleFishBody.left)
-        # Image du corps
-        ImagePIL = Image.open(self.listeImages[self.numImageActuelle])
-        ScaleFishBody(Interface.canvasEchelle2,ImagePIL,(1920,1440))
         Interface.PolygoneD = ScaleClassBody(Interface.canvasEchelle2,points_longueur,'#ffffff')
 
 
