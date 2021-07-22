@@ -368,7 +368,7 @@ class ScaleClassBody():
                 Interface.PolygoneB.previous_x = event.x
                 Interface.PolygoneB.previous_y = event.y
                 Interface.PolygoneB.update_points(Interface.canvasCorps)
-                Interface.afficheLongueurBody()
+                # Interface.afficheLongueurBody()
 
             if self.selected==3:
                 Interface.canvasCorps.move(3,dx/3,dy/3)
@@ -383,7 +383,7 @@ class ScaleClassBody():
                 Interface.PolygoneB.previous_x = event.x
                 Interface.PolygoneB.previous_y = event.y
                 Interface.PolygoneB.update_points(Interface.canvasCorps)
-                Interface.afficheLongueurBody()
+                # Interface.afficheLongueurBody()
         # Interface.afficheLongueurBody()
         ScaleClassBody.update_points(canvas3)
 
@@ -424,7 +424,7 @@ class ScaleFishBody():
         ScaleFishBody.img = ImageTk.PhotoImage(PIL_image.resize(size, Image.ANTIALIAS))
         ScaleFishBody.poisson = canvas3.create_image(0, 0, anchor=tk.NW, image=ScaleFishBody.img)
         Interface.canvasEchelle2.itemconfig(ScaleFishBody.poisson,state='hidden')
-        Interface.canvasEchelle2.move(ScaleFishBody.poisson,-(ScaleFishBody.left[0]-25),-(ScaleFishBody.left[1]-125))
+        Interface.canvasEchelle2.move(ScaleFishBody.poisson,-(ScaleFishBody.left[0]-25),-(ScaleFishBody.left[1]-160))
 
 
 ## Import du modèle de détection
@@ -467,12 +467,12 @@ class Interface(tk.Tk):
     def add_canvas(self):
         ''' Canvas pour la tête '''
         Interface.canvasTete = tk.Canvas(self,bg='#f0f0f0',bd=0,highlightthickness=1, highlightbackground="black")
-        Interface.canvasTete.config(width=500, height=400)
+        Interface.canvasTete.config(width=500, height=370)
         Interface.canvasTete.grid(column=0,row=8)
 
         ''' Canvas pour le corps '''
         Interface.canvasCorps = tk.Canvas(self,bg='#f0f0f0',highlightthickness=1, highlightbackground="black")
-        Interface.canvasCorps.config(width=630, height=400)
+        Interface.canvasCorps.config(width=630, height=370)
         Interface.canvasCorps.grid(column=1,row=8)
 
         ''' Canvas pour l'échelle '''
@@ -490,8 +490,8 @@ class Interface(tk.Tk):
 
         """Canvas pour logo"""
         Interface.canvasEchelle2 = tk.Canvas(self,bg='#f0f0f0')
-        Interface.canvasEchelle2.config(width=1590,height=200)
-        Interface.canvasEchelle2.place(relx=0,rely=0.7)
+        Interface.canvasEchelle2.config(width=1590,height=240)
+        Interface.canvasEchelle2.place(relx=0,rely=0.66)
 
         ''' Canvas pour le schema '''
         pathSchema = XY_tools.Externes.resource_path("schema.png")
@@ -757,7 +757,11 @@ class Interface(tk.Tk):
 
 
     def Model_Sexage(self):
-        Interface.lenBody = XY_tools.Externes.euclide(Interface.canvasEchelle2.coords(Interface.PolygoneD.nodes[0]),Interface.canvasEchelle2.coords(Interface.PolygoneD.nodes[1]))
+
+        try:
+            Interface.lenBody = XY_tools.Externes.euclide(Interface.canvasEchelle2.coords(Interface.PolygoneD.nodes[0]),Interface.canvasEchelle2.coords(Interface.PolygoneD.nodes[1]))
+        except:
+            pass
         Interface.allDist(Interface.lenBody)
         text,ae,proba = IA_sexage.Prediction.load_models(Interface.modeleDistances)
 
@@ -938,7 +942,7 @@ class Interface(tk.Tk):
         points_longueur = self.Model_Longueur(self.imgActuelle)
         pt1,pt2 = points_longueur[0],points_longueur[1]
         ScaleFishBody.left = pt1
-        points_longueur = XY_tools.Externes.centerPoints([pt1,pt2],ScaleFishBody.left,25,125)
+        points_longueur = XY_tools.Externes.centerPoints([pt1,pt2],ScaleFishBody.left,25,160)
 
         # Images
         HeadFish(self.canvasTete,Image.open(self.imgActuelle),cv2.imread(self.imgActuelle),(1920,1440))
