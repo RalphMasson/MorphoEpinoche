@@ -368,7 +368,6 @@ class ScaleClassBody():
                 Interface.PolygoneB.previous_x = event.x
                 Interface.PolygoneB.previous_y = event.y
                 Interface.PolygoneB.update_points(Interface.canvasCorps)
-                # Interface.afficheLongueurBody()
 
             if self.selected==3:
                 Interface.canvasCorps.move(3,dx/3,dy/3)
@@ -383,8 +382,7 @@ class ScaleClassBody():
                 Interface.PolygoneB.previous_x = event.x
                 Interface.PolygoneB.previous_y = event.y
                 Interface.PolygoneB.update_points(Interface.canvasCorps)
-                # Interface.afficheLongueurBody()
-        # Interface.afficheLongueurBody()
+
         ScaleClassBody.update_points(canvas3)
 
 ## Canvas pour les images
@@ -504,8 +502,6 @@ class Interface(tk.Tk):
 
     def add_buttons(self):
 
-
-        # self.boutonImport = tk.Button(self,text = "Import images",command = self.importImage,fg='purple')
         self.boutonImport = ttk.Button(self,text = "Importer les images",command = self.importImage)
         try:
             self.logo = tk.PhotoImage(file = os.path.join(sys._MEIPASS, 'logo_import.png'))
@@ -517,8 +513,6 @@ class Interface(tk.Tk):
         self.boutonImport.place(relx=0.20,rely=0.12)
         self.boutonImport.bind('<Control-o>',self.importImage)
 
-
-        # self.boutonPredict = tk.Button(self,text = "Predict",command = self.Model_Sexage,fg='purple')
         self.boutonPredict = ttk.Button(self,text = "Predire",command = self.Model_Sexage)
         try:
             self.logo2 = tk.PhotoImage(file = os.path.join(sys._MEIPASS, 'logo_predict.png'))
@@ -530,9 +524,6 @@ class Interface(tk.Tk):
         self.boutonPredict.place(relx=0.31,rely=0.12)
         self.boutonPredict.bind('<Control-p>',self.Model_Sexage)
 
-
-
-        # self.boutonPrevious = tk.Button(self,text='<--',fg='red',command = self.previousImage)
         self.boutonPrevious = ttk.Button(self,text="",command = self.previousImage)
         try:
             self.logo3 = tk.PhotoImage(file = os.path.join(sys._MEIPASS, 'logo_left_arrow.png'))
@@ -543,8 +534,6 @@ class Interface(tk.Tk):
         self.boutonPrevious.config(image = self.small_logo3)
         self.boutonPrevious.place(relx=0.40,rely=0.12)
 
-
-        # self.boutonNext = tk.Button(self,text='-->',fg='red',command = self.nextImage)
         self.boutonNext = ttk.Button(self,text="",command = self.nextImage)
         try:
             self.logo4 = tk.PhotoImage(file = os.path.join(sys._MEIPASS, 'logo_right_arrow.png'))
@@ -561,7 +550,6 @@ class Interface(tk.Tk):
 
     def add_labels(self):
         ''' Label Intro de presentation'''
-        # tk.Label(self, text = 'PREDICTION',font=("Purisa",12,"bold"),fg='purple').place(relx=0.25,rely=0.08)
         tk.Label(self,text=" ",font=("Purisa",12,"bold")).grid(ipadx=2)
         tk.Label(self,text=" Procédure de sexage de l'épinoche à trois épines \n",font=("Andalus",16,"bold")).place(relx=0.3,rely=0.01)
         tk.Label(self,text="\n \n \n \n ").grid(column=0,row=1)
@@ -579,7 +567,7 @@ class Interface(tk.Tk):
     def add_menu(self):
         ''' Fenetre et menu'''
         self.state('zoomed')
-        self.title("Sex Determination for Three Spined Stickleback")
+        self.title("Morphométrie Ineris (Epinoche)")
         menubar = tk.Menu(self)
         menuFichier = tk.Menu(menubar,tearoff=0)
         menuFichier.add_command(label="Importer", command=self.importImage,accelerator="(Ctrl+O)")
@@ -596,16 +584,12 @@ class Interface(tk.Tk):
         self.bind_all("<Control-Return>",lambda e : self.nextImage())
         menuOutils.add_command(label="Image précédente",command=self.previousImage,accelerator="(Ctrl+Backspace)")
         self.bind_all("<Control-BackSpace>",lambda e : self.previousImage())
-
-        menuOutils.add_separator()
-        menuOutils.add_command(label="Ouvrir base de données",command=self.openDataBase,accelerator="(Ctrl+H)")
-        self.bind_all("<Control-h>",lambda e : self.openDataBase())
         menubar.add_cascade(label="Outils",menu=menuOutils)
 
         menuModeles = tk.Menu(menubar,tearoff=0)
         menuModeles.add_command(label="Prépare MaJ Pointage",command=Interface.improveLandmarksModel)
-        menuModeles.add_command(label="MaJ Pointage 🔒",command=self.updatePointModel)
-        menuModeles.add_command(label="MaJ Sexage 🔒",command=self.updatePointModel1)
+        menuModeles.add_command(label="MaJ Pointage 🔒",command=GUI_update.InterfacePoint)
+        menuModeles.add_command(label="MaJ Sexage 🔒",command=GUI_update.InterfaceGender)
         menubar.add_cascade(label="Modèles",menu=menuModeles)
 
         menuAffichage = tk.Menu(menubar,tearoff=0)
@@ -616,31 +600,33 @@ class Interface(tk.Tk):
         menuAide = tk.Menu(menubar, tearoff=0)
         menuAide.add_command(label="A propos", command=self.help,accelerator="(Ctrl+I)")
         self.bind_all("<Control-i>",lambda e : self.help())
+        menuAide.add_command(label="Exemple d'image acceptée",command=Interface.displayExample)
         menuAide.add_command(label="Version",command=Interface.getVersion)
         menubar.add_cascade(label="Aide", menu=menuAide)
         self.config(menu=menubar)
 
+    def displayExample():
+        import sys,subprocess
+        cmdline = {'win32':'explorer'}[sys.platform]
+        try:
+            path = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\images\example.jpg'
+        except:
+            path = os.path.join(sys._MEIPASS, 'example.jpg')
+        subprocess.Popen([cmdline,path])
+
     def createlog(self):
         if not os.path.exists(os.getcwd()+"/log"):
             os.mkdir(os.getcwd()+"/log")
-            pathname = os.getcwd()+"/log/"
-            date = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
-            filename = date+"_"+"rapport"
-            filename2 = date+"_"+"resultats"
-            self.finalname = pathname+filename+".txt"
-            self.finalname2 = pathname+filename2+".csv"
-            f = open(self.finalname,"w+")
-            f.close()
 
-        if os.path.exists(os.getcwd()+"/log"):
-            pathname = os.getcwd()+"/log/"
-            date = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
-            filename = date+"_"+"rapport"
-            filename2 = date+"_"+"resultats"
-            self.finalname = pathname+filename+".txt"
-            self.finalname2 = pathname+filename2+".csv"
-            f = open(self.finalname,"w+")
-            f.close()
+        pathname = os.getcwd()+"/log/"
+        date = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+        filename = date+"_"+"rapport"
+        filename2 = date+"_"+"resultats"
+        self.finalname = pathname+filename+".txt"
+        self.finalname2 = pathname+filename2+".csv"
+        f = open(self.finalname,"w+")
+        f.close()
+
         self.data_result = pd.DataFrame()
         self.NomImages = []
         self.data_distances = []
@@ -686,8 +672,6 @@ class Interface(tk.Tk):
         f = open(self.finalname,"a")
         f.write(message)
         f.close()
-
-
 
     def verbose_sexe(self,text,proba):
         message = "\t Sexe : "+text+"\n"
@@ -823,23 +807,11 @@ class Interface(tk.Tk):
         GUI_little.app.pack(side="top", fill="both", expand=True)
         GUI_little.app.mainloop()
 
-    def updatePointModel(self):
-        GUI_update.InterfacePoint()
-
-    def updatePointModel1(self):
-        GUI_update.InterfaceGender()
-
     def afficheLongueur():
         """!
         Méthode permettant de mettre à jour l'affichage des longueurs dans l'interface
         """
         Interface.PolygoneA.calculDistances()
-
-    def afficheLongueurBody():
-        """!
-        Méthode permettant de mettre à jour l'affichage des longueurs du corps dans l'interface
-        """
-        Interface.PolygoneB.calculDistances()
 
     def clearAllCanvas(self):
         """!
@@ -882,15 +854,7 @@ class Interface(tk.Tk):
 
         reponse = tk.messagebox.askyesnocancel(title="Informations",message=message)
         if(reponse):
-            Interface.updateVersion()
-
-
-    def updateVersion():
-        """!
-        Méthode permettant d'ouvrir le lien github du projet
-        """
-        webbrowser.open('https://github.com/RalphMasson/MorphoEpinoche/releases/')
-
+            webbrowser.open('https://github.com/RalphMasson/MorphoEpinoche/releases/')
 
     def allDist(lenBody):
         px50mm = XY_tools.Externes.euclide(Interface.canvasEchelle.coords(Interface.PolygoneC.nodes[0]),Interface.canvasEchelle.coords(Interface.PolygoneC.nodes[1]))
@@ -962,15 +926,6 @@ class Interface(tk.Tk):
         Interface.PolygoneD = ScaleClassBody(Interface.canvasEchelle2,points_longueur,'#ffffff')
 
 
-    def affichePrediction(self):
-        """!
-        Méthode permettant d'afficher la prédiction du sexe
-        """
-        choix,couleur,p = IA_sexage.Prediction.predict(None,"","")
-        app.labelSex.config(text="")
-        app.labelSex.config(text=choix+" avec p="+str(round(p,2)),font=("Purisa",16),fg=couleur)
-
-
     def nextImage(self):
         """!
         Méthode permettant de passer à l'image d'après
@@ -1006,47 +961,11 @@ class Interface(tk.Tk):
         self.bind_all("<Control-Return>",lambda e : self.nextImage())
         self.bind_all("<Control-BackSpace>",lambda e : self.previousImage())
 
-    def openDataBase(self):
-        """!
-        Méthode permettant d'ouvrir le fichier csv s'il existe
-        """
-        pypath = inspect.getfile(lambda: None)
-        pypath = '/'.join(pypath.split('\\')[:-1])
-        import subprocess
-        if(os.path.exists(pypath3+"/DistancesPourModele.csv")):
-            try:
-                subprocess.Popen(pypath3+"/DistancesPourModele.csv",shell=True)
-            except:
-                commande = "start notepad.EXE "
-                commande += pypath3+"/DistancesPourModele.csv"
-                os.system(commande)
-
-        elif(os.path.exists(os.getcwd()+"\DistancesPourModele.csv")):
-            try:
-                subprocess.Popen(os.getcwd()+"\DistancesPourModele.csv",shell=True)
-            except:
-                commande = "start notepad.EXE "
-                commande += os.getcwd()+"\DistancesPourModele.csv"
-                os.system(commande)
-
-        else:
-            message = "La base de données n'a pas été trouvée"
-            message += "\n\n1) Vérifier qu'elle est située ici : "
-            message += "\n"+pypath3+"/DistancesPourModele.csv"
-            test = os.getcwd()
-            test2 = inspect.getfile(lambda: None)
-            message += "\n"+test
-            message += "\n"+'/'.join(test2.split('\\')[:-1])+"/DistancesPourModele.csv"
-            message += "\n\n2) Commencer par créer une base de données"
-            # message += "\n"+str(len(test))
-            # message += "\n"+str(len('/'.join(test2.split('\\')[:-1])))
-            tk.messagebox.showwarning(title="Attention", message=message)
-
     def help(self):
         """!
         Méthode permettant d'afficher des informations
         """
-        message = "PROCEDURE DE SEXAGE DE L'EPINOCHE v1.8"
+        message = "PROCEDURE DE SEXAGE DE L'EPINOCHE v"+str(Interface.version)
         message += "\n\n- Modèle de placement de points par Machine Learning (learning : 200 individus)"
         message += "\n\n- Modèle de classification Male/Femelle par Machine Learning (learning : 336 individus)"
         message += "\n\n\n Interface développée par R. Masson pour l'INERIS"

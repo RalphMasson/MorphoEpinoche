@@ -8,6 +8,7 @@ block_cipher = None
 added_files = [('C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\images\\logo2.png', '.'),
                ('C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\images\\schema.png', '.'),
                ('C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\images\\logo_import.png','.'),
+               ('C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\images\\example.jpg','.'),
                ('C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\images\\logo_predict.png','.'),
                ('C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\images\\logo_left_arrow.png','.'),
                ('C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\images\\logo_right_arrow.png','.'),
