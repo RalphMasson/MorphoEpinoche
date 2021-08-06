@@ -12,13 +12,14 @@ added_files = [('C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\image
                ('C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\images\\logo_predict.png','.'),
                ('C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\images\\logo_left_arrow.png','.'),
                ('C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\images\\logo_right_arrow.png','.'),
-               ('C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\models\\predictor_head.dat','.'),
+               ('C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\models\\predictor_head2.dat','.'),
                ('C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\models\\predictor_LS.dat','.'),
                ('C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\models\\predictor_scale2.dat','.'),
-               ('C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\models\\GBClassifierFinal2.joblib','.'),
-               ('C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\models\\SVCClassifierFinal2.joblib','.'),
-               ('C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\models\\XGBClassifierFinal2.joblib','.'),
-               ('C:\\Users\\MASSON\\AppData\\Local\\Programs\\Python\\Python38\\Lib\\site-packages\\xgboost','xgboost')]
+               ('C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\models\\GBClassifierFinal3.joblib','.'),
+               ('C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\models\\SVCClassifierFinal3.joblib','.'),
+               ('C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\models\\XGBClassifierFinal3.joblib','.'),
+               ('C:\\Users\\MASSON\\AppData\\Local\\Programs\\Python\\Python38\\Lib\\site-packages\\xgboost','xgboost'),
+               ('C:\\Users\\MASSON\\AppData\\Local\\Programs\\Python\\Python38\\Lib\\site-packages\\sklearn','sklearn')]
 
 a = Analysis(['GUI_normal.py'],
              pathex=['C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\code\\GUI_normal.py'],

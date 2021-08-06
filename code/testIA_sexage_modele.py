@@ -26,7 +26,7 @@ import testIA_sexage
 
 csv = r"C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\rapports\bdd_v0.csv"
 bdd = pd.read_csv(csv,encoding="latin-1",delimiter=";")
-
+#
 y = bdd['Sexe']
 X = bdd.drop(bdd.columns[0],axis=1)
 X2 = bdd.drop(bdd.columns[0],axis=1)
@@ -60,6 +60,19 @@ print(clf0.score(X_train,y_train))
 print(clf0.score(X_test,y_test))
 """
 
+print("Gradient Boosting Classifier")
+parameters = {
+    "loss":["deviance"],
+    "learning_rate": [0.01, 0.02, 0.03],
+    "max_depth":[4,6,8],
+    "subsample":[0.5, 0.618, 0.9],
+    "n_estimators":[100,500,1000]
+    }
+
+clf0 = GridSearchCV(GradientBoostingClassifier(), parameters, cv=10, n_jobs=-1,verbose=2).fit(X_train,y_train)
+dump(clf0, r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\rapports\GBClassifierFinal23.joblib')
+
+
 
 # listeGradientBoosting = []
 
@@ -87,7 +100,7 @@ print(clf0.score(X_test,y_test))
 # clf = GradientBoostingClassifier(criterion = "friedman_mse",learning_rate = 0.070,n_estimators=1000,max_depth=5,max_features="sqrt",subsample=0.618,loss="deviance")
 # clf.fit(X_train,y_train)
 #
-from joblib import dump, load
+# from joblib import dump, load
 # dump(clf, r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\rapports\GBClassifierFinal2.joblib')
 # dump(clf0, r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\rapports\GBClassifierFinal2.joblib')
 
@@ -141,7 +154,7 @@ dump(clf01,r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\SVCClass
 
 ## XGBoost
 # # # #
-# # # # import xgboost as xgb
+import xgboost as xgb
 # # # # from sklearn.model_selection import StratifiedKFold
 # # # # from sklearn.model_selection import RandomizedSearchCV
 # # # #
@@ -169,3 +182,24 @@ dump(clf01,r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\SVCClass
 # # # #
 # # # # dump(clf_xgb0, r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\rapports\XGBClassifierFinal2.joblib')
 # # # #
+
+
+
+
+
+
+
+
+##
+
+
+clf_gb1 = GradientBoostingClassifier(learning_rate = 0.03,n_estimators=500,max_depth=4,subsample=0.618,loss="deviance").fit(X_train,y_train)
+
+
+dump(clf_gb1,r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\GBClassifierFinal3.joblib')
+
+clf_svc1 = SVC(C=10,gamma=0.001,kernel="poly",probability=True).fit(X_train,y_train)
+dump(clf_svc1,r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\SVCClassifierFinal3.joblib')
+
+clf_xgb1 = xgb.XGBClassifier(objective="binary:logistic",eval_metric='mlogloss', random_state=42,nthread=4,colsample_bytree = 0.6,gamma = 1.5,max_depth = 5,min_child_weight = 1,n_estimators = 500,subsample = 0.6).fit(X_train,y_train)
+dump(clf_xgb1,r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\XGBClassifierFinal3.joblib')

@@ -23,9 +23,12 @@ import xgboost as xgb
 import pandas as pd
 ## Classes pour afficher les points sur les images
 
+
+
+
 class Polygone():
     # classe polygone pour les 2 images principales
-    def __init__(self, canvas, points,color):
+    def __init__(self, canvas, points,color,ligne):
         """!
         Constructeur du polygone de la tête
         @param canvas tk.Canvas : cadre de l'image
@@ -46,6 +49,11 @@ class Polygone():
             self.id_polygons.append(self.polygon)
             canvas.tag_bind(self.polygon, '<ButtonPress-1>',   lambda event, tag=self.polygon: self.on_press_tag(event, 0, tag))
             canvas.tag_bind(self.polygon, '<ButtonRelease-1>', lambda event, tag=self.polygon: self.on_release_tag(event, 0, tag,canvas))
+            if ligne:
+                canvas.create_line(self.points[2][0],self.points[2][1],self.points[3][0],self.points[3][1],fill="green")
+                print("points Polygone B")
+                print(self.points)
+
             self.nodes = []
             self.nonodes = []
             for number, point in enumerate(self.points):
@@ -101,6 +109,7 @@ class Polygone():
         @param tag int : numero de l'id
         """
         if self.selected:
+            print(self.selected)
             dx = event.x - self.previous_x
             dy = event.y - self.previous_y
             canvas.move(self.selected, dx, dy)
@@ -210,6 +219,7 @@ class ScaleClass():
         @param tag int : numero de l'id
         """
         if self.selected:
+            print(self.selected)
             dx = event.x - self.previous_x
             dy = event.y - self.previous_y
             canvas2.move(self.selected, dx, dy)
@@ -222,10 +232,10 @@ class ScaleClass():
             self.previous_y = event.y
             px50mm = XY_tools.Externes.euclide(Interface.canvasEchelle.coords(Interface.PolygoneC.nodes[0]),Interface.canvasEchelle.coords(Interface.PolygoneC.nodes[1]))
 
-            if self.selected==5:
-                Interface.canvasCorps.move(9,dx/3,dy/3)
+            if self.selected==5+Interface.numImageActuelle*6:
+                Interface.canvasCorps.move(10+Interface.numImageActuelle*11,dx/3,dy/3)
                 Interface.canvasCorps.update()
-                Interface.canvasCorps.move(Interface.PolygoneB.nonodes[Interface.PolygoneB.nodes.index(9)],dx/3,dy/3)
+                Interface.canvasCorps.move(Interface.PolygoneB.nonodes[Interface.PolygoneB.nodes.index(10+Interface.numImageActuelle*11)],dx/3,dy/3)
                 Interface.canvasCorps.update()
                 Interface.PolygoneB.points[3][0] += dx
                 Interface.PolygoneB.points[3][1] += dy
@@ -238,10 +248,10 @@ class ScaleClass():
                 Interface.afficheLongueur()
                 Interface.allDist(Interface.lenBody)
 
-            if self.selected==3:
-                Interface.canvasCorps.move(7,dx/3,dy/3)
+            if self.selected==3+Interface.numImageActuelle*6:
+                Interface.canvasCorps.move(8+Interface.numImageActuelle*11,dx/3,dy/3)
                 Interface.canvasCorps.update()
-                Interface.canvasCorps.move(Interface.PolygoneB.nonodes[Interface.PolygoneB.nodes.index(7)],dx/3,dy/3)
+                Interface.canvasCorps.move(Interface.PolygoneB.nonodes[Interface.PolygoneB.nodes.index(8+Interface.numImageActuelle*11)],dx/3,dy/3)
                 Interface.canvasCorps.update()
                 Interface.PolygoneB.points[2][0] += dx
                 Interface.PolygoneB.points[2][1] += dy
@@ -354,11 +364,12 @@ class ScaleClassBody():
             canvas3.coords(self.polygon, coords)
             self.previous_x = event.x
             self.previous_y = event.y
-
-            if self.selected==5:
-                Interface.canvasCorps.move(5,dx/3,dy/3)
+            print(self.selected)
+            if self.selected==5+Interface.numImageActuelle*6:
+                Interface.canvasCorps.move(6+Interface.numImageActuelle*11,dx/3,dy/3)
+                print(6+Interface.numImageActuelle*11)
                 Interface.canvasCorps.update()
-                Interface.canvasCorps.move(Interface.PolygoneB.nonodes[Interface.PolygoneB.nodes.index(5)],dx/3,dy/3)
+                Interface.canvasCorps.move(Interface.PolygoneB.nonodes[Interface.PolygoneB.nodes.index(6+Interface.numImageActuelle*11)],dx/3,dy/3)
                 Interface.canvasCorps.update()
                 Interface.PolygoneB.points[1][0] += dx
                 Interface.PolygoneB.points[1][1] += dy
@@ -369,10 +380,10 @@ class ScaleClassBody():
                 Interface.PolygoneB.previous_y = event.y
                 Interface.PolygoneB.update_points(Interface.canvasCorps)
 
-            if self.selected==3:
-                Interface.canvasCorps.move(3,dx/3,dy/3)
+            if self.selected==3+Interface.numImageActuelle*6:
+                Interface.canvasCorps.move(4+Interface.numImageActuelle*11,dx/3,dy/3)
                 Interface.canvasCorps.update()
-                Interface.canvasCorps.move(Interface.PolygoneB.nonodes[Interface.PolygoneB.nodes.index(3)],dx/3,dy/3)
+                Interface.canvasCorps.move(Interface.PolygoneB.nonodes[Interface.PolygoneB.nodes.index(4+Interface.numImageActuelle*11)],dx/3,dy/3)
                 Interface.canvasCorps.update()
                 Interface.PolygoneB.points[0][0] += dx
                 Interface.PolygoneB.points[0][1] += dy
@@ -404,7 +415,7 @@ class BodyFish():
     def __init__(self, canvas1,PIL_image,size):
         BodyFish.img = ImageTk.PhotoImage(PIL_image.resize(size, Image.ANTIALIAS))
         BodyFish.poisson = canvas1.create_image(0, 0, anchor=tk.NW, image=BodyFish.img)
-        canvas1.move(BodyFish.poisson, -(BodyFish.left[0]-50),-(BodyFish.left[1]-150))
+        canvas1.move(BodyFish.poisson, -(BodyFish.left[0]-590),-(BodyFish.left[1]-340))
 
 class ScaleFish():
     poisson = None
@@ -444,6 +455,20 @@ class ModelPoints():
 
 ## Interface finale
 
+
+
+class Splash(tk.Tk):
+    def __init__(self):
+        tk.Tk.__init__(self)
+        self.title("Splash")
+
+        # required to make window show before the program gets to the mainloop
+        self.update()
+
+
+
+
+
 class Interface(tk.Tk):
     sexModele = None
     version = 1.9
@@ -452,15 +477,30 @@ class Interface(tk.Tk):
         """!
         Constructeur de l'interface
         """
-        super().__init__()
+        import time
+
         self.listeImages = []
-        self.numImageActuelle = 0
+        # splash = Splash()
+        # time.sleep(6)
+        # splash.destroy()
+        super().__init__()
+
+        Interface.numImageActuelle = 0
         self.add_menu()
         self.add_buttons()
         self.add_labels()
         self.add_canvas()
         self.createlog()
         self.verbose_intro()
+
+    def restart_program(self):
+        import sys
+        import os
+        """Restarts the current program.
+        Note: this function does not return. Any cleanup action (like
+        saving data) must be done before calling this function."""
+        python = sys.executable
+        os.execl(python, python, * sys.argv)
 
     def add_canvas(self):
         ''' Canvas pour la tête '''
@@ -495,12 +535,23 @@ class Interface(tk.Tk):
         pathSchema = XY_tools.Externes.resource_path("schema.png")
         self.canvasSchema = tk.Canvas(self,bg='#f0f0f0')
         self.canvasSchema.config(width = 288,height=192)
-        self.canvasSchema.place(x=1250,y=0)
+        # self.canvasSchema.place(x=1250,y=0)
+        self.canvasSchema.place(relx=0.82,rely=0)
+
         self.imgSchema = ImageTk.PhotoImage(Image.open(pathSchema).resize((288,192)))
         self.canvasSchema.create_image(0,0,anchor=tk.NW,image=self.imgSchema)
 
 
     def add_buttons(self):
+        self.boutonRestart = ttk.Button(self,text="Restart",command = self.restart_program)
+        try:
+            self.logo0 = tk.PhotoImage(file = os.path.join(sys._MEIPASS, 'logo_restart.png'))
+        except:
+            self.logo0 = tk.PhotoImage(file = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\images\logo_restart.png')
+        self.boutonRestart.config(image=self.logo0, compound=tk.LEFT)
+        self.small_logo0 = self.logo0.subsample(17,17)
+        self.boutonRestart.config(image = self.small_logo0)
+        self.boutonRestart.place(relx=0.05,rely=0.12)
 
         self.boutonImport = ttk.Button(self,text = "Importer les images",command = self.importImage)
         try:
@@ -552,8 +603,14 @@ class Interface(tk.Tk):
         ''' Label Intro de presentation'''
         tk.Label(self,text=" ",font=("Purisa",12,"bold")).grid(ipadx=2)
         tk.Label(self,text=" Procédure de sexage de l'épinoche à trois épines \n",font=("Andalus",16,"bold")).place(relx=0.3,rely=0.01)
-        tk.Label(self,text="\n \n \n \n ").grid(column=0,row=1)
+        # tk.Label(self,text="\n \n \n \n ").grid(column=10,row=1)
+        tk.Label(self,text=" ",font=("Purisa",12,"bold")).grid(ipadx=2)
+        tk.Label(self,text=" ",font=("Purisa",12,"bold")).grid(ipadx=2)
+        tk.Label(self,text=" ",font=("Purisa",12,"bold")).grid(ipadx=2)
+        tk.Label(self,text=" ",font=("Purisa",12,"bold")).grid(ipadx=2)
+        tk.Label(self,text=" ",font=("Purisa",12,"bold")).grid(ipadx=2)
 
+        # tk.Label(self,text="\n \n \n \n ").place(relx = 0.1,rely=0.2)
         self.labelSex = tk.Label(self,text="")
         self.labelSex.place(relx=0.55,rely=0.13)
         tk.Label(self,text=" ").grid(column=0,row=3)
@@ -661,7 +718,7 @@ class Interface(tk.Tk):
         f.write(message)
         f.close()
     def verbose_points(self,listepoints):
-        message = XY_tools.Externes.verbose_points(listepoints,self.listeImages, self.numImageActuelle)
+        message = XY_tools.Externes.verbose_points(listepoints,self.listeImages, Interface.numImageActuelle)
         f = open(self.finalname,"a")
         f.write(message)
         f.close()
@@ -691,15 +748,15 @@ class Interface(tk.Tk):
             @param pathimage dossier de l'image
         """
         try:
-            pathPredictor = os.path.join(sys._MEIPASS, 'predictor_head.dat')
+            pathPredictor = os.path.join(sys._MEIPASS, 'predictor_head2.dat')
             a = ModelPoints(os.path.join(sys._MEIPASS,''),"")
-            a.predict(pathimage,os.path.join(sys._MEIPASS,''),"predictor_head.dat")
+            a.predict(pathimage,os.path.join(sys._MEIPASS,''),"predictor_head2.dat")
             listepoints = ML.ML_pointage.xmltolistY(os.path.join(sys._MEIPASS,"output.xml"),0)
 
         except:
-            pathPredictor = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\predictor_head.dat'
+            pathPredictor = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\predictor_head2.dat'
             a = ModelPoints(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\',"")
-            a.predict(pathimage,pypath2+"\models\\","predictor_head.dat")
+            a.predict(pathimage,pypath2+"\models\\","predictor_head2.dat")
             listepoints = ML.ML_pointage.xmltolistY(pypath2+"\models\\"+"output.xml",0)
 
         self.verbose_points(listepoints)
@@ -751,15 +808,17 @@ class Interface(tk.Tk):
 
         self.verbose_distances(ae)
         self.verbose_sexe(text,proba)
-
+        text2 = text.split(";")
+        print(text2)
         app.labelSex.config(text = text)
-        nomImage = "".join(self.listeImages[self.numImageActuelle].split("/")[-1])
+        # print(text)
+        nomImage = "".join(self.listeImages[Interface.numImageActuelle].split("/")[-1])
         self.NomImages.append(nomImage)
-        self.NumImages.append(self.numImageActuelle+1)
+        self.NumImages.append(Interface.numImageActuelle+1)
         self.LS.append(list(ae.values[0])[0])
         self.sexe.append(text.split(">")[-1])
 
-        if(self.numImageActuelle==len(self.listeImages)-1):
+        if(Interface.numImageActuelle==len(self.listeImages)-1):
 
             try:
                 self.verbose_conclusion()
@@ -786,6 +845,9 @@ class Interface(tk.Tk):
         Interface.canvasEchelle2.itemconfig(ScaleFishBody.poisson,state='hidden')
         Interface.lenBody = XY_tools.Externes.euclide(Interface.canvasEchelle2.coords(3),Interface.canvasEchelle2.coords(5))
         Interface.canvasEchelle2.destroy()
+        # Interface.canvasEchelle2.delete('all')
+
+
 
     def improveLandmarksModel():
         message = "Pour ajouter des données au modèle v1 de placement de points :"
@@ -828,7 +890,12 @@ class Interface(tk.Tk):
         self.labelSex.config(text="")
         Interface.canvasTete.delete('all')
         Interface.canvasCorps.delete('all')
-        Interface.canvasEchelle2.delete('all')
+        try:
+            Interface.canvasEchelle2.delete('all')
+        except:
+            Interface.canvasEchelle2 = tk.Canvas(self,bg='#f0f0f0')
+            Interface.canvasEchelle2.config(width=1590,height=240)
+            Interface.canvasEchelle2.place(relx=0,rely=0.66)
         Interface.canvasEchelle.delete('all')
 
         ScaleClassBody.pointsEchelle = []
@@ -839,7 +906,7 @@ class Interface(tk.Tk):
         Méthode permettant de remettre à zero les images chargées
         """
         self.listeImages = []
-        self.numImageActuelle = 0
+        Interface.numImageActuelle = 0
 
     def getVersion():
 
@@ -878,10 +945,10 @@ class Interface(tk.Tk):
         """!
         Méthode permettant de calculer les points et de les disposer sur l'image
         """
-        path_global = '/'.join(self.listeImages[self.numImageActuelle].split('/')[:-1])
-        self.imgActuelle = self.listeImages[self.numImageActuelle]
+        path_global = '/'.join(self.listeImages[Interface.numImageActuelle].split('/')[:-1])
+        self.imgActuelle = self.listeImages[Interface.numImageActuelle]
         app.labelNomImage.config(text=self.imgActuelle)
-        app.labelNumImage.config(text=str(self.numImageActuelle+1)+"/"+str(len(self.listeImages)))
+        app.labelNumImage.config(text=str(Interface.numImageActuelle+1)+"/"+str(len(self.listeImages)))
 
         # ScaleFish Model_Echelle
         ScaleFish.left = self.Model_Echelle(self.imgActuelle)[0]
@@ -897,10 +964,11 @@ class Interface(tk.Tk):
         # BodyFish Model Longueur + Model_Echelle
         corpsStandard = self.Model_Longueur(self.imgActuelle)
         corpsStandard = [list(np.array(corpsStandard[0])/3),list(np.array(corpsStandard[1])/3)]
-        BodyFish.left = corpsStandard[0]
+
         points_echelle2 = self.Model_Echelle(self.imgActuelle)
         corpsStandard.extend([list(np.array(points_echelle2[0])/3),list(np.array(points_echelle2[1])/3)])
-        corpsStandard = XY_tools.Externes.centerPoints(corpsStandard[0:4],BodyFish.left,50,150)
+        BodyFish.left = corpsStandard[3]
+        corpsStandard = XY_tools.Externes.centerPoints(corpsStandard[0:4],BodyFish.left,590,340)
 
         # ScaleFishBody Model_Longueur
         points_longueur = self.Model_Longueur(self.imgActuelle)
@@ -915,11 +983,11 @@ class Interface(tk.Tk):
         ScaleFishBody(Interface.canvasEchelle2,Image.open(self.imgActuelle),(1920,1440))
 
         # Points
-        Interface.PolygoneA = Polygone(self.canvasTete,points_tete,'#ff00f2')
+        Interface.PolygoneA = Polygone(self.canvasTete,points_tete,'#ff00f2',ligne=False)
         Interface.PolygoneA.pointsEchelle = points_echelle
         Interface.PolygoneA.calculDistances()
 
-        Interface.PolygoneB = Polygone(Interface.canvasCorps,corpsStandard,'cyan')
+        Interface.PolygoneB = Polygone(Interface.canvasCorps,corpsStandard,'cyan',ligne=True)
 
         Interface.PolygoneC = ScaleClass(Interface.canvasEchelle,points_echelle,'#ffffff')
 
@@ -930,14 +998,14 @@ class Interface(tk.Tk):
         """!
         Méthode permettant de passer à l'image d'après
         """
-        if(self.numImageActuelle<len(self.listeImages)):
+        if(Interface.numImageActuelle<len(self.listeImages)):
             self.blockButton(+1)
 
     def previousImage(self):
         """!
         Méthode permettant de revenir a l'image précédente
         """
-        if(self.numImageActuelle>0):
+        if(Interface.numImageActuelle>0):
             self.blockButton(-1)
 
     def blockButton(self,param):
@@ -948,7 +1016,7 @@ class Interface(tk.Tk):
         import time
         self.unbind_all("<Control-Return>")
         self.unbind_all("<Control-BackSpace>")
-        self.numImageActuelle+=param
+        Interface.numImageActuelle+=param
         nbPointNonDetectes = 0
         time.sleep(0.3)
         self.boutonPrevious.configure(state=tk.DISABLED)
@@ -971,6 +1039,9 @@ class Interface(tk.Tk):
         message += "\n\n\n Interface développée par R. Masson pour l'INERIS"
         tk.messagebox.showinfo(title="Informations",message=message)
 
-
+import pyuac
+if not pyuac.isUserAdmin():
+    print("Re-launching as admin!")
+    pyuac.runAsAdmin()
 app = Interface()
 app.mainloop()

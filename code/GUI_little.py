@@ -766,11 +766,11 @@ class Interface(tk.Frame):
         # self.sexModel = tk.Entry(self.frame,width=3,textvariable=Interface.sexModele)
         # self.sexModel.pack(padx=5,pady=5,anchor=tk.N)
         # tk.Button(self.frame,text = "Model Update (close Excel before)",command = HeadClass.genererAllDistancesHead,fg='green').pack(padx=0,pady=0,fill='x')
-        self.boutonPrevious = tk.Button(self.frame,text='←',font=("Purisa",13,"bold"),command = self.previousImage)
-        self.boutonPrevious.pack(fill='x',ipady=8)
+
         self.boutonNext = tk.Button(self.frame,text='→',font=("Purisa",13,"bold"),command = self.nextImage)
         self.boutonNext.pack(fill='x',ipady=8)
-
+        self.boutonPrevious = tk.Button(self.frame,text='←',font=("Purisa",13,"bold"),command = self.previousImage)
+        self.boutonPrevious.pack(fill='x',ipady=8)
         self.labelSex = tk.Label(self.frame,text="")
         self.labelSex.pack()
 
@@ -1042,7 +1042,9 @@ class Interface(tk.Frame):
         ScaleFish.left = points_echelle[0]
 
         #Placement des points de l'echelle au bon endroit
-        points_echelle = XY_tools.Externes.centerPoints2([points_echelle[0],points_echelle[1]],ScaleFish.left)
+        # points_echelle = XY_tools.Externes.centerPoints2([points_echelle[0],points_echelle[1]],ScaleFish.left)
+        points_echelle = XY_tools.Externes.centerPoints(points_echelle[0:2],ScaleFish.left,25,50)
+
         app.labelNomImage.config(text=self.listeImages[self.numImageActuelle])
         app.labelNumImage.config(text=str(self.numImageActuelle+1)+"/"+str(len(self.listeImages)))
 
@@ -1068,7 +1070,7 @@ class Interface(tk.Frame):
 
         #Affichage des points sur la tête
         pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19,pt21 = points_tete_copy
-        points_tete_copy = XY_tools.Externes.centerPoints([pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19,pt21],HeadFish.oeilXY)
+        points_tete_copy = XY_tools.Externes.centerPoints([pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19,pt21],HeadFish.oeilXY,200,200)
         HeadClass.pointsEchelle = points_echelle
         HeadClass(self.canvasTete, points_tete_copy,'#ff00f2')
         self.canvasTete.update()
@@ -1083,7 +1085,7 @@ class Interface(tk.Frame):
         points_longueur = self.Model_Longueur('/'.join(self.listeImages[0].split('/')[:-1]))[0]
         pt1,pt2 = [points_longueur[0][0],points_longueur[0][1]],[points_longueur[1][0],points_longueur[1][1]]
         ScaleFishBody.left = [points_longueur[0][0],points_longueur[0][1]]
-        points_longueur = XY_tools.Externes.centerPoints3([pt1,pt2],ScaleFishBody.left)
+        points_longueur = XY_tools.Externes.centerPoints([pt1,pt2],ScaleFishBody.left,0,0)
 
         # Image du corps
         ImagePIL = Image.open(self.listeImages[self.numImageActuelle])
@@ -1096,18 +1098,18 @@ class Interface(tk.Frame):
         """
         print("points tête")
         try:
-            pathPredictor = os.path.join(sys._MEIPASS, 'predictor_head.dat')
+            pathPredictor = os.path.join(sys._MEIPASS, 'predictor_head2.dat')
         except:
-            pathPredictor = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\predictor_head.dat'
+            pathPredictor = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\predictor_head2.dat'
         try:
             a = ModelPoints(os.path.join(sys._MEIPASS,''),"")
         except:
             a = ModelPoints(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\',"")
         # print("load ok")
         try:
-            a.predict(pathimage,os.path.join(sys._MEIPASS,''),"predictor_head.dat")
+            a.predict(pathimage,os.path.join(sys._MEIPASS,''),"predictor_head2.dat")
         except:
-            a.predict(pathimage,Temp.ppath2+"\models\\","predictor_head.dat")
+            a.predict(pathimage,Temp.ppath2+"\models\\","predictor_head2.dat")
 
         # print("predict ok")
         # print(Temp.chemin)
@@ -1175,13 +1177,13 @@ class Interface(tk.Frame):
         from joblib import dump, load
         import pandas as pd
         try:
-            clf = load(os.path.join(sys._MEIPASS,"GBClassifierFinal.joblib"))
-            clf1 = load(os.path.join(sys._MEIPASS,"SVCClassifierFinal.joblib"))
-            clf2 = load(os.path.join(sys._MEIPASS,"XGBClassifierFinal.joblib"))
+            clf = load(os.path.join(sys._MEIPASS,"GBClassifierFinal3.joblib"))
+            clf1 = load(os.path.join(sys._MEIPASS,"SVCClassifierFinal3.joblib"))
+            clf2 = load(os.path.join(sys._MEIPASS,"XGBClassifierFinal3.joblib"))
         except:
-            clf = load(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\GBClassifierFinal.joblib')
-            clf1 = load(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\SVCClassifierFinal.joblib')
-            clf2 = load(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\XGBClassifierFinal.joblib')
+            clf = load(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\GBClassifierFinal3.joblib')
+            clf1 = load(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\SVCClassifierFinal3.joblib')
+            clf2 = load(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\XGBClassifierFinal3.joblib')
 
         pd.set_option('display.max_columns', None)
         pd.set_option('display.expand_frame_repr', False)

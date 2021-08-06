@@ -1,9 +1,9 @@
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.datasets import make_classification
-from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import StandardScaler
-from sklearn.svm import SVC
+# from sklearn.model_selection import train_test_split
+# from sklearn.ensemble import RandomForestClassifier
+# from sklearn.datasets import make_classification
+# from sklearn.pipeline import make_pipeline
+# from sklearn.preprocessing import StandardScaler
+# from sklearn.svm import SVC
 import pandas as pd
 from joblib import dump, load
 
@@ -41,12 +41,13 @@ class Prediction():
 
         self.X = self.bdd.drop('Sexe (0:F, 1:M)',axis=1)
         self.y = self.bdd[self.bdd.columns[0]]
-        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.X, self.y, test_size=0.3)
-
+        # self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(self.X, self.y, test_size=0.3)
+        print(toto)
 
     def parameters(self):
-        self.clf=RandomForestClassifier(n_estimators=2000)
-        self.clf1 = make_pipeline(StandardScaler(), SVC(C=100,gamma=0.01,kernel='poly'))
+        # self.clf=RandomForestClassifier(n_estimators=2000)
+        # self.clf1 = make_pipeline(StandardScaler(), SVC(C=100,gamma=0.01,kernel='poly'))
+        print(toto)
 
     def train(self):
         """!
@@ -56,17 +57,17 @@ class Prediction():
 
         """
 
-        self.clf.fit(self.X_train,self.y_train)
+        # self.clf.fit(self.X_train,self.y_train)
         print(self.path)
         print(self.clf.score(self.X_train,self.y_train))
         print(self.clf.score(self.X_test,self.y_test))
-        dump(self.clf, self.path+"modelRF.joblib")
+        # dump(self.clf, self.path+"modelRF.joblib")
 
 
-        self.clf1.fit(self.X_train,self.y_train)
+        # self.clf1.fit(self.X_train,self.y_train)
         print(self.clf1.score(self.X_train,self.y_train))
         print(self.clf1.score(self.X_test,self.y_test))
-        dump(self.clf1, self.path+"modelSVC.joblib")
+        # dump(self.clf1, self.path+"modelSVC.joblib")
 
 
     def load_models(modeleDistances):
@@ -74,13 +75,13 @@ class Prediction():
         import pandas as pd
         import numpy as np
         try:
-            clf = load(os.path.join(sys._MEIPASS,"GBClassifierFinal2.joblib"))
-            clf1 = load(os.path.join(sys._MEIPASS,"SVCClassifierFinal2.joblib"))
-            clf2 = load(os.path.join(sys._MEIPASS,"XGBClassifierFinal2.joblib"))
+            clf = load(os.path.join(sys._MEIPASS,"GBClassifierFinal3.joblib"))
+            clf1 = load(os.path.join(sys._MEIPASS,"SVCClassifierFinal3.joblib"))
+            clf2 = load(os.path.join(sys._MEIPASS,"XGBClassifierFinal3.joblib"))
         except:
-            clf = load(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\GBClassifierFinal2.joblib')
-            clf1 = load(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\SVCClassifierFinal2.joblib')
-            clf2 = load(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\XGBClassifierFinal2.joblib')
+            clf = load(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\GBClassifierFinal3.joblib')
+            clf1 = load(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\SVCClassifierFinal3.joblib')
+            clf2 = load(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\XGBClassifierFinal3.joblib')
 
         pd.set_option('display.max_columns', None)
         pd.set_option('display.expand_frame_repr', False)

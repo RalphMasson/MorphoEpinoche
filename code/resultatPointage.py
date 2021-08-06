@@ -6,17 +6,17 @@ import PIL.ImageOps
 
 
 
-img = Image.open(r"C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\test_pointage_ML\Nouveau dossier\pt9_truth.png")
+img = Image.open(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\images\errTestv1.png')
 
 b, g, r = img.split()
 img = Image.merge("RGB", (r, g, b)).convert("RGBA")
 
-background = Image.open(r"C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\test_pointage_ML\Nouveau dossier\pt9_pred.png").convert("RGBA")
+background = Image.open(r"C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\images\errTestv1.png").convert("RGBA")
 
 # background.paste(img, (0, 0), img)
 
 
-blended = Image.blend(img, background, alpha=0.5)
+blended = Image.blend(img, background, alpha=0.9)
 
 
 import matplotlib.pyplot as plt
