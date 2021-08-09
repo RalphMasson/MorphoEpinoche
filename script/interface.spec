@@ -12,6 +12,7 @@ added_files = [('C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\image
                ('C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\images\\logo_predict.png','.'),
                ('C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\images\\logo_left_arrow.png','.'),
                ('C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\images\\logo_right_arrow.png','.'),
+               ('C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\images\\logo_restart.png','.'),
                ('C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\models\\predictor_head2.dat','.'),
                ('C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\models\\predictor_LS.dat','.'),
                ('C:\\Users\\MASSON\\Desktop\\STAGE_EPINOCHE\\moduleMorpho\\models\\predictor_scale2.dat','.'),

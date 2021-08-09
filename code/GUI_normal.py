@@ -48,6 +48,7 @@ class Polygone():
             self.polygon = canvas.create_polygon(self.points,fill='',outline=outline,smooth=0,width=2,dash=(1,))
             self.id_polygons.append(self.polygon)
             canvas.tag_bind(self.polygon, '<ButtonPress-1>',   lambda event, tag=self.polygon: self.on_press_tag(event, 0, tag))
+
             canvas.tag_bind(self.polygon, '<ButtonRelease-1>', lambda event, tag=self.polygon: self.on_release_tag(event, 0, tag,canvas))
             if ligne:
                 canvas.create_line(self.points[2][0],self.points[2][1],self.points[3][0],self.points[3][1],fill="green")
@@ -59,6 +60,10 @@ class Polygone():
             for number, point in enumerate(self.points):
                 x, y = point
                 node = canvas.create_rectangle((x-3, y-3, x+3, y+3), fill=color)
+                if not ligne:
+                    canvas.tag_bind(node, '<Enter>',   lambda event: self.check_hand_enter(canvas))
+                    canvas.tag_bind(node, '<Leave>',   lambda event: self.check_hand_leave(canvas))
+
                 label = canvas.create_text((x+15, y+6),text=str(listenode[num]),font=("Purisa", 12),fill='purple')
                 num+=1
                 self.nodes.append(node)
@@ -70,6 +75,11 @@ class Polygone():
         self.update_points(canvas)
         if(len(self.pointsEchelle)>0):
              Interface.afficheLongueur()
+
+    def check_hand_enter(self,canvas):
+        canvas.config(cursor="hand1")
+    def check_hand_leave(self,canvas):
+        canvas.config(cursor="")
 
     def update_points(self,canvas):
         """!
@@ -172,6 +182,8 @@ class ScaleClass():
             for number, point in enumerate(self.points):
                 x, y = point
                 node = canvas2.create_rectangle((x-3, y-3, x+3, y+3), fill='#f0f0f0',outline="#f0f0f0")
+                canvas2.tag_bind(node, '<Enter>',   lambda event: self.check_hand_enter(canvas2))
+                canvas2.tag_bind(node, '<Leave>',   lambda event: self.check_hand_leave(canvas2))
                 label = canvas2.create_text((x+15, y+6),text=str(listenode[num]),font=("Purisa", 12),fill='#f0f0f0')
                 num+=1
                 self.nodes.append(node)
@@ -180,6 +192,11 @@ class ScaleClass():
                 canvas2.tag_bind(node, '<ButtonRelease-1>', lambda event, number=number, tag=node: self.on_release_tag(event, number, tag,canvas2))
                 canvas2.tag_bind(node, '<B1-Motion>', lambda event, number=number: self.on_move_node(event, number,canvas2))
         ScaleClass.update_points(canvas2)
+
+    def check_hand_enter(self,canvas2):
+        canvas2.config(cursor="hand1")
+    def check_hand_leave(self,canvas2):
+        canvas2.config(cursor="")
 
     def update_points(canvas2):
         """!
@@ -305,6 +322,8 @@ class ScaleClassBody():
             for number, point in enumerate(self.points):
                 x, y = point
                 node = canvas3.create_rectangle((x-3, y-3, x+3, y+3), fill='#f0f0f0',outline="#f0f0f0")
+                canvas3.tag_bind(node, '<Enter>',   lambda event: self.check_hand_enter(canvas3))
+                canvas3.tag_bind(node, '<Leave>',   lambda event: self.check_hand_leave(canvas3))
                 label = canvas3.create_text((x+15, y+6),text=str(listenode[num]),font=("Purisa", 12),fill='#f0f0f0')
                 num+=1
                 self.nodes.append(node)
@@ -315,6 +334,10 @@ class ScaleClassBody():
 
         ScaleClassBody.update_points(canvas3)
 
+    def check_hand_enter(self,canvas3):
+        canvas3.config(cursor="hand1")
+    def check_hand_leave(self,canvas3):
+        canvas3.config(cursor="")
 
 
     def update_points(canvas3):
@@ -455,20 +478,6 @@ class ModelPoints():
 
 ## Interface finale
 
-
-
-class Splash(tk.Tk):
-    def __init__(self):
-        tk.Tk.__init__(self)
-        self.title("Splash")
-
-        # required to make window show before the program gets to the mainloop
-        self.update()
-
-
-
-
-
 class Interface(tk.Tk):
     sexModele = None
     version = 1.9
@@ -480,9 +489,6 @@ class Interface(tk.Tk):
         import time
 
         self.listeImages = []
-        # splash = Splash()
-        # time.sleep(6)
-        # splash.destroy()
         super().__init__()
 
         Interface.numImageActuelle = 0
@@ -681,9 +687,10 @@ class Interface(tk.Tk):
         filename2 = date+"_"+"resultats"
         self.finalname = pathname+filename+".txt"
         self.finalname2 = pathname+filename2+".csv"
+        os.umask(0)
         f = open(self.finalname,"w+")
         f.close()
-
+        os.chmod(self.finalname, 0o777)
         self.data_result = pd.DataFrame()
         self.NomImages = []
         self.data_distances = []
@@ -1040,8 +1047,9 @@ class Interface(tk.Tk):
         tk.messagebox.showinfo(title="Informations",message=message)
 
 import pyuac
-if not pyuac.isUserAdmin():
-    print("Re-launching as admin!")
-    pyuac.runAsAdmin()
+import ctypes, sys
+# ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
+
+# pyuac.runAsAdmin()
 app = Interface()
 app.mainloop()
