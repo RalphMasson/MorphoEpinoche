@@ -311,7 +311,7 @@ class BodyClass():
         BodyClass.distances_check = XY_tools.Externes.calculDistances2(BodyClass.pointsFish[2:4],BodyClass.pointsFish[0:2])
         return BodyClass.distances_check
 
-class ScaleClass():
+class ScaleClassC():
     """Variables globales pour export
     id_polygons : liste des id des polygons (la tete et l'echelle)
     pointsFish : liste des points de la tête [(x1,y1),(x2,y2)...]
@@ -478,7 +478,7 @@ class ScaleClass():
 
 
 
-class ScaleClassBody():
+class ScaleClassBodyC():
     """Variables globales pour export
     id_polygons : liste des id des polygons (la tete et l'echelle)
     pointsFish : liste des points de la tête [(x1,y1),(x2,y2)...]
@@ -695,7 +695,7 @@ class Interface(tk.Frame):
     sexModele = None
     app = None
     chemin = ""
-    version = 1.6
+    version = 2.0
     def __init__(self, master, **kwargs):
         """!
         Constructeur de l'interface
@@ -731,6 +731,7 @@ class Interface(tk.Frame):
     def on_mousewheel(self,event):
         scroll = -1 if event.delta > 0 else 1
         self.canvasGeneral.yview_scroll(scroll, "units")
+
     def populate(self):
 
         self.listeImages = []
@@ -771,6 +772,8 @@ class Interface(tk.Frame):
         self.boutonNext.pack(fill='x',ipady=8)
         self.boutonPrevious = tk.Button(self.frame,text='←',font=("Purisa",13,"bold"),command = self.previousImage)
         self.boutonPrevious.pack(fill='x',ipady=8)
+        tk.Button(self.frame,text="Normal version",command=None).pack()
+
         self.labelSex = tk.Label(self.frame,text="")
         self.labelSex.pack()
 
@@ -813,6 +816,7 @@ class Interface(tk.Frame):
         for x in HeadClass.distances_all:
             listedistances2.append(x)
         Interface.modeleDistances = listedistances2
+
 
     def onFrameConfigure(self, event):
         '''Reset the scroll region to encompass the inner frame'''
