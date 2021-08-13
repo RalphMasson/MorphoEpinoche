@@ -1378,6 +1378,65 @@ class Interface(tk.Frame):
         python = sys.executable
         os.execl(python, python, * sys.argv)
 
+    def changeLangueFr(self):
+        self.boutonImport.config(text = "Importer les images")
+        self.boutonPredict.config(text = "Prédire")
+        self.boutonCorps.config(text = "1) Réglage corps")
+        self.boutonEchelle.config(text = "2) Réglage échelle")
+        self.labelIntro.config(text=" Procédure de sexage de l'épinoche à trois épines",font=("Andalus",16,"bold"))
+        self.menubar.entryconfig(1,label = "Fichier")
+        self.menubar.entryconfig(2,label = "Outils")
+        self.menubar.entryconfig(3,label = "Modèles")
+        self.menubar.entryconfig(4,label = "Affichage")
+        self.menubar.entryconfig(5,label = "Langue")
+        self.menubar.entryconfig(6,label = "Aide")
+        self.menuFichier.entryconfig(0,label="Importer")
+        self.menuFichier.entryconfig(2,label="Quitter")
+        self.menuOutils.entryconfig(0,label="Prédire le sexe")
+        self.menuOutils.entryconfig(1,label="Image suivante")
+        self.menuOutils.entryconfig(2,label="Image précédente")
+
+        self.menuModeles.entryconfig(0,label = "Préparer MaJ Pointage")
+        self.menuModeles.entryconfig(1,label = "MaJ Pointage 🔒")
+        self.menuModeles.entryconfig(2,label = "MaJ Sexage 🔒")
+
+        self.menuAffichage.entryconfig(0,label = "Vue pour petit écran")
+        self.menuAffichage.entryconfig(1,label = "Vue pour grand écran")
+
+
+    def changeLangueEn(self):
+        self.boutonImport.config(text = "Import images")
+        self.boutonPredict.config(text = "Predict")
+        self.boutonCorps.config(text = "1) Check Body landmarks")
+        self.boutonEchelle.config(text = "2) Check Scale landmarks")
+        self.labelIntro.config(text="",font=("Andalus",16,"bold"))
+
+        self.labelIntro.config(text=" Sexing procedure for three-spined stickleback  ",font=("Andalus",16,"bold"))
+
+        self.menubar.entryconfig(1,label = "File")
+        self.menubar.entryconfig(2,label = "Tools")
+        self.menubar.entryconfig(3,label = "Models")
+        self.menubar.entryconfig(4,label = "Display")
+        self.menubar.entryconfig(5,label = "Language")
+        self.menubar.entryconfig(6,label = "Help")
+
+
+        self.menuFichier.entryconfig(0,label="Import")
+        self.menuFichier.entryconfig(2,label="Quit")
+
+        self.menuOutils.entryconfig(0,label="Predict the gender")
+        self.menuOutils.entryconfig(1,label="Next image")
+        self.menuOutils.entryconfig(2,label="Previous image")
+
+        self.menuModeles.entryconfig(0,label = "Prepare Update")
+        self.menuModeles.entryconfig(1,label = "Landmark Model Update 🔒")
+        self.menuModeles.entryconfig(2,label = "Classification Model Update 🔒")
+
+        self.menuAffichage.entryconfig(0,label = "Mini View")
+        self.menuAffichage.entryconfig(1,label = "Normal View")
+
+
+
     def add_canvas(self):
         """Canvas pour logo"""
         pathLogo = XY_tools.Externes.resource_path("logo2.png")
@@ -1400,28 +1459,23 @@ class Interface(tk.Frame):
         pathSchema = XY_tools.Externes.resource_path("schema.png")
         self.canvasSchema = tk.Canvas(self,bg='#f0f0f0')
         self.canvasSchema.config(width = 288,height=192)
-        # self.canvasSchema.place(x=1250,y=0)
         self.canvasSchema.place(relx=0.79,rely=0)
-        # self.canvasSchema.pack(side=tk.LEFT)
 
         ''' Canvas pour la tête '''
         Interface.canvasTete = tk.Canvas(self,bg='#f0f0f0',bd=0,highlightthickness=1, highlightbackground="black")
         Interface.canvasTete.config(width=500, height=370)
         Interface.canvasTete.grid(column=0,row=8)
-        # Interface.canvasTete.place(relx=0,rely=0.2)
-        # Interface.canvasTete.pack(side = tk.BOTTOM)
+
 
         ''' Canvas pour le corps '''
         Interface.canvasCorps = tk.Canvas(self,bg='#f0f0f0',highlightthickness=1, highlightbackground="black")
         Interface.canvasCorps.config(width=630, height=370)
         Interface.canvasCorps.grid(column=1,row=8)
-        # Interface.canvasTete.pack()
 
         ''' Canvas pour l'échelle '''
         Interface.canvasEchelle = tk.Canvas(self,bg='#f0f0f0')
         Interface.canvasEchelle.config(width=1590, height=200)
         Interface.canvasEchelle.place(relx=0,rely=0.7)
-        # Interface.canvasEchelle.pack()
 
 
 
@@ -1429,7 +1483,6 @@ class Interface(tk.Frame):
         Interface.canvasEchelle2 = tk.Canvas(self,bg='#f0f0f0')
         Interface.canvasEchelle2.config(width=1590,height=240)
         Interface.canvasEchelle2.place(relx=0,rely=0.66)
-        # Interface.canvasEchelle2.pack()
 
 
 
@@ -1462,7 +1515,6 @@ class Interface(tk.Frame):
         self.small_logo0 = self.logo0.subsample(17,17)
         self.boutonRestart.config(image = self.small_logo0)
         self.boutonRestart.place(relx=0.05,rely=0.12)
-        # self.boutonRestart.pack(side=tk.LEFT)
 
         self.boutonImport = ttk.Button(self,text = "Importer les images",command = self.importImage)
         try:
@@ -1473,7 +1525,6 @@ class Interface(tk.Frame):
         self.small_logo = self.logo.subsample(7,7)
         self.boutonImport.config(image = self.small_logo)
         self.boutonImport.place(relx=0.20,rely=0.12)
-        # self.boutonImport.pack(side=tk.LEFT)
 
         self.boutonImport.bind('<Control-o>',self.importImage)
 
@@ -1486,7 +1537,6 @@ class Interface(tk.Frame):
         self.small_logo2 = self.logo2.subsample(15,15)
         self.boutonPredict.config(image = self.small_logo2)
         self.boutonPredict.place(relx=0.31,rely=0.12)
-        # self.boutonPredict.pack(side=tk.LEFT)
 
         self.boutonPredict.bind('<Control-p>',self.Model_Sexage)
 
@@ -1499,7 +1549,6 @@ class Interface(tk.Frame):
         self.small_logo3 = self.logo3.subsample(15,15)
         self.boutonPrevious.config(image = self.small_logo3)
         self.boutonPrevious.place(relx=0.40,rely=0.12)
-        # self.boutonPrevious.pack(side=tk.LEFT)
 
         self.boutonNext = ttk.Button(self,text="",command = self.nextImage)
         try:
@@ -1510,31 +1559,21 @@ class Interface(tk.Frame):
         self.small_logo4 = self.logo4.subsample(15,15)
         self.boutonNext.config(image = self.small_logo4)
         self.boutonNext.place(relx=0.47,rely=0.12)
-        # self.boutonNext.pack(side=tk.LEFT)
 
-        ttk.Button(self,text="1) Réglage corps", command = self.afficheCorps).place(relx = 0.75,rely=0.5)
-        ttk.Button(self,text="2) Réglage échelle",command = self.hideCorps).place(relx=0.75,rely=0.55)
-        # ttk.Button(self,text="3) Cacher l'image",command = self.hideScale).place(relx = 0.75,rely=0.6)
+        self.boutonCorps = ttk.Button(self,text="1) Réglage corps", command = self.afficheCorps)
+        self.boutonCorps.place(relx = 0.75,rely=0.5)
+
+        self.boutonEchelle = ttk.Button(self,text="2) Réglage échelle",command = self.hideCorps)
+        self.boutonEchelle.place(relx=0.75,rely=0.55)
 
     def add_labels(self):
         ''' Label Intro de presentation'''
-        # tk.Label(self,text=" ",font=("Purisa",12,"bold")).grid(ipadx=2)
-        # tk.Label(self,text="\n",justify=tk.LEFT,font=("Purisa",8,"bold","underline")).grid(column=2,row=4)
 
-        # tk.Label(self,text=" Procédure de sexage de l'épinoche à trois épines \n",font=("Andalus",16,"bold")).place(relx=0.3,rely=0.01)
-        tk.Label(self,text=" Procédure de sexage de l'épinoche à trois épines",font=("Andalus",16,"bold")).place(relx=0.3,rely=0)
-        # tk.Label(self,text=" ",font=("Andalus",16,"bold")).pack()
-        # tk.Label(self,text="\n \n \n \n ").grid(column=0,row=1)
-        # tk.Label(self,text=" ",font=("Purisa",12,"bold")).grid(ipadx=2)
-        # tk.Label(self,text=" ",font=("Purisa",12,"bold")).grid(ipadx=2)
-        # tk.Label(self,text=" ",font=("Purisa",12,"bold")).grid(ipadx=2)
-        # tk.Label(self,text=" ",font=("Purisa",12,"bold")).grid(ipadx=2)
-        # tk.Label(self,text=" ",font=("Purisa",12,"bold")).grid(ipadx=2)
+        self.labelIntro = tk.Label(self,text=" Procédure de sexage de l'épinoche à trois épines",font=("Andalus",16,"bold"))
+        self.labelIntro.place(relx=0.3,rely=0)
 
-        # tk.Label(self,text="\n \n \n \n ").place(relx = 0.99,rely=0.2)
         self.labelSex = tk.Label(self,text="")
         self.labelSex.place(relx=0.55,rely=0.13)
-        # tk.Label(self,text=" ").grid(column=0,row=3)
 
         self.labelNumImage = tk.Label(self,text="",font=("Purisa",11),fg='gray')
         self.labelNumImage.place(relx=0.05,rely=0.975)
@@ -1545,41 +1584,48 @@ class Interface(tk.Frame):
         ''' Fenetre et menu'''
         self.controller.state('zoomed')
         self.controller.title("Morphométrie Ineris (Epinoche)")
-        menubar = tk.Menu(self)
-        menuFichier = tk.Menu(menubar,tearoff=0)
-        menuFichier.add_command(label="Importer", command=self.importImage,accelerator="(Ctrl+O)")
+        self.menubar = tk.Menu(self)
+        self.menuFichier = tk.Menu(self.menubar,tearoff=0)
+        self.menuFichier.add_command(label="Importer", command=self.importImage,accelerator="(Ctrl+O)")
         self.bind_all("<Control-o>",lambda e : self.importImage())
-        menuFichier.add_separator()
-        menuFichier.add_command(label="Quitter", command=self.destroy,accelerator="(Ctrl+Q)")
+        self.menuFichier.add_separator()
+        self.menuFichier.add_command(label="Quitter", command=self.destroy,accelerator="(Ctrl+Q)")
         self.bind("<Control-q>",lambda e : self.destroy())
-        menubar.add_cascade(label="Fichier", menu=menuFichier)
+        self.menubar.add_cascade(label="Fichier", menu=self.menuFichier)
 
-        menuOutils = tk.Menu(menubar,tearoff=0)
-        menuOutils.add_command(label="Prédire le sexe",command=self.Model_Sexage,accelerator="(Ctrl+P)")
+        self.menuOutils = tk.Menu(self.menubar,tearoff=0)
+        self.menuOutils.add_command(label="Prédire le sexe",command=self.Model_Sexage,accelerator="(Ctrl+P)")
         self.bind("<Control-p>",lambda e : self.Model_Sexage())
-        menuOutils.add_command(label="Image suivante",command=self.nextImage,accelerator="(Ctrl+Entrée)")
+        self.menuOutils.add_command(label="Image suivante",command=self.nextImage,accelerator="(Ctrl+Entrée)")
         self.bind("<Control-Return>",lambda e : self.nextImage())
-        menuOutils.add_command(label="Image précédente",command=self.previousImage,accelerator="(Ctrl+Backspace)")
+        self.menuOutils.add_command(label="Image précédente",command=self.previousImage,accelerator="(Ctrl+Backspace)")
         self.bind("<Control-BackSpace>",lambda e : self.previousImage())
-        menubar.add_cascade(label="Outils",menu=menuOutils)
+        self.menubar.add_cascade(label="Outils",menu=self.menuOutils)
 
-        menuModeles = tk.Menu(menubar,tearoff=0)
-        menuModeles.add_command(label="Prépare MaJ Pointage",command=Interface.improveLandmarksModel)
-        menuModeles.add_command(label="MaJ Pointage 🔒",command=GUI_update.InterfacePoint)
-        menuModeles.add_command(label="MaJ Sexage 🔒",command=GUI_update.InterfaceGender)
-        menubar.add_cascade(label="Modèles",menu=menuModeles)
+        self.menuModeles = tk.Menu(self.menubar,tearoff=0)
+        self.menuModeles.add_command(label="Prépare MaJ Pointage",command=Interface.improveLandmarksModel)
+        self.menuModeles.add_command(label="MaJ Pointage 🔒",command=GUI_update.InterfacePoint)
+        self.menuModeles.add_command(label="MaJ Sexage 🔒",command=GUI_update.InterfaceGender)
+        self.menubar.add_cascade(label="Modèles",menu=self.menuModeles)
 
-        menuAffichage = tk.Menu(menubar,tearoff=0)
-        menuAffichage.add_command(label="Vue pour petit écran",command=Interface.changeView(),accelerator="(Ctrl+N)")
+        self.menuAffichage = tk.Menu(self.menubar,tearoff=0)
+        self.menuAffichage.add_command(label="Vue pour petit écran",command=lambda:self.controller.show_frame(InterfaceC),accelerator="(Alt+c)")
         self.bind_all("<Alt-c>",lambda e: self.controller.show_frame(InterfaceC))
-        menubar.add_cascade(label="Affichage",menu=menuAffichage)
+        self.menuAffichage.add_command(label="Vue pour grand écran",command=lambda:self.controller.show_frame(Interface),accelerator="(Alt+v)")
+        self.bind_all("<Alt-v>",lambda e: self.controller.show_frame(Interface))
+        self.menubar.add_cascade(label="Affichage",menu=self.menuAffichage)
 
-        menuAide = tk.Menu(menubar, tearoff=0)
+        menuLangue = tk.Menu(self.menubar,tearoff=0)
+        menuLangue.add_command(label="Français",command=self.changeLangueFr)
+        menuLangue.add_command(label="English",command=self.changeLangueEn)
+        self.menubar.add_cascade(label="Langues",menu=menuLangue)
+
+        menuAide = tk.Menu(self.menubar, tearoff=0)
         menuAide.add_command(label="A propos", command=self.help)
         menuAide.add_command(label="Exemple d'image acceptée",command=Interface.displayExample)
         menuAide.add_command(label="Version",command=Interface.getVersion)
-        menubar.add_cascade(label="Aide", menu=menuAide)
-        self.controller.config(menu=menubar)
+        self.menubar.add_cascade(label="Aide", menu=menuAide)
+        self.controller.config(menu=self.menubar)
 
     def displayExample():
         import sys,subprocess
@@ -1973,11 +2019,8 @@ class InterfaceC(tk.Frame):
     version = 2.0
     def __init__(self, master,controller):
         tk.Frame.__init__(self, master)
-        # label = tk.Label(self, text="This is page 1", font=controller.title_font)
-        # label.pack(side="top", fill="x", pady=10)
         self.controller = controller
         self.root = master
-        self.add_menu()
         self.canvasGeneral = tk.Canvas(self,width=600,height=700,highlightthickness=0, highlightbackground="black")
         self.frame = tk.Frame(self.canvasGeneral)
         self.frame.pack(fill=tk.BOTH,expand=True)
@@ -2029,19 +2072,15 @@ class InterfaceC(tk.Frame):
         self.canvasSchema.create_image(0,0,anchor=tk.NW,image=self.imgSchema)
 
         ''' Boutons '''
-        # tk.Label(self.frame, text = 'PREDICTION',font=("Purisa",12,"bold"),fg='purple').pack(padx=5,pady=0,anchor=tk.W,fill='x')
         self.boutonImport = tk.Button(self.frame,text = "Import image and autoplace",command = self.importImage,fg='purple')
 
         self.boutonImport.pack(anchor=tk.W,padx=5,pady=5,ipady=15,expand=True,fill='x')
 
         self.boutonImport.bind('<Control-o>',self.importImage)
         tk.Button(self.frame,text = "Predict",command = self.Model_Sexage,fg='purple').pack(anchor=tk.W,padx=5,ipady=8,fill='x')
-        # tk.Label(self.frame, text = 'ADD THESE VALUES TO MODEL',font=("Purisa",12,"bold"),fg='green').pack(padx=0,pady=0)
         InterfaceC.sexModele = tk.StringVar(self.frame)
 
-        # self.sexModel = tk.Entry(self.frame,width=3,textvariable=Interface.sexModele)
-        # self.sexModel.pack(padx=5,pady=5,anchor=tk.N)
-        # tk.Button(self.frame,text = "Model Update (close Excel before)",command = HeadClass.genererAllDistancesHead,fg='green').pack(padx=0,pady=0,fill='x')
+
 
         self.boutonNext = tk.Button(self.frame,text='→',font=("Purisa",13,"bold"),command = self.nextImage)
         self.boutonNext.pack(fill='x',ipady=8)
@@ -2086,14 +2125,6 @@ class InterfaceC(tk.Frame):
 
 
     def switch(self):
-        # Interface.chemin = pypath3
-        # Interface.ppath2 = pypath2
-        # self.destroy()
-        #
-        # app = Interface()
-        #
-        # app.pack(side="top", fill="both", expand=True)
-        # app.mainloop()
 
         app = Interface()
         app.restart_program()
@@ -2119,9 +2150,9 @@ class InterfaceC(tk.Frame):
         '''Reset the scroll region to encompass the inner frame'''
         self.canvasGeneral.configure(scrollregion=self.canvasGeneral.bbox("all"))
     def add_menu(self):
-        self.controller.state('zoomed')
-        self.controller.title("Sex Determination for Three Spined Stickleback")
-        menubar = tk.Menu(self.root)
+        # self.state('zoomed')
+        # self.title("Sex Determination for Three Spined Stickleback")
+        menubar = tk.Menu(self.controller)
         menuFichier = tk.Menu(menubar,tearoff=0)
         menuFichier.add_command(label="Importer", command=self.importImage,accelerator="(Ctrl+O)")
         self.bind_all("<Control-i>",lambda e : self.importImage())
@@ -2638,1232 +2669,3 @@ class InterfaceC(tk.Frame):
 
 app = MainApp()
 app.mainloop()
-
-#
-#
-# class Interface(tk.Tk):
-#     sexModele = None
-#     version = 1.9
-#     canvasTete = None
-#     def __init__(self):
-#         """!
-#         Constructeur de l'interface
-#         """
-#         import time
-#
-#         self.listeImages = []
-#         super().__init__()
-#
-#         Interface.numImageActuelle = 0
-#         self.add_menu()
-#         self.add_buttons()
-#         self.add_labels()
-#         self.add_canvas()
-#         self.createlog()
-#         self.verbose_intro()
-#
-#     def restart_program(self):
-#         import sys
-#         import os
-#         """Restarts the current program.
-#         Note: this function does not return. Any cleanup action (like
-#         saving data) must be done before calling this function."""
-#         python = sys.executable
-#         os.execl(python, python, * sys.argv)
-#
-#     def add_canvas(self):
-#         ''' Canvas pour la tête '''
-#         Interface.canvasTete = tk.Canvas(self,bg='#f0f0f0',bd=0,highlightthickness=1, highlightbackground="black")
-#         Interface.canvasTete.config(width=500, height=370)
-#         Interface.canvasTete.grid(column=0,row=8)
-#
-#         ''' Canvas pour le corps '''
-#         Interface.canvasCorps = tk.Canvas(self,bg='#f0f0f0',highlightthickness=1, highlightbackground="black")
-#         Interface.canvasCorps.config(width=630, height=370)
-#         Interface.canvasCorps.grid(column=1,row=8)
-#
-#         ''' Canvas pour l'échelle '''
-#         Interface.canvasEchelle = tk.Canvas(self,bg='#f0f0f0')
-#         Interface.canvasEchelle.config(width=1590, height=200)
-#         Interface.canvasEchelle.place(relx=0,rely=0.7)
-#
-#         """Canvas pour logo"""
-#         pathLogo = XY_tools.Externes.resource_path("logo2.png")
-#         self.canvasLogo2 = tk.Canvas(self,bg='#f0f0f0')
-#         self.canvasLogo2.config(width=157,height=84)
-#         self.canvasLogo2.place(x=0,y=0)
-#         self.imgLogo2 = ImageTk.PhotoImage(Image.open(pathLogo).resize((157,84)))
-#         self.canvasLogo2.create_image(0, 0, anchor=tk.NW,image=self.imgLogo2)
-#
-#         """Canvas pour logo"""
-#         Interface.canvasEchelle2 = tk.Canvas(self,bg='#f0f0f0')
-#         Interface.canvasEchelle2.config(width=1590,height=240)
-#         Interface.canvasEchelle2.place(relx=0,rely=0.66)
-#
-#         ''' Canvas pour le schema '''
-#         pathSchema = XY_tools.Externes.resource_path("schema.png")
-#         self.canvasSchema = tk.Canvas(self,bg='#f0f0f0')
-#         self.canvasSchema.config(width = 288,height=192)
-#         # self.canvasSchema.place(x=1250,y=0)
-#         self.canvasSchema.place(relx=0.82,rely=0)
-#
-#         self.imgSchema = ImageTk.PhotoImage(Image.open(pathSchema).resize((288,192)))
-#         self.canvasSchema.create_image(0,0,anchor=tk.NW,image=self.imgSchema)
-#
-#
-#     def add_buttons(self):
-#         self.boutonRestart = ttk.Button(self,text="Restart",command = self.restart_program)
-#         try:
-#             self.logo0 = tk.PhotoImage(file = os.path.join(sys._MEIPASS, 'logo_restart.png'))
-#         except:
-#             self.logo0 = tk.PhotoImage(file = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\images\logo_restart.png')
-#
-#         self.boutonRestart.config(image=self.logo0, compound=tk.LEFT)
-#         self.small_logo0 = self.logo0.subsample(17,17)
-#         self.boutonRestart.config(image = self.small_logo0)
-#         self.boutonRestart.place(relx=0.05,rely=0.12)
-#
-#         self.boutonImport = ttk.Button(self,text = "Importer les images",command = self.importImage)
-#         try:
-#             self.logo = tk.PhotoImage(file = os.path.join(sys._MEIPASS, 'logo_import.png'))
-#         except:
-#             self.logo = tk.PhotoImage(file = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\images\logo_import.png')
-#         self.boutonImport.config(image=self.logo, compound=tk.LEFT)
-#         self.small_logo = self.logo.subsample(7,7)
-#         self.boutonImport.config(image = self.small_logo)
-#         self.boutonImport.place(relx=0.20,rely=0.12)
-#         self.boutonImport.bind('<Control-o>',self.importImage)
-#
-#         self.boutonPredict = ttk.Button(self,text = "Predire",command = self.Model_Sexage)
-#         try:
-#             self.logo2 = tk.PhotoImage(file = os.path.join(sys._MEIPASS, 'logo_predict.png'))
-#         except:
-#             self.logo2 = tk.PhotoImage(file = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\images\logo_predict.png')
-#         self.boutonPredict.config(image=self.logo2, compound=tk.LEFT)
-#         self.small_logo2 = self.logo2.subsample(15,15)
-#         self.boutonPredict.config(image = self.small_logo2)
-#         self.boutonPredict.place(relx=0.31,rely=0.12)
-#         self.boutonPredict.bind('<Control-p>',self.Model_Sexage)
-#
-#         self.boutonPrevious = ttk.Button(self,text="",command = self.previousImage)
-#         try:
-#             self.logo3 = tk.PhotoImage(file = os.path.join(sys._MEIPASS, 'logo_left_arrow.png'))
-#         except:
-#             self.logo3 = tk.PhotoImage(file = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\images\logo_left_arrow.png')
-#         self.boutonPrevious.config(image=self.logo3, compound=tk.LEFT)
-#         self.small_logo3 = self.logo3.subsample(15,15)
-#         self.boutonPrevious.config(image = self.small_logo3)
-#         self.boutonPrevious.place(relx=0.40,rely=0.12)
-#
-#         self.boutonNext = ttk.Button(self,text="",command = self.nextImage)
-#         try:
-#             self.logo4 = tk.PhotoImage(file = os.path.join(sys._MEIPASS, 'logo_right_arrow.png'))
-#         except:
-#             self.logo4 = tk.PhotoImage(file = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\images\logo_right_arrow.png')
-#         self.boutonNext.config(image=self.logo4, compound=tk.LEFT)
-#         self.small_logo4 = self.logo4.subsample(15,15)
-#         self.boutonNext.config(image = self.small_logo4)
-#         self.boutonNext.place(relx=0.47,rely=0.12)
-#
-#         ttk.Button(self,text="1) Réglage corps", command = self.afficheCorps).place(relx = 0.75,rely=0.5)
-#         ttk.Button(self,text="2) Réglage échelle",command = self.hideCorps).place(relx=0.75,rely=0.55)
-#         ttk.Button(self,text="3) Cacher l'image",command = self.hideScale).place(relx = 0.75,rely=0.6)
-#
-#     def add_labels(self):
-#         ''' Label Intro de presentation'''
-#         tk.Label(self,text=" ",font=("Purisa",12,"bold")).grid(ipadx=2)
-#         tk.Label(self,text=" Procédure de sexage de l'épinoche à trois épines \n",font=("Andalus",16,"bold")).place(relx=0.3,rely=0.01)
-#         # tk.Label(self,text="\n \n \n \n ").grid(column=10,row=1)
-#         tk.Label(self,text=" ",font=("Purisa",12,"bold")).grid(ipadx=2)
-#         tk.Label(self,text=" ",font=("Purisa",12,"bold")).grid(ipadx=2)
-#         tk.Label(self,text=" ",font=("Purisa",12,"bold")).grid(ipadx=2)
-#         tk.Label(self,text=" ",font=("Purisa",12,"bold")).grid(ipadx=2)
-#         tk.Label(self,text=" ",font=("Purisa",12,"bold")).grid(ipadx=2)
-#
-#         # tk.Label(self,text="\n \n \n \n ").place(relx = 0.1,rely=0.2)
-#         self.labelSex = tk.Label(self,text="")
-#         self.labelSex.place(relx=0.55,rely=0.13)
-#         tk.Label(self,text=" ").grid(column=0,row=3)
-#
-#         self.labelNumImage = tk.Label(self,text="",font=("Purisa",11),fg='gray')
-#         self.labelNumImage.place(relx=0.05,rely=0.975)
-#         self.labelNomImage = tk.Label(self,text="",font=("Purisa",11),fg='gray')
-#         self.labelNomImage.place(relx=0.1,rely=0.975)
-#         tk.Label(self,text="\n",justify=tk.LEFT,font=("Purisa",8,"bold","underline")).grid(column=2,row=4)
-#
-#     def add_menu(self):
-#         ''' Fenetre et menu'''
-#         self.state('zoomed')
-#         self.title("Morphométrie Ineris (Epinoche)")
-#         menubar = tk.Menu(self)
-#         menuFichier = tk.Menu(menubar,tearoff=0)
-#         menuFichier.add_command(label="Importer", command=self.importImage,accelerator="(Ctrl+O)")
-#         self.bind_all("<Control-o>",lambda e : self.importImage())
-#         menuFichier.add_separator()
-#         menuFichier.add_command(label="Quitter", command=self.destroy,accelerator="(Ctrl+Q)")
-#         self.bind_all("<Control-q>",lambda e : self.destroy())
-#         menubar.add_cascade(label="Fichier", menu=menuFichier)
-#
-#         menuOutils = tk.Menu(menubar,tearoff=0)
-#         menuOutils.add_command(label="Prédire le sexe",command=self.Model_Sexage,accelerator="(Ctrl+P)")
-#         self.bind_all("<Control-p>",lambda e : self.Model_Sexage())
-#         menuOutils.add_command(label="Image suivante",command=self.nextImage,accelerator="(Ctrl+Entrée)")
-#         self.bind_all("<Control-Return>",lambda e : self.nextImage())
-#         menuOutils.add_command(label="Image précédente",command=self.previousImage,accelerator="(Ctrl+Backspace)")
-#         self.bind_all("<Control-BackSpace>",lambda e : self.previousImage())
-#         menubar.add_cascade(label="Outils",menu=menuOutils)
-#
-#         menuModeles = tk.Menu(menubar,tearoff=0)
-#         menuModeles.add_command(label="Prépare MaJ Pointage",command=Interface.improveLandmarksModel)
-#         menuModeles.add_command(label="MaJ Pointage 🔒",command=GUI_update.InterfacePoint)
-#         menuModeles.add_command(label="MaJ Sexage 🔒",command=GUI_update.InterfaceGender)
-#         menubar.add_cascade(label="Modèles",menu=menuModeles)
-#
-#         menuAffichage = tk.Menu(menubar,tearoff=0)
-#         menuAffichage.add_command(label="Vue pour petit écran",command=self.changeView,accelerator="(Ctrl+N)")
-#         self.bind_all("<Control-n>",lambda e : self.changeView())
-#         menubar.add_cascade(label="Affichage",menu=menuAffichage)
-#
-#         menuAide = tk.Menu(menubar, tearoff=0)
-#         menuAide.add_command(label="A propos", command=self.help,accelerator="(Ctrl+I)")
-#         self.bind_all("<Control-i>",lambda e : self.help())
-#         menuAide.add_command(label="Exemple d'image acceptée",command=Interface.displayExample)
-#         menuAide.add_command(label="Version",command=Interface.getVersion)
-#         menubar.add_cascade(label="Aide", menu=menuAide)
-#         self.config(menu=menubar)
-#
-#     def displayExample():
-#         import sys,subprocess
-#         cmdline = {'win32':'explorer'}[sys.platform]
-#         try:
-#             path = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\images\example.jpg'
-#         except:
-#             path = os.path.join(sys._MEIPASS, 'example.jpg')
-#         subprocess.Popen([cmdline,path])
-#
-#     def createlog(self):
-#         if not os.path.exists(os.getcwd()+"/log"):
-#             os.mkdir(os.getcwd()+"/log")
-#
-#         pathname = os.getcwd()+"/log/"
-#         date = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
-#         filename = date+"_"+"rapport"
-#         filename2 = date+"_"+"resultats"
-#         self.finalname = pathname+filename+".txt"
-#         self.finalname2 = pathname+filename2+".csv"
-#         os.umask(0)
-#         f = open(self.finalname,"w+")
-#         f.close()
-#         os.chmod(self.finalname, 0o777)
-#         self.data_result = pd.DataFrame()
-#         self.NomImages = []
-#         self.data_distances = []
-#         self.LS = []
-#         self.sexe = []
-#         self.NumImages = []
-#
-#     def verbose_intro(self):
-#         message = "Rapport généré le "+datetime.now().strftime("%d/%m/%Y")+" à "+datetime.now().strftime("%H:%M:%S")+"\n\n"
-#         message += "# Morphométrie Epinoche Ineris v"+str(Interface.version)+"\n"
-#         message += "- Développé par Ralph MASSON pour l'unité ESMI \n"
-#         message += "- Contact : ralph.masson@gmail.com \n\n"
-#         message += "# Langage et bibliothèques utilisés : \n"
-#         message += "- Python 3.8.6 \n"
-#         message += "- sklearn 0.23.2 - numpy 1.18.5 - scipy 1.5.2 - dlib 19.22.0 - xgboost 1.4.2 \n\n"
-#         message += "# ML_morph\n"
-#         message += "\t - Algorithme utilisé : Regression trees (gradient boosting) \n"
-#         message += "\t - Performances : erreur de placement moyenne de 4 pixels (0.25% de la longueur standard) \n\n"
-#         message += "# ML_gender\n"
-#         message += "\t - Algorithmes utilisés : Gradient Boosting, SVM, XGBoost (consensus) \n"
-#         message += "\t - Performances : 100% de bonne classification (10% d'indéterminé en moyenne) par consensus stricte de 3 modèles \n"
-#
-#         f = open(self.finalname,"a")
-#         f.write(message)
-#         f.close()
-#
-#     def verbose_photo(self):
-#         message = "\n# Photos importées pour la prédiction :\n"
-#         for x in self.listeImages:
-#             message += "\t - "+x+"\n"
-#         f = open(self.finalname,"a")
-#         f.write(message)
-#         f.close()
-#     def verbose_points(self,listepoints):
-#         message = XY_tools.Externes.verbose_points(listepoints,self.listeImages, Interface.numImageActuelle)
-#         f = open(self.finalname,"a")
-#         f.write(message)
-#         f.close()
-#
-#     def verbose_distances(self,df_distance):
-#         message = "\t Distances : "+str(list(df_distance.values[0]))[1:-1]
-#         message += "\n"
-#         f = open(self.finalname,"a")
-#         f.write(message)
-#         f.close()
-#
-#     def verbose_sexe(self,text,proba):
-#         message = "\t Sexe : "+text+"\n"
-#         f = open(self.finalname,"a")
-#         f.write(message)
-#         f.close()
-#
-#     def verbose_conclusion(self):
-#         message = "\nFIN \n"
-#         message += datetime.now().strftime("%d/%m/%Y")+" à "+datetime.now().strftime("%H:%M:%S")+"\n"
-#         f = open(self.finalname,"a")
-#         f.write(message)
-#         f.close()
-#
-#     def Model_Tete(self,pathimage):
-#         """!
-#             @param pathimage dossier de l'image
-#         """
-#         try:
-#             pathPredictor = os.path.join(sys._MEIPASS, 'predictor_head2.dat')
-#             a = ModelPoints(os.path.join(sys._MEIPASS,''),"")
-#             a.predict(pathimage,os.path.join(sys._MEIPASS,''),"predictor_head2.dat")
-#             listepoints = ML.ML_pointage.xmltolistY(os.path.join(sys._MEIPASS,"output.xml"),0)
-#
-#         except:
-#             pathPredictor = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\predictor_head2.dat'
-#             a = ModelPoints(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\',"")
-#             a.predict(pathimage,pypath2+"\models\\","predictor_head2.dat")
-#             listepoints = ML.ML_pointage.xmltolistY(pypath2+"\models\\"+"output.xml",0)
-#
-#         self.verbose_points(listepoints)
-#         return listepoints[0]
-#
-#     def Model_Echelle(self,pathimage):
-#         """!
-#             @param pathimage dossier de l'image
-#         """
-#         try:
-#             pathPredictor = os.path.join(sys._MEIPASS, 'predictor_scale2.dat')
-#             a = ModelPoints(os.path.join(sys._MEIPASS,''),"")
-#             a.predict(pathimage,os.path.join(sys._MEIPASS,''),"predictor_scale2.dat")
-#             listepoints = ML.ML_pointage.xmltolistY(os.path.join(sys._MEIPASS,"output.xml"),0)
-#
-#         except:
-#             pathPredictor = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\predictor_scale2.dat'
-#             a = ModelPoints(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\',"")
-#             a.predict(pathimage,pypath2+"\models\\","predictor_scale2.dat")
-#             listepoints = ML.ML_pointage.xmltolistY(pypath2+"\models\\"+"output.xml",0)
-#
-#         return listepoints[0]
-#
-#
-#     def Model_Longueur(self,pathimage):
-#         try:
-#             pathPredictor = os.path.join(sys._MEIPASS, 'predictor_LS.dat')
-#             a = ModelPoints(os.path.join(sys._MEIPASS,''),"")
-#             a.predict(pathimage,os.path.join(sys._MEIPASS,''),"predictor_LS.dat")
-#             listepoints = ML.ML_pointage.xmltolistY(os.path.join(sys._MEIPASS,"output.xml"),0)
-#
-#         except:
-#             pathPredictor = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\predictor_LS.dat'
-#             a = ModelPoints(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\',"")
-#             a.predict(pathimage,pypath2+"\models\\","predictor_LS.dat")
-#             listepoints = ML.ML_pointage.xmltolistY(pypath2+"\models\\"+"output.xml",0)
-#
-#         return listepoints[0]
-#
-#
-#     def Model_Sexage(self):
-#
-#         try:
-#             Interface.lenBody = XY_tools.Externes.euclide(Interface.canvasEchelle2.coords(Interface.PolygoneD.nodes[0]),Interface.canvasEchelle2.coords(Interface.PolygoneD.nodes[1]))
-#         except:
-#             pass
-#         Interface.allDist(Interface.lenBody)
-#         text,ae,proba = IA_sexage.Prediction.load_models(Interface.modeleDistances)
-#
-#         self.verbose_distances(ae)
-#         self.verbose_sexe(text,proba)
-#         text2 = text.split(";")
-#         print(text2)
-#         app.labelSex.config(text = text)
-#         # print(text)
-#         nomImage = "".join(self.listeImages[Interface.numImageActuelle].split("/")[-1])
-#         self.NomImages.append(nomImage)
-#         self.NumImages.append(Interface.numImageActuelle+1)
-#         self.LS.append(list(ae.values[0])[0])
-#         self.sexe.append(text.split(">")[-1])
-#
-#         if(Interface.numImageActuelle==len(self.listeImages)-1):
-#
-#             try:
-#                 self.verbose_conclusion()
-#                 self.data_result['ID'] = self.NumImages
-#                 self.data_result['Nom'] = self.NomImages
-#                 self.data_result['LS'] = self.LS
-#                 self.data_result['Sexe'] = self.sexe
-#                 self.data_result = self.data_result.drop_duplicates()
-#                 self.data_result.to_csv(self.finalname2,index=False,sep=";",encoding="UTF-8")
-#
-#             except:
-#                 pass
-#
-#     def afficheScale(self):
-#         Interface.canvasEchelle.itemconfig(ScaleFish.poisson,state='normal')
-#
-#     def hideScale(self):
-#         Interface.canvasEchelle.itemconfig(ScaleFish.poisson,state='hidden')
-#
-#     def afficheCorps(self):
-#         Interface.canvasEchelle2.itemconfig(ScaleFishBody.poisson,state='normal')
-#
-#     def hideCorps(self):
-#         Interface.canvasEchelle2.itemconfig(ScaleFishBody.poisson,state='hidden')
-#         Interface.lenBody = XY_tools.Externes.euclide(Interface.canvasEchelle2.coords(3),Interface.canvasEchelle2.coords(5))
-#         Interface.canvasEchelle2.destroy()
-#         # Interface.canvasEchelle2.delete('all')
-#
-#
-#
-#     def improveLandmarksModel():
-#         message = "Pour ajouter des données au modèle v1 de placement de points :"
-#         message += "\n\n1) Ajouter les photos nouvelles dans un dossier tmp"
-#         message += "\n2) Créer un fichier temp.tps grâce à tpsUtils (build tps)"
-#         message += "\n3) Créer un fichier v2.tps grâce à tpsUtils (append temp+v1) sans inclure path"
-#         message += "\n4) Pointer les images avec tpsDig"
-#         message += "\n5) Sauvegarder (overwrite) v2.tps"
-#         message += "\n6) Déplacer les images novelles dans le même dossier que les anciennes"
-#
-#         tk.messagebox.showinfo(title="Informations",message=message)
-#
-#     def changeView(self):
-#         GUI_little.Temp.chemin = pypath3
-#         GUI_little.Temp.ppath2 = pypath2
-#         self.destroy()
-#         root = tk.Tk()
-#         # GUI_little.app = GUI_little.Interface(root)
-#         GUI_little.app = InterfaceC(root)
-#
-#         GUI_little.app.pack(side="top", fill="both", expand=True)
-#         GUI_little.app.mainloop()
-#
-#     def afficheLongueur():
-#         """!
-#         Méthode permettant de mettre à jour l'affichage des longueurs dans l'interface
-#         """
-#         Interface.PolygoneA.calculDistances()
-#
-#     def clearAllCanvas(self):
-#         """!
-#         Méthode permettant de remettre à zero l'interface
-#         """
-#         Interface.PolygoneA.id_polygons=[]
-#         Interface.PolygoneA.pointsFish=[]
-#         Interface.PolygoneA.pointsEchelle=[]
-#         Interface.PolygoneA.distances_check=[0 for _ in range(20)]
-#         Interface.PolygoneB.id_polygons=[]
-#         Interface.PolygoneB.pointsFish=[]
-#         Interface.PolygoneB.pointsEchelle=[]
-#         Interface.PolygoneB.distances_check=[0 for _ in range(20)]
-#         self.labelSex.config(text="")
-#         Interface.canvasTete.delete('all')
-#         Interface.canvasCorps.delete('all')
-#         try:
-#             Interface.canvasEchelle2.delete('all')
-#         except:
-#             Interface.canvasEchelle2 = tk.Canvas(self,bg='#f0f0f0')
-#             Interface.canvasEchelle2.config(width=1590,height=240)
-#             Interface.canvasEchelle2.place(relx=0,rely=0.66)
-#         Interface.canvasEchelle.delete('all')
-#
-#         ScaleClassBody.pointsEchelle = []
-#         self.labelNomImage.config(text="")
-#
-#     def resetListeImages(self):
-#         """!
-#         Méthode permettant de remettre à zero les images chargées
-#         """
-#         self.listeImages = []
-#         Interface.numImageActuelle = 0
-#
-#     def getVersion():
-#
-#         try:
-#             version = XY_tools.Externes.getVersion()
-#         except:
-#             version = "-- No internet connection --"
-#
-#         message = "Dernière version disponible : "+"v"+str(version)
-#         message += "\nVersion actuelle : "+"v"+str(Interface.version)
-#         message += "\nCliquez sur OK pour télécharger"
-#
-#         reponse = tk.messagebox.askyesnocancel(title="Informations",message=message)
-#         if(reponse):
-#             webbrowser.open('https://github.com/RalphMasson/MorphoEpinoche/releases/')
-#
-#     def allDist(lenBody):
-#         px50mm = XY_tools.Externes.euclide(Interface.canvasEchelle.coords(Interface.PolygoneC.nodes[0]),Interface.canvasEchelle.coords(Interface.PolygoneC.nodes[1]))
-#         listedistances2 = []
-#         listedistances2.append(round(lenBody*50/px50mm,5))
-#         for x in Interface.PolygoneA.distances_all:
-#             listedistances2.append(x)
-#         Interface.modeleDistances = listedistances2
-#
-#     def importImage(self,event=' '):
-#         """!
-#         Méthode permettant de charger 1 ou plusieurs images
-#         """
-#         self.choice = 0
-#         self.resetListeImages()
-#         self.listeImages = XY_tools.Externes.openfn()
-#         self.verbose_photo()
-#         self.calculPoints()
-#
-#     def calculPoints(self):
-#         """!
-#         Méthode permettant de calculer les points et de les disposer sur l'image
-#         """
-#         path_global = '/'.join(self.listeImages[Interface.numImageActuelle].split('/')[:-1])
-#         self.imgActuelle = self.listeImages[Interface.numImageActuelle]
-#         app.labelNomImage.config(text=self.imgActuelle)
-#         app.labelNumImage.config(text=str(Interface.numImageActuelle+1)+"/"+str(len(self.listeImages)))
-#
-#         # ScaleFish Model_Echelle
-#         ScaleFish.left = self.Model_Echelle(self.imgActuelle)[0]
-#         points_echelle = self.Model_Echelle(self.imgActuelle)
-#         points_echelle = XY_tools.Externes.centerPoints(points_echelle[0:2],ScaleFish.left,25,50)
-#
-#         # HeadFish Model_Tete
-#         points_tete = self.Model_Tete(self.imgActuelle)
-#         HeadFish.oeilXY = [np.mean(np.array(points_tete).T[0][1:3])]
-#         HeadFish.oeilXY.append(np.mean(np.array(points_tete).T[1][1:3]))
-#         points_tete = XY_tools.Externes.centerPoints(points_tete[0:10],HeadFish.oeilXY,200,200)
-#
-#         # BodyFish Model Longueur + Model_Echelle
-#         corpsStandard = self.Model_Longueur(self.imgActuelle)
-#         corpsStandard = [list(np.array(corpsStandard[0])/3),list(np.array(corpsStandard[1])/3)]
-#
-#         points_echelle2 = self.Model_Echelle(self.imgActuelle)
-#         corpsStandard.extend([list(np.array(points_echelle2[0])/3),list(np.array(points_echelle2[1])/3)])
-#         BodyFish.left = corpsStandard[3]
-#         corpsStandard = XY_tools.Externes.centerPoints(corpsStandard[0:4],BodyFish.left,590,340)
-#
-#         # ScaleFishBody Model_Longueur
-#         points_longueur = self.Model_Longueur(self.imgActuelle)
-#         pt1,pt2 = points_longueur[0],points_longueur[1]
-#         ScaleFishBody.left = pt1
-#         points_longueur = XY_tools.Externes.centerPoints([pt1,pt2],ScaleFishBody.left,25,160)
-#
-#         # Images
-#         HeadFish(self.canvasTete,Image.open(self.imgActuelle),cv2.imread(self.imgActuelle),(1920,1440))
-#         BodyFish(Interface.canvasCorps,Image.open(self.imgActuelle),(640,480))
-#         ScaleFish(Interface.canvasEchelle,Image.open(self.imgActuelle),(1920,1440))
-#         ScaleFishBody(Interface.canvasEchelle2,Image.open(self.imgActuelle),(1920,1440))
-#
-#         # Points
-#         Interface.PolygoneA = Polygone(self.canvasTete,points_tete,'#ff00f2',ligne=False)
-#         Interface.PolygoneA.pointsEchelle = points_echelle
-#         Interface.PolygoneA.calculDistances()
-#
-#         Interface.PolygoneB = Polygone(Interface.canvasCorps,corpsStandard,'cyan',ligne=True)
-#
-#         Interface.PolygoneC = ScaleClass(Interface.canvasEchelle,points_echelle,'#ffffff')
-#
-#         Interface.PolygoneD = ScaleClassBody(Interface.canvasEchelle2,points_longueur,'#ffffff')
-#
-#
-#     def nextImage(self):
-#         """!
-#         Méthode permettant de passer à l'image d'après
-#         """
-#         if(Interface.numImageActuelle<len(self.listeImages)):
-#             self.blockButton(+1)
-#
-#     def previousImage(self):
-#         """!
-#         Méthode permettant de revenir a l'image précédente
-#         """
-#         if(Interface.numImageActuelle>0):
-#             self.blockButton(-1)
-#
-#     def blockButton(self,param):
-#         """!
-#         Méthode permettant de désactiver temporairement les boutons pour éviter une superposition d'images
-#         @param param : +1 pour passer à l'image suivante, -1 pour la précédente
-#         """
-#         import time
-#         self.unbind_all("<Control-Return>")
-#         self.unbind_all("<Control-BackSpace>")
-#         Interface.numImageActuelle+=param
-#         nbPointNonDetectes = 0
-#         time.sleep(0.3)
-#         self.boutonPrevious.configure(state=tk.DISABLED)
-#         self.boutonNext.configure(state=tk.DISABLED)
-#         self.clearAllCanvas()
-#         self.calculPoints()
-#         time.sleep(0.3)
-#         self.boutonPrevious.configure(state=tk.ACTIVE)
-#         self.boutonNext.configure(state=tk.ACTIVE)
-#         self.bind_all("<Control-Return>",lambda e : self.nextImage())
-#         self.bind_all("<Control-BackSpace>",lambda e : self.previousImage())
-#
-#     def help(self):
-#         """!
-#         Méthode permettant d'afficher des informations
-#         """
-#         message = "PROCEDURE DE SEXAGE DE L'EPINOCHE v"+str(Interface.version)
-#         message += "\n\n- Modèle de placement de points par Machine Learning (learning : 200 individus)"
-#         message += "\n\n- Modèle de classification Male/Femelle par Machine Learning (learning : 336 individus)"
-#         message += "\n\n\n Interface développée par R. Masson pour l'INERIS"
-#         tk.messagebox.showinfo(title="Informations",message=message)
-
-
-
-
-# class InterfaceC(tk.Frame):
-#
-#     def __init__(self, master, **kwargs):
-#         """!
-#         Constructeur de l'interface
-#         """
-#         tk.Frame.__init__(self)
-    #     self.root = master
-    #     self.add_menu()
-    #     self.canvasGeneral = tk.Canvas(self,width=600,height=700,highlightthickness=0, highlightbackground="black")
-    #     self.frame = tk.Frame(self.canvasGeneral)
-    #     self.frame.pack(fill=tk.BOTH,expand=True)
-    #     self.add_scrollbar()
-    #     self.populate()
-    #     self.createlog()
-    #
-    #
-    # def add_scrollbar(self):
-    #     self.vsb = tk.Scrollbar(self,orient="vertical",command=self.canvasGeneral.yview)
-    #     self.hsb = tk.Scrollbar(self,orient="horizontal",command=self.canvasGeneral.xview)
-    #     self.canvasGeneral.configure(yscrollcommand=self.vsb.set)
-    #     self.canvasGeneral.configure(xscrollcommand=self.hsb.set)
-    #     self.vsb.pack(side="right", fill="y")
-    #     self.hsb.pack(side="bottom", fill="x")
-    #     self.canvasGeneral.pack(side="left", fill="both", expand=True)
-    #     self.canvasGeneral.create_window((0,0), window=self.frame, anchor="nw",tags="self.frame")
-    #     self.frame.bind("<Configure>", self.onFrameConfigure)
-    #     self.canvasGeneral.bind_all("<MouseWheel>", self.on_mousewheel)
-    #     self.canvasGeneral.bind_all("<Control-MouseWheel>", self.on_mousewheel2)
-    #
-    # def on_mousewheel2(self,event):
-    #     scroll = -1 if event.delta > 0 else 1
-    #     self.canvasGeneral.xview_scroll(scroll, "units")
-    #
-    # def on_mousewheel(self,event):
-    #     scroll = -1 if event.delta > 0 else 1
-    #     self.canvasGeneral.yview_scroll(scroll, "units")
-    #
-    # def populate(self):
-    #
-    #     self.listeImages = []
-    #     """Canvas pour logo"""
-    #
-    #     pathLogo = InterfaceC.resource_path("logo2.png")
-    #     self.canvasLogo = tk.Canvas(self.frame,bg='#f0f0f0')
-    #     self.canvasLogo.config(width=157,height=84)
-    #     self.imgLogo = ImageTk.PhotoImage(Image.open(pathLogo).resize((157,84)))
-    #     self.canvasLogo.create_image(0, 0, anchor=tk.NW,image=self.imgLogo)
-    #
-    #     tk.Label(self.frame,text=" Sexing procedure of three-spined stickleback (mini) \n",font=("Andalus",16,"bold")).pack(padx=5,pady=5)
-    #
-    #     ''' Canvas pour le schema '''
-    #     pathSchema = InterfaceC.resource_path("schema.png")
-    #     self.canvasSchema = tk.Canvas(self.frame,bg='#f0f0f0')
-    #     self.canvasSchema.config(width = 288,height=192)
-    #
-    #     self.imgSchema = ImageTk.PhotoImage(Image.open(pathSchema).resize((288,192)))
-    #     self.canvasSchema.create_image(0,0,anchor=tk.NW,image=self.imgSchema)
-    #
-    #     ''' Boutons '''
-    #     tk.Label(self.frame, text = 'PREDICTION',font=("Purisa",12,"bold"),fg='purple').pack(padx=5,pady=0,anchor=tk.W,fill='x')
-    #     self.boutonImport = tk.Button(self.frame,text = "Import image and autoplace",command = self.importImage,fg='purple')
-    #
-    #     self.boutonImport.pack(anchor=tk.W,padx=5,pady=5,ipady=15,expand=True,fill='x')
-    #
-    #     self.boutonImport.bind('<Control-o>',self.importImage)
-    #     tk.Button(self.frame,text = "Predict",command = self.Model_Sexage,fg='purple').pack(anchor=tk.W,padx=5,ipady=8,fill='x')
-    #     # tk.Label(self.frame, text = 'ADD THESE VALUES TO MODEL',font=("Purisa",12,"bold"),fg='green').pack(padx=0,pady=0)
-    #     InterfaceC.sexModele = tk.StringVar(self.frame)
-    #
-    #     # self.sexModel = tk.Entry(self.frame,width=3,textvariable=Interface.sexModele)
-    #     # self.sexModel.pack(padx=5,pady=5,anchor=tk.N)
-    #     # tk.Button(self.frame,text = "Model Update (close Excel before)",command = HeadClass.genererAllDistancesHead,fg='green').pack(padx=0,pady=0,fill='x')
-    #
-    #     self.boutonNext = tk.Button(self.frame,text='→',font=("Purisa",13,"bold"),command = self.nextImage)
-    #     self.boutonNext.pack(fill='x',ipady=8)
-    #     self.boutonPrevious = tk.Button(self.frame,text='←',font=("Purisa",13,"bold"),command = self.previousImage)
-    #     self.boutonPrevious.pack(fill='x',ipady=8)
-    #     tk.Button(self.frame,text="Normal version",command=self.switch).pack()
-    #
-    #     self.labelSex = tk.Label(self.frame,text="")
-    #     self.labelSex.pack()
-    #
-    #     self.labelInfoPoints = tk.Label(self.frame,text="")
-    #
-    #
-    #     ''' Canvas pour la tête '''
-    #     self.labelLongueur = tk.Label(self.frame,text="",justify=tk.LEFT)
-    #     InterfaceC.canvasTete = tk.Canvas(self.frame,bg='#f0f0f0',bd=0,highlightthickness=1, highlightbackground="black")
-    #     InterfaceC.canvasTete.config(width=500, height=500)
-    #     InterfaceC.canvasTete.pack()
-    #     self.labelLongueurBody = tk.Label(self.frame,justify=tk.LEFT)
-    #
-    #     ''' Canvas pour le corps '''
-    #     InterfaceC.canvasCorps = tk.Canvas(self.frame,bg='#f0f0f0',highlightthickness=1, highlightbackground="black")
-    #     InterfaceC.canvasCorps.config(width=630, height=500)
-    #     InterfaceC.canvasCorps.pack(padx=6)
-    #     self.labelNumImage = tk.Label(self.frame,text="Image :",font=("Purisa",11),fg='gray')
-    #     self.labelNumImage.pack()
-    #     self.labelNomImage = tk.Label(self.frame,text="",font=("Purisa",11),fg='gray')
-    #     self.labelNomImage.pack()
-    #
-    #
-    #     InterfaceC.canvasEchelle2 = tk.Canvas(self,bg='#f0f0f0')
-    #     InterfaceC.canvasEchelle = tk.Canvas(self,bg='#f0f0f0')
-    #
-    # def switch(self):
-    #     # Interface.chemin = pypath3
-    #     # Interface.ppath2 = pypath2
-    #     # self.destroy()
-    #     #
-    #     # app = Interface()
-    #     #
-    #     # app.pack(side="top", fill="both", expand=True)
-    #     # app.mainloop()
-    #
-    #     app = Interface()
-    #     app.restart_program()
-    #
-    # def allDist(lenBody):
-    #     listepoints = []
-    #     for i in HeadClass.nodes:
-    #         listepoints.append([InterfaceC.canvasTete.coords(i)[0]+3,InterfaceC.canvasTete.coords(i)[1]+3])
-    #     px50mm = XY_tools.Externes.euclide(InterfaceC.canvasEchelle.coords(3),InterfaceC.canvasEchelle.coords(5))
-    #
-    #     listedistances2 = []
-    #     print(lenBody)
-    #     print(px50mm)
-    #     listedistances2.append(round(lenBody*50/px50mm,5))
-    #     print(HeadClass.distances_all)
-    #
-    #     for x in HeadClass.distances_all:
-    #         listedistances2.append(x)
-    #     InterfaceC.modeleDistances = listedistances2
-    #
-    # def onFrameConfigure(self, event):
-    #     '''Reset the scroll region to encompass the inner frame'''
-    #     self.canvasGeneral.configure(scrollregion=self.canvasGeneral.bbox("all"))
-    # def add_menu(self):
-    #     self.root.state('zoomed')
-    #     self.root.title("Sex Determination for Three Spined Stickleback")
-    #     menubar = tk.Menu(self.root)
-    #     menuFichier = tk.Menu(menubar,tearoff=0)
-    #     menuFichier.add_command(label="Importer", command=self.importImage,accelerator="(Ctrl+O)")
-    #     self.bind_all("<Control-o>",lambda e : self.importImage())
-    #     menuFichier.add_separator()
-    #     menuFichier.add_command(label="Quitter", command=self.root.destroy,accelerator="(Ctrl+Q)")
-    #     self.bind_all("<Control-q>",lambda e : self.root.destroy())
-    #     menubar.add_cascade(label="Fichier", menu=menuFichier)
-    #
-    #     menuOutils = tk.Menu(menubar,tearoff=0)
-    #     menuOutils.add_command(label="Prédire le sexe",command=InterfaceC.affichePrediction,accelerator="(Ctrl+P)")
-    #     self.bind_all("<Control-p>",lambda e : self.Model_Sexage())
-    #     menuOutils.add_command(label="Image suivante",command=self.nextImage,accelerator="(Ctrl+Entrée)")
-    #     self.bind_all("<Control-Return>",lambda e : self.nextImage())
-    #     menuOutils.add_command(label="Image précédente",command=self.previousImage,accelerator="(Ctrl+Backspace)")
-    #     self.bind_all("<Control-BackSpace>",lambda e : self.previousImage())
-    #
-    #     menuOutils.add_separator()
-    #     menuOutils.add_command(label="Ouvrir base de données",command=self.openDataBase,accelerator="(Ctrl+H)")
-    #     self.bind_all("<Control-h>",lambda e : self.openDataBase())
-    #     menubar.add_cascade(label="Outils",menu=menuOutils)
-    #
-    #     menuAide = tk.Menu(menubar, tearoff=0)
-    #     menuAide.add_command(label="A propos", command=self.help,accelerator="(Ctrl+I)")
-    #     self.bind_all("<Control-i>",lambda e : self.help())
-    #     menuAide.add_command(label="Version",command=InterfaceC.getVersion)
-    #     menubar.add_cascade(label="Aide", menu=menuAide)
-    #
-    #     self.root.config(menu=menubar)
-    #
-    # def createlog(self):
-    #     if not os.path.exists(os.getcwd()+"/log"):
-    #         os.mkdir(os.getcwd()+"/log")
-    #         pathname = os.getcwd()+"/log/"
-    #         date = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
-    #         filename = "rapport" + "_" + date
-    #         f = open(pathname+filename+".txt","w+")
-    #     if os.path.exists(os.getcwd()+"/log"):
-    #         pathname = os.getcwd()+"/log/"
-    #         date = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
-    #         filename = "rapport" + "_" + date
-    #         self.finalname = pathname+filename+".txt"
-    #         f = open(self.finalname,"w+")
-    #         f.close()
-    #
-    # def verbose_intro(self):
-    #     message = "Rapport généré le "+datetime.now().strftime("%d/%m/%Y")+" à "+datetime.now().strftime("%H:%M:%S")+"\n"
-    #     message += "# Morphométrie Ineris v"+str(InterfaceC.version)+"\n\n"
-    #     message += "# ML_morph version\n"
-    #     message += "\t - Algorithme utilisé : Regression trees (gradient boosting) \n"
-    #     message += "\t - Performances : erreur de placement moyenne de 4 pixels (0.25% de la longueur standard) \n\n"
-    #     message += "# ML_gender version\n"
-    #     message += "\t - Algorithmes utilisés : Gradient Boosting, SVM, Random Forest (consensus) \n"
-    #     message += "\t - Performances : 0.9% \n"
-    #
-    #     f = open(self.finalname,"a")
-    #     f.write(message)
-    #     f.close()
-    #
-    # def verbose_photo(self):
-    #     message = "\n# Photos importées pour la prédiction :\n"
-    #     for x in self.listeImages:
-    #         message += "\t"+x+"\n"
-    #     f = open(self.finalname,"a")
-    #     f.write(message)
-    #     f.close()
-    #
-    # def verbose_points(self,listepoints):
-    #     message = "\n# Coordonnées des points détectés :\n"
-    #     listepoints = listepoints[0]
-    #     for i in range(1,10):
-    #         message += "\t -"
-    #         for j in range(1,len(self.listeImages)+1):
-    #             message += "point n°"+str(i)+": "+"X = "+str(listepoints[i][0])+" Y = " +str(listepoints[i][1])+"\t"
-    #         message += "\n"
-    #     f = open(self.finalname,"a")
-    #     f.write(message)
-    #     f.close()
-    #
-    # def verbose_distances(self,df_distance):
-    #     message = "\n# Distances utilisées pour la prédiction du sexe :\n"
-    #     for j in range(1,len(self.listeImages)+1):
-    #         # message += "distance n°"+str(i)+"= \t\t\t"
-    #         message += df_distance
-    #     message += "\n"
-    #     f = open(self.finalname,"a")
-    #     f.write(message)
-    #     f.close()
-    #
-    # def verbose_sexe(self,text,proba):
-    #     message = "\n# Sexe finalement prédit :\n"
-    #     for i in range(1,len(self.listeImages)+1):
-    #         message += "\t - image n°"+str(i)+": "+text+"  (p="+str(proba)+"....)\n"
-    #     f = open(self.finalname,"a")
-    #     f.write(message)
-    #     f.close()
-    #
-    # def verbose_conclusion(self):
-    #     message = "\nFIN \n"
-    #     message += datetime.now().strftime("%d/%m/%Y")+" à "+datetime.now().strftime("%H:%M:%S")+"\n"
-    #     f = open(self.finalname,"a")
-    #     f.write(message)
-    #     f.close()
-    #
-    #
-    # def getVersion():
-    #     try:
-    #         version = XY_tools.Externes.getVersion()
-    #     except:
-    #         version = "-- No internet connection --"
-    #
-    #     message = "Dernière version disponible : "+"v"+str(version)
-    #     message += "\nVersion actuelle : "+"v"+str(InterfaceC.version)
-    #     message += "\nCliquez sur OK pour télécharger"
-    #
-    #     reponse = tk.messagebox.askyesnocancel(title="Informations",message=message)
-    #     if(reponse):
-    #         InterfaceC.updateVersion()
-    #
-    # def resource_path(relative_path):
-    #     """!
-    #     Méthode permettant d'avoir le chemin absolu temporaire (pour l'exe) ou normal
-    #     @param relative_path String : chemin du fichier dans le pc
-    #     @return resource_path : chemin temporaire
-    #     """
-    #     try:
-    #         base_path = sys._MEIPASS
-    #         # print(base_path)
-    #     except Exception:
-    #         base_path = pypath2+"/images/"
-    #         base_path = '/'.join(pypath1.split("/")[:-1])+"/images"
-    #         # print(base_path)
-    #         print('/'.join(pypath1.split("/")[:-1])+"/images")
-    #         # print(pypath2)
-    #         # print(pypath3)
-    #
-    #     return os.path.join(base_path, relative_path)
-    #
-    # def afficheLongueur():
-    #     """!
-    #     Méthode permettant de mettre à jour l'affichage des longueurs dans l'interface
-    #     """
-    #     # app.labelLongueur.config(text=XY_tools.Externes.Longueur(HeadClass.calculDistances()))
-    #     HeadClass.calculDistances()
-    #
-    # def afficheLongueurBody():
-    #     """!
-    #     Méthode permettant de mettre à jour l'affichage des longueurs du corps dans l'interface
-    #     """
-    #     # app.labelLongueurBody.config(text=XY_tools.Externes.LongueurBody(BodyClass.calculDistances()))
-    #     BodyClass.calculDistances()
-    #
-    # def clearAllCanvas(self):
-    #     """!
-    #     Méthode permettant de remettre à zero l'interface
-    #     """
-    #     HeadClass.id_polygons=[]
-    #     HeadClass.pointsFish=[]
-    #     HeadClass.pointsEchelle=[]
-    #     HeadClass.distances_check=[0 for _ in range(20)]
-    #     self.labelLongueur.config(text="")
-    #     BodyClass.id_polygons=[]
-    #     BodyClass.pointsFish=[]
-    #     BodyClass.pointsEchelle=[]
-    #     BodyClass.distances_check=[0 for _ in range(20)]
-    #     self.labelLongueurBody.config(text="")
-    #     self.labelInfoPoints.config(text="")
-    #     self.labelSex.config(text="")
-    #     self.canvasTete.delete('all')
-    #     self.canvasCorps.delete('all')
-    #     self.labelNomImage.config(text="")
-    #
-    # def resetListeImages(self):
-    #     """!
-    #     Méthode permettant de remettre à zero les images chargées
-    #     """
-    #     self.listeImages = []
-    #     self.numImageActuelle = 0
-    #
-    # def updateVersion():
-    #     """!
-    #     Méthode permettant d'ouvrir le lien github du projet
-    #     """
-    #     webbrowser.open('https://github.com/RalphMasson/MorphoEpinoche/releases/')
-    #
-    #
-    # def importImage(self,event=' '):
-    #     """!
-    #     Méthode permettant de charger 1 ou plusieurs images
-    #     """
-    #     self.choice = 0
-    #     self.resetListeImages()
-    #     self.listeImages = XY_tools.Externes.openfn()
-    #     self.calculPoints()
-    #     # print("chemin temp")
-    #     # print(Temp.chemin)
-    #
-    #
-    # def calculPoints(self):
-    #     """!
-    #     Méthode permettant de calculer les points et de les disposer sur l'image
-    #     """
-    #     # print("\n liste images selectionnées")
-    #     # print(self.listeImages)
-    #     # print("\n image actuelle")
-    #     # print(self.listeImages[self.numImageActuelle])
-    #     # print("\n")
-    #     path_global = '/'.join(self.listeImages[self.numImageActuelle].split('/')[:-1])
-    #
-    #     #Points de la tête
-    #     points_tete = self.Model_Tete(self.listeImages[self.numImageActuelle])[0]
-    #     points_tete_copy = points_tete
-    #
-    #     #Oeil du poisson
-    #     HeadFish.oeilXY = [0.5*(points_tete_copy[1][0]+points_tete_copy[2][0]),0.5*(points_tete_copy[1][1]+points_tete_copy[2][1])]
-    #
-    #     #Points de l'échelle calculés par le modèle 2
-    #     points_echelle = self.Model_Echelle(self.listeImages[self.numImageActuelle])[0]
-    #     points_echelle_copy = points_echelle
-    #     ScaleFish.left = points_echelle[0]
-    #
-    #     #Placement des points de l'echelle au bon endroit
-    #     # points_echelle = XY_tools.Externes.centerPoints2([points_echelle[0],points_echelle[1]],ScaleFish.left)
-    #     points_echelle = XY_tools.Externes.centerPoints(points_echelle[0:2],ScaleFish.left,25,50)
-    #
-    #     app.labelNomImage.config(text=self.listeImages[self.numImageActuelle])
-    #     app.labelNumImage.config(text=str(self.numImageActuelle+1)+"/"+str(len(self.listeImages)))
-    #
-    #     #Image de la tête
-    #     self.ImagePIL = Image.open(self.listeImages[self.numImageActuelle])
-    #     HeadFish(self.canvasTete,self.ImagePIL,cv2.imread(self.listeImages[self.numImageActuelle]),(1920,1440))
-    #
-    #     #Image entière
-    #     self.ImagePIL2 = Image.open(self.listeImages[self.numImageActuelle])
-    #     BodyFish(InterfaceC.canvasCorps,self.ImagePIL2,(640,480))
-    #
-    #     #Calcul des points du corps
-    #     listePoints3 = self.Model_Longueur(self.listeImages[self.numImageActuelle])[0]
-    #     listePoints3 = [[listePoints3[0][0]/3,listePoints3[0][1]/3],[listePoints3[1][0]/3,listePoints3[1][1]/3]]
-    #     corpsStandard = listePoints3
-    #
-    #     #Ajout de l'echelle
-    #     corpsStandard.extend([[points_echelle_copy[0][0]/3,points_echelle_copy[0][1]/3],[points_echelle_copy[1][0]/3,points_echelle_copy[1][1]/3]])
-    #
-    #     #Affichage des points sur l'image entière
-    #     BodyClass(InterfaceC.canvasCorps,corpsStandard,'cyan')
-    #     InterfaceC.canvasCorps.update()
-    #
-    #     #Affichage des points sur la tête
-    #     pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19,pt21 = points_tete_copy
-    #     points_tete_copy = XY_tools.Externes.centerPoints([pt3,pt5,pt7,pt9,pt11,pt13,pt15,pt17,pt19,pt21],HeadFish.oeilXY,200,200)
-    #     HeadClass.pointsEchelle = points_echelle
-    #     HeadClass(self.canvasTete, points_tete_copy,'#ff00f2')
-    #     self.canvasTete.update()
-    #
-    #     #Image de l'échelle
-    #     ImagePIL = Image.open(self.listeImages[self.numImageActuelle])
-    #     tete2 = points_tete
-    #     ScaleFish(InterfaceC.canvasEchelle,ImagePIL,(1920,1440))
-    #     ScaleClass(InterfaceC.canvasEchelle,points_echelle,'#ffffff')
-    #
-    #     # Calcul des points  du corps Bis
-    #     points_longueur = self.Model_Longueur('/'.join(self.listeImages[0].split('/')[:-1]))[0]
-    #     pt1,pt2 = [points_longueur[0][0],points_longueur[0][1]],[points_longueur[1][0],points_longueur[1][1]]
-    #     ScaleFishBody.left = [points_longueur[0][0],points_longueur[0][1]]
-    #     points_longueur = XY_tools.Externes.centerPoints([pt1,pt2],ScaleFishBody.left,0,0)
-    #
-    #     # Image du corps
-    #     ImagePIL = Image.open(self.listeImages[self.numImageActuelle])
-    #     ScaleFishBody(InterfaceC.canvasEchelle2,ImagePIL,(1920,1440))
-    #     ScaleClassBody(InterfaceC.canvasEchelle2,points_longueur,'#ffffff')
-    #
-    # def Model_Tete(self,pathimage):
-    #     """!
-    #         @param pathimage dossier de l'image
-    #     """
-    #     print("points tête")
-    #     try:
-    #         pathPredictor = os.path.join(sys._MEIPASS, 'predictor_head2.dat')
-    #     except:
-    #         pathPredictor = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\predictor_head2.dat'
-    #     try:
-    #         a = ModelPoints(os.path.join(sys._MEIPASS,''),"")
-    #     except:
-    #         a = ModelPoints(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\',"")
-    #     # print("load ok")
-    #     try:
-    #         a.predict(pathimage,os.path.join(sys._MEIPASS,''),"predictor_head2.dat")
-    #     except:
-    #         a.predict(pathimage,Temp.ppath2+"\models\\","predictor_head2.dat")
-    #
-    #     # print("predict ok")
-    #     # print(Temp.chemin)
-    #     try:
-    #         listepoints = ML.ML_pointage.xmltolistY(Temp.ppath2+"\models\\"+"output.xml",0)
-    #     except:
-    #         listepoints = ML.ML_pointage.xmltolistY(os.path.join(sys._MEIPASS,"output.xml"),0)
-    #     self.verbose_points(listepoints)
-    #     return listepoints
-    #
-    # def Model_Echelle(self,pathimage):
-    #     """!
-    #         @param pathimage dossier de l'image
-    #     """
-    #     print("points echelle")
-    #     try:
-    #         pathPredictor = os.path.join(sys._MEIPASS, 'predictor_scale2.dat')
-    #     except:
-    #         pathPredictor = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\predictor_scale2.dat'
-    #
-    #     try:
-    #         a = ModelPoints(os.path.join(sys._MEIPASS,''),"")
-    #     except:
-    #         a = ModelPoints(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\',"")
-    #
-    #     try:
-    #         a.predict(pathimage,os.path.join(sys._MEIPASS,''),"predictor_scale2.dat")
-    #     except:
-    #         a.predict(pathimage,Temp.ppath2+"\models\\","predictor_scale2.dat")
-    #
-    #     try:
-    #         listepoints = ML.ML_pointage.xmltolistY(Temp.ppath2+"\models\\"+"output.xml",0)
-    #     except:
-    #         listepoints = ML.ML_pointage.xmltolistY(os.path.join(sys._MEIPASS,"output.xml"),0)
-    #
-    #     return listepoints
-    #
-    #
-    # def Model_Longueur(self,pathimage):
-    #     print("points longueur")
-    #     try:
-    #         pathPredictor = os.path.join(sys._MEIPASS, 'predictor_LS.dat')
-    #     except:
-    #         pathPredictor = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\predictor_LS.dat'
-    #     try:
-    #         a = ModelPoints(os.path.join(sys._MEIPASS,''),"")
-    #     except:
-    #         a = ModelPoints(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\',"")
-    #     try:
-    #         a.predict(pathimage,os.path.join(sys._MEIPASS,''),"predictor_LS.dat")
-    #     except:
-    #         a.predict(pathimage,Temp.ppath2+"\models\\","predictor_LS.dat")
-    #
-    #     try:
-    #         listepoints = ML.ML_pointage.xmltolistY(Temp.ppath2+"\models\\"+"output.xml",0)
-    #     except:
-    #         listepoints = ML.ML_pointage.xmltolistY(os.path.join(sys._MEIPASS,"output.xml"),0)
-    #     return listepoints
-    #
-    #
-    # def Model_Sexage(self):
-    #     print("classification")
-    #     InterfaceC.lenBody = XY_tools.Externes.euclide(InterfaceC.canvasEchelle2.coords(3),InterfaceC.canvasEchelle2.coords(5))
-    #     InterfaceC.allDist(InterfaceC.lenBody)
-    #     from joblib import dump, load
-    #     import pandas as pd
-    #     try:
-    #         clf = load(os.path.join(sys._MEIPASS,"GBClassifierFinal3.joblib"))
-    #         clf1 = load(os.path.join(sys._MEIPASS,"SVCClassifierFinal3.joblib"))
-    #         clf2 = load(os.path.join(sys._MEIPASS,"XGBClassifierFinal3.joblib"))
-    #     except:
-    #         clf = load(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\GBClassifierFinal3.joblib')
-    #         clf1 = load(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\SVCClassifierFinal3.joblib')
-    #         clf2 = load(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\XGBClassifierFinal3.joblib')
-    #
-    #     pd.set_option('display.max_columns', None)
-    #     pd.set_option('display.expand_frame_repr', False)
-    #     pd.set_option('max_colwidth', None)
-    #     ae = pd.DataFrame(InterfaceC.modeleDistances).T
-    #
-    #     # print(ae)
-    #     prediction = clf.predict(ae)
-    #     prediction1 = clf1.predict(ae)
-    #     prediction2 = clf2.predict(ae)
-    #
-    #
-    #     ## Consensus
-    #     if(prediction==prediction1==prediction2):
-    #         y_consensus = prediction
-    #     else:
-    #         y_consensus = 0.5
-    #
-    #     proba = max(clf.predict_proba(ae)[0])
-    #     listePredictionInt = [clf.predict(ae)[0], clf1.predict(ae)[0], clf2.predict(ae)[0]]
-    #     listeProba = [list(np.round(clf.predict_proba(ae),4).flatten()), list(np.round(clf1.predict_proba(ae),4).flatten()),list(np.round(clf2.predict_proba(ae),4).flatten())]
-    #
-    #     listePredictionStr = ["F" if x==0 else "M" for x in listePredictionInt]
-    #     if y_consensus==0:
-    #         consensusStr = "F"
-    #     if y_consensus==1:
-    #         consensusStr = "M"
-    #     if y_consensus==0.5:
-    #         consensusStr = "Undetermined"
-    #
-    #     text = ""
-    #     for i in range(3):
-    #         text += listePredictionStr[i]+" "+str(listeProba[i][listePredictionInt[i]])+";"
-    #     text+="\n\n Sex classification : "+consensusStr
-    #     app.labelSex.config(text = text)
-    #
-    #     self.verbose_distances(str(ae))
-    #     self.verbose_sexe(text,proba)
-    #     self.verbose_conclusion()
-    #
-    #
-    # def affichePrediction():
-    #     """!
-    #     Méthode permettant d'afficher la prédiction du sexe
-    #     """
-    #     choix,couleur,p = IA_sexage.Prediction.predict(None,"","")
-    #     app.labelSex.config(text="")
-    #     app.labelSex.config(text=choix+" avec p="+str(round(p,2)),font=("Purisa",16),fg=couleur)
-    #
-    # def nextImage(self):
-    #     """!
-    #     Méthode permettant de passer à l'image d'après
-    #     """
-    #     if(self.numImageActuelle<len(self.listeImages)):
-    #         self.blockButton(+1)
-    #
-    #
-    # def previousImage(self):
-    #     """!
-    #     Méthode permettant de revenir a l'image précédente
-    #     """
-    #     if(self.numImageActuelle>0):
-    #         self.blockButton(-1)
-    #
-    # def blockButton(self,param):
-    #     """!
-    #     Méthode permettant de désactiver temporairement les boutons pour éviter une superposition d'images
-    #     @param param : +1 pour passer à l'image suivante, -1 pour la précédente
-    #     """
-    #     import time
-    #     self.unbind_all("<Control-Return>")
-    #     self.unbind_all("<Control-BackSpace>")
-    #     self.numImageActuelle+=param
-    #     nbPointNonDetectes = 0
-    #     time.sleep(0.3)
-    #     self.boutonPrevious.configure(state=tk.DISABLED)
-    #     self.boutonNext.configure(state=tk.DISABLED)
-    #     self.calculPoints()
-    #     time.sleep(0.3)
-    #     self.boutonPrevious.configure(state=tk.ACTIVE)
-    #     self.boutonNext.configure(state=tk.ACTIVE)
-    #     self.bind_all("<Control-Return>",lambda e : self.nextImage())
-    #     self.bind_all("<Control-BackSpace>",lambda e : self.previousImage())
-    #
-    # def openDataBase(self):
-    #     """!
-    #     Méthode permettant d'ouvrir le fichier csv s'il existe
-    #     """
-    #     pypath = inspect.getfile(lambda: None)
-    #     pypath = '/'.join(pypath.split('\\')[:-1])
-    #     import subprocess
-    #     print("toto")
-    #     print('/'.join(inspect.getfile(lambda: None).split('\\')[:-2])+"/executable/DistancesPourModele.csv")
-    #     print(pypath3+"\DistancesPourModele.csv")
-    #     print(Temp.chemin+"/DistancesPourModele.csv")
-    #     if(os.path.exists('/'.join(inspect.getfile(lambda: None).split('\\')[:-2])+"/executable/DistancesPourModele.csv")):
-    #         try:
-    #             subprocess.Popen('/'.join(inspect.getfile(lambda: None).split('\\')[:-2])+"/executable/DistancesPourModele.csv",shell=True)
-    #         except:
-    #             commande = "start notepad.EXE "
-    #             commande += pypath3+"/DistancesPourModele.csv"
-    #             os.system(commande)
-    #
-    #     elif(os.path.exists(Temp.chemin+"/DistancesPourModele.csv")):
-    #         try:
-    #             subprocess.Popen(Temp.chemin+"/DistancesPourModele.csv",shell=True)
-    #         except:
-    #             commande = "start notepad.EXE "
-    #             commande += os.getcwd()+"\DistancesPourModele.csv"
-    #             os.system(commande)
-    #
-    #     elif(os.path.exists(os.getcwd()+"\DistancesPourModele.csv")):
-    #         try:
-    #             subprocess.Popen(os.getcwd()+"\DistancesPourModele.csv",shell=True)
-    #         except:
-    #             None
-    #
-    #     else:
-    #         message = "La base de données n'a pas été trouvée"
-    #         message += "\n\n1) Vérifier qu'elle est située ici : "
-    #         message += "\n"+pypath3+"/DistancesPourModele.csv"
-    #         test = os.getcwd()
-    #         test2 = inspect.getfile(lambda: None)
-    #         message += "\n"+test
-    #         message += "\n"+'/'.join(test2.split('\\')[:-2])+"executable/DistancesPourModele.csv"
-    #         message += "\n\n2) Commencer par créer une base de données"
-    #         # message += "\n"+str(len(test))
-    #         # message += "\n"+str(len('/'.join(test2.split('\\')[:-1])))
-    #         tk.messagebox.showwarning(title="Attention", message=message)
-    #
-    # def help(self):
-    #     """!
-    #     Méthode permettant d'afficher des informations
-    #     """
-    #     message = "PROCEDURE DE SEXAGE DE L'EPINOCHE v1.6"
-    #     message += "\n\n- Modèle de placement de points par traitement d'image et par Machine Learning (learning : 150 individus)"
-    #     message += "\n\n- Modèle de classification Male/Femelle par Machine Learning (learning : 300 individus)"
-    #     message += "\n\n\n Interface développée par R. Masson pour l'INERIS"
-    #     tk.messagebox.showinfo(title="Informations",message=message)
-
-import pyuac
-import ctypes, sys
-# ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
-
-# # pyuac.runAsAdmin()
-# app = Interface()
-# app.mainloop()
