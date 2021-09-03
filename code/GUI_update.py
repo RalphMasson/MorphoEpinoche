@@ -53,7 +53,21 @@ class ModelPoints():
             Règle les paramètres d'entrainement
             @return a : liste des options choisies
         """
+        #1e
         a = ModelPoints.pointsML.parameter_model([500,3],0.08,1,20,700,20,200)
+
+        #2e
+        # a = ModelPoints.pointsML.parameter_model([500,4],0.08,1,20,800,20,300)
+
+        # # # #3e
+        # a = ModelPoints.pointsML.parameter_model([500,4],0.08,1,20,1000,20,300)
+
+        #4e
+        # a = ModelPoints.pointsML.parameter_model([500,4],0.08,1,20,1200,20,300)
+
+
+
+
         return a
 
     def train(self):
