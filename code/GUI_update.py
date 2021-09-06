@@ -66,8 +66,6 @@ class ModelPoints():
         # a = ModelPoints.pointsML.parameter_model([500,4],0.08,1,20,1200,20,300)
 
 
-
-
         return a
 
     def train(self):

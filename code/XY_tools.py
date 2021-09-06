@@ -314,4 +314,8 @@ class Externes():
     def cheminAvant2(aaa):
         return "/".join(aaa.split("/")[:-1])+"/"
     def sizeKoParent(path_et_nom_fichier_extension):
+        """!
+        Méthode permettant d'avoir la taille du fichier
+        @return str
+        """
         return str(round(int(os.path.getsize(path_et_nom_fichier_extension)/1048)))+" Ko"

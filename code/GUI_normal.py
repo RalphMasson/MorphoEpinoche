@@ -2426,12 +2426,6 @@ class InterfaceC(tk.Frame):
         message += "\n\n\n Interface développée par R. Masson pour l'INERIS"
         tk.messagebox.showinfo(title="Informations",message=message)
 
-
-
-
-
-
-
-
+## Lancement global de l'interface
 app = MainApp()
 app.mainloop()

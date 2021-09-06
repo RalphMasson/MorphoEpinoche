@@ -1,4 +1,4 @@
-### mise en forme du fichier de pointage
+## Mise en forme du fichier de pointage (imageJ -> tps)
 
 
 import pandas as pd
@@ -61,7 +61,5 @@ listeAllImage = os.listdir("C:\\Users\\MASSON\\Desktop\\POINTAGe\\all\\")
 # #             f.write("IMAGE="+str(listeLabel[j//10])+"\n")
 # #             f.write("ID="+str(k)+"\n")
 # #     f.close()
-
-## training for each folder
 
 
