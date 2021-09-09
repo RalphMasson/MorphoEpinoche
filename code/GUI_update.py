@@ -108,7 +108,10 @@ class ModelSexage():
         ModelSexage.sexage.parameters()
         ModelSexage.list1 = list(ModelSexage.sexage.clf.get_params().keys())
         ModelSexage.list2 = list(ModelSexage.sexage.clf.get_params().values())
-
+        ModelSexage.list3 = list(ModelSexage.sexage.clf1.get_params().keys())
+        ModelSexage.list4 = list(ModelSexage.sexage.clf1.get_params().values())
+        ModelSexage.list5 = list(ModelSexage.sexage.clf2.get_params().keys())
+        ModelSexage.list6 = list(ModelSexage.sexage.clf2.get_params().values())
     def train(self):
         """!
             Entraine le modèle
@@ -177,30 +180,31 @@ class InterfacePoint(tk.Tk):
         message += "\n2) Avec tpsUtils, faites un append dans un nouveau fichier .tps"
         message += "\n3) Déplacer les images nouvelles dans le même dossier que les anciennes"
         tk.Label(self,text=message,justify=tk.LEFT,borderwidth=2,highlightthickness=1,bd=0,highlightbackground="black", highlightcolor="black").place(relx = 0.05,rely = 0.1)
-        tk.Label(self,text="cascade_depth (6-18)").place(relx=0.001,rely = 0.4)
-        tk.Label(self,text="tree_depth (2-8)").place(relx=0.001,rely = 0.44)
-        tk.Label(self,text="tree per cascade (500)").place(relx=0.001,rely = 0.48)
-        tk.Label(self,text="nu (0-1)").place(relx=0.001,rely = 0.52)
-        tk.Label(self,text="oversampling amout (0-50)").place(relx=0.001,rely = 0.56)
-        tk.Label(self,text="feature pool size (300-700)").place(relx=0.001,rely = 0.6)
-        tk.Label(self,text="split tests (10-30)").place(relx=0.001,rely = 0.64)
+        # tk.Label(self,text="cascade_depth (6-18)").place(relx=0.001,rely = 0.4)
+        # tk.Label(self,text="tree_depth (2-8)").place(relx=0.001,rely = 0.44)
+        # tk.Label(self,text="tree per cascade (500)").place(relx=0.001,rely = 0.48)
+        # tk.Label(self,text="nu (0-1)").place(relx=0.001,rely = 0.52)
+        # tk.Label(self,text="oversampling amout (0-50)").place(relx=0.001,rely = 0.56)
+        # tk.Label(self,text="feature pool size (300-700)").place(relx=0.001,rely = 0.6)
+        # tk.Label(self,text="split tests (10-30)").place(relx=0.001,rely = 0.64)
 
 
     def add_entrys(self):
-        self.EntryCascade = tk.StringVar(self)
-        self.CascadeDepth = tk.Entry(self,textvariable = self.EntryCascade).place(relx=0.12,rely=0.4,width = 60)
-        self.EntryTree= tk.StringVar(self)
-        self.TreeDepth = tk.Entry(self,textvariable = self.EntryTree).place(relx=0.12,rely=0.44,width = 60)
-        self.EntryTreeCascade = tk.StringVar(self)
-        self.TreeCascade = tk.Entry(self,textvariable = self.EntryTreeCascade).place(relx=0.12,rely=0.48,width = 60)
-        self.EntryNu = tk.StringVar(self)
-        self.Nu = tk.Entry(self,textvariable = self.EntryNu).place(relx=0.12,rely=0.52,width = 60)
-        self.EntryOS = tk.StringVar(self)
-        self.Oversampling = tk.Entry(self,textvariable = self.EntryOS).place(relx=0.12,rely=0.56,width = 60)
-        self.EntryFeaturePoolSize = tk.StringVar(self)
-        self.FeaturePoolSize = tk.Entry(self,textvariable = self.EntryFeaturePoolSize).place(relx=0.12,rely=0.6,width = 60)
-        self.EntrySplitTests = tk.StringVar(self)
-        self.SplitTests = tk.Entry(self,textvariable = self.EntrySplitTests).place(relx=0.12,rely=0.64,width = 60)
+        # self.EntryCascade = tk.StringVar(self)
+        # self.CascadeDepth = tk.Entry(self,textvariable = self.EntryCascade).place(relx=0.12,rely=0.4,width = 60)
+        # self.EntryTree= tk.StringVar(self)
+        # self.TreeDepth = tk.Entry(self,textvariable = self.EntryTree).place(relx=0.12,rely=0.44,width = 60)
+        # self.EntryTreeCascade = tk.StringVar(self)
+        # self.TreeCascade = tk.Entry(self,textvariable = self.EntryTreeCascade).place(relx=0.12,rely=0.48,width = 60)
+        # self.EntryNu = tk.StringVar(self)
+        # self.Nu = tk.Entry(self,textvariable = self.EntryNu).place(relx=0.12,rely=0.52,width = 60)
+        # self.EntryOS = tk.StringVar(self)
+        # self.Oversampling = tk.Entry(self,textvariable = self.EntryOS).place(relx=0.12,rely=0.56,width = 60)
+        # self.EntryFeaturePoolSize = tk.StringVar(self)
+        # self.FeaturePoolSize = tk.Entry(self,textvariable = self.EntryFeaturePoolSize).place(relx=0.12,rely=0.6,width = 60)
+        # self.EntrySplitTests = tk.StringVar(self)
+        # self.SplitTests = tk.Entry(self,textvariable = self.EntrySplitTests).place(relx=0.12,rely=0.64,width = 60)
+        print("toto")
 
     def add_buttons(self):
         self.boutonImageAll = tk.Button(self,text="1) Selectionner le dossier version2",command=self.getDirectoryModel).place(relx=0.05,rely=0.22)
@@ -208,7 +212,7 @@ class InterfacePoint(tk.Tk):
         self.text = tk.Text(self,height=35, width=150)
         self.text.place(relx=0.18,rely=0.3)
         self.text.configure(state='disabled')
-        self.buttonOptions = tk.Button(self,text="Modifier options (leave blank to default)").place(relx = 0.02,rely = 0.35)
+        # self.buttonOptions = tk.Button(self,text="Modifier options (leave blank to default)").place(relx = 0.02,rely = 0.35)
 
     def getDirectoryModel(self):
         InterfacePoint.modele_path = XY_tools.Externes.openfolder()+"/"
@@ -315,7 +319,7 @@ class InterfaceGender(tk.Tk):
         self.text = tk.Text(self,height=40, width=150)
         self.text.place(relx=0.18,rely=0.2)
         self.text.configure(state='disabled')
-        self.buttonOptions = tk.Button(self,text="Modifier options (leave blank to default)").place(relx = 0.02,rely = 0.35)
+        # self.buttonOptions = tk.Button(self,text="Modifier options (leave blank to default)").place(relx = 0.02,rely = 0.35)
 
     def getDirectoryModel(self):
         """!
@@ -346,11 +350,26 @@ class InterfaceGender(tk.Tk):
 
         list1 = list(ModelSexage.list1)
         list2 = list(ModelSexage.list2)
+        list3 = list(ModelSexage.list3)
+        list4 = list(ModelSexage.list4)
+        list5 = list(ModelSexage.list5)
+        list6 = list(ModelSexage.list6)
 
-        self.text.insert("insert","\n\n--> Training with following parameters :")
+        self.text.insert("insert","\n\n--> Training with following parameters :\n\n")
         for i in range(len(list1)):
-            self.text.insert("insert","\n\t"+str(list1[i]) + " : "+str(list2[i]))
+            self.text.insert("insert","\t"+str(list1[i]) + " : "+str(list2[i]))
             self.text.update()
+        self.text.insert("insert","\n\n")
+        for i in range(len(list3)):
+            self.text.insert("insert","\t"+str(list3[i]) + " : "+str(list4[i]))
+            self.text.update()
+        self.text.insert("insert","\n\n")
+
+        for i in range(len(list5)):
+            self.text.insert("insert","\t"+str(list5[i]) + " : "+str(list6[i]))
+            self.text.update()
+        self.text.insert("insert","\n\n")
+
 
         start = time.time()
         a.train()
@@ -362,11 +381,12 @@ class InterfaceGender(tk.Tk):
 
         b = a.accuracyTrain()
 
-        self.text.insert("insert","\n--> Modèle SVC mis à jour : "+XY_tools.Externes.sizeKoParent(InterfaceGender.csv_folder+"modelSVC.joblib"))
-        self.text.insert("insert","\n--> Modèle RF mis à jour : "+XY_tools.Externes.sizeKoParent(InterfaceGender.csv_folder+"modelRF.joblib"))
+        self.text.insert("insert","\n--> Modèle SVC mis à jour : "+XY_tools.Externes.sizeKoParent(InterfaceGender.csv_folder+"SVCClassifierFinalx.joblib"))
+        self.text.insert("insert","\n--> Modèle GB mis à jour : "+XY_tools.Externes.sizeKoParent(InterfaceGender.csv_folder+"GBClassifierFinalx.joblib"))
+        self.text.insert("insert","\n--> Modèle XGB mis à jour : "+XY_tools.Externes.sizeKoParent(InterfaceGender.csv_folder+"XGBClassifierFinalx.joblib"))
 
-        self.text.insert("insert","\n--> Training score: {}".format(a.accuracyTrain()))
-        self.text.insert("insert","\n--> Testing score: {}".format(a.accuracyTest()))
+        # self.text.insert("insert","\n--> Training score: {}".format(a.accuracyTrain()))
+        # self.text.insert("insert","\n--> Testing score: {}".format(a.accuracyTest()))
 
         self.text.insert("insert","\n\n\t\t\tModèle finalisé : "+str(date.today())+" "+str(datetime.now().time()))
         self.text.insert("insert","\n#########################################")

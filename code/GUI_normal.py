@@ -7,7 +7,11 @@ pypath = pypath.split('\\')
 pypath1 = '/'.join(pypath[:-1])
 pypath3 = '/'.join(pypath[:-2])+"/executable"
 pypath2 = '/'.join(pypath[:-2])
+print("path2")
+print(pypath2)
 sys.path.insert(0,pypath1)
+
+pathPython = r"C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\DEPLOIEMENT_INERIS_2021\\"
 
 # Import des bibliothèques de python (s'assurer qu'elles soient installées si le code est lancé depuis la console)
 import tkinter as tk
@@ -21,7 +25,7 @@ import xgboost as xgb
 import pandas as pd
 
 # Import des bibliothèques liées à l'interface
-import XY_tools,IA_sexage,GUI_little,GUI_update
+import XY_tools,IA_sexage,GUI_update
 import IA_morph as ML
 
 
@@ -138,7 +142,7 @@ class Polygone():
         """!
         Methode pour calculer certaines distances caractéristiques
         """
-
+        print(self.points)
         self.distances_all = XY_tools.Externes.calculDistancesv2(self.pointsEchelle, self.points)
         return self.distances_all
 
@@ -566,8 +570,10 @@ class BodyClass():
             self.previous_y = event.y
 
             px50mm = XY_tools.Externes.euclide(InterfaceC.canvasEchelle.coords(3),InterfaceC.canvasEchelle.coords(5))
+            print("\n\nPoints sélectionné \n\n")
+            print(self.selected)
 
-            if self.selected==5:
+            if self.selected==5+10*InterfaceC.numImageActuelle:
                 InterfaceC.canvasEchelle2.move(5,3*dx,3*dy)
                 InterfaceC.canvasEchelle2.update()
                 InterfaceC.canvasEchelle2.move(InterfaceC.PolygoneC.nonodes[InterfaceC.PolygoneC.nodes.index(5)],3*dx,3*dy)
@@ -581,7 +587,7 @@ class BodyClass():
                 InterfaceC.PolygoneC.update_points(InterfaceC.canvasEchelle2)
                 InterfaceC.afficheLongueur()
 
-            if self.selected==3:
+            if self.selected==3+10*InterfaceC.numImageActuelle:
                 InterfaceC.canvasEchelle2.move(3,3*dx,3*dy)
                 InterfaceC.canvasEchelle2.update()
                 InterfaceC.canvasEchelle2.move(InterfaceC.PolygoneC.nonodes[InterfaceC.PolygoneC.nodes.index(3)],3*dx,3*dy)
@@ -596,7 +602,7 @@ class BodyClass():
                 InterfaceC.PolygoneC.update_points(InterfaceC.canvasEchelle2)
                 InterfaceC.afficheLongueur()
 
-            if self.selected==7:
+            if self.selected==7+10*InterfaceC.numImageActuelle:
                 InterfaceC.canvasEchelle.move(3,3*dx,3*dy)
                 InterfaceC.canvasEchelle.update()
                 InterfaceC.canvasEchelle.move(InterfaceC.PolygoneB.nonodes[InterfaceC.PolygoneB.nodes.index(3)],3*dx,3*dy)
@@ -611,7 +617,7 @@ class BodyClass():
                 InterfaceC.PolygoneB.update_points(InterfaceC.canvasEchelle)
                 InterfaceC.afficheLongueur()
 
-            if self.selected==9:
+            if self.selected==9+10*InterfaceC.numImageActuelle:
                 InterfaceC.canvasEchelle.move(5,3*dx,3*dy)
                 InterfaceC.canvasEchelle.update()
                 InterfaceC.canvasEchelle.move(InterfaceC.PolygoneB.nonodes[InterfaceC.PolygoneB.nodes.index(5)],3*dx,3*dy)
@@ -793,11 +799,18 @@ class Interface(tk.Frame):
 
     def add_canvas(self):
         """Canvas pour logo Ineris"""
-        pathLogo = XY_tools.Externes.resource_path("logo2.png")
+        # pathLogo = XY_tools.Externes.resource_path("logo2.png")
+        try:
+            pathLogo = XY_tools.Externes.resource_path("logo2.png")
+            self.imgLogo2 = ImageTk.PhotoImage(Image.open(pathLogo).resize((157,84)))
+
+        except:
+            pathLogo = pathPython + "\images\logo2.png"
+            self.imgLogo2 = ImageTk.PhotoImage(Image.open(pathLogo).resize((157,84)))
+
         self.canvasLogo2 = tk.Canvas(self,bg='#f0f0f0')
         self.canvasLogo2.config(width=157,height=84)
         self.canvasLogo2.place(x=0,y=0)
-        self.imgLogo2 = ImageTk.PhotoImage(Image.open(pathLogo).resize((157,84)))
         self.canvasLogo2.create_image(0, 0, anchor=tk.NW,image=self.imgLogo2)
 
         ''' Canvas blanc '''
@@ -807,11 +820,17 @@ class Interface(tk.Frame):
         self.canvasBlank.grid(row=1)
 
         ''' Canvas pour le schema de pointage '''
-        pathSchema = XY_tools.Externes.resource_path("schema.png")
+        # pathSchema = XY_tools.Externes.resource_path("schema.png")
+        try:
+            pathSchema = XY_tools.Externes.resource_path("schema.png")
+            self.imgSchema = ImageTk.PhotoImage(Image.open(pathSchema).resize((288,192)))
+        except:
+            pathSchema = pathPython + "\images\schema.png"
+            self.imgSchema = ImageTk.PhotoImage(Image.open(pathSchema).resize((288,192)))
+
         self.canvasSchema = tk.Canvas(self,bg='#f0f0f0')
         self.canvasSchema.config(width = 288,height=192)
         self.canvasSchema.place(relx=0.79,rely=0)
-        self.imgSchema = ImageTk.PhotoImage(Image.open(pathSchema).resize((288,192)))
         self.canvasSchema.create_image(0,0,anchor=tk.NW,image=self.imgSchema)
 
         ''' Canvas pour la tête '''
@@ -841,7 +860,7 @@ class Interface(tk.Frame):
         try:
             self.logo00 = tk.PhotoImage(file = os.path.join(sys._MEIPASS, 'logo_mini.png'))
         except:
-            self.logo00 = tk.PhotoImage(file = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\images\logo_mini.png')
+            self.logo00 = tk.PhotoImage(file = pathPython+'\images\logo_mini.png')
 
         self.boutonMini.config(image=self.logo00, compound=tk.LEFT)
         self.small_logo00 = self.logo00.subsample(15,15)
@@ -854,7 +873,7 @@ class Interface(tk.Frame):
         try:
             self.logo0 = tk.PhotoImage(file = os.path.join(sys._MEIPASS, 'logo_restart.png'))
         except:
-            self.logo0 = tk.PhotoImage(file = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\images\logo_restart.png')
+            self.logo0 = tk.PhotoImage(file = pathPython+'\images\logo_restart.png')
 
         self.boutonRestart.config(image=self.logo0, compound=tk.LEFT)
         self.small_logo0 = self.logo0.subsample(17,17)
@@ -865,7 +884,7 @@ class Interface(tk.Frame):
         try:
             self.logo = tk.PhotoImage(file = os.path.join(sys._MEIPASS, 'logo_import.png'))
         except:
-            self.logo = tk.PhotoImage(file = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\images\logo_import.png')
+            self.logo = tk.PhotoImage(file =pathPython+'images\logo_import.png')
         self.boutonImport.config(image=self.logo, compound=tk.LEFT)
         self.small_logo = self.logo.subsample(7,7)
         self.boutonImport.config(image = self.small_logo)
@@ -877,7 +896,7 @@ class Interface(tk.Frame):
         try:
             self.logo2 = tk.PhotoImage(file = os.path.join(sys._MEIPASS, 'logo_predict.png'))
         except:
-            self.logo2 = tk.PhotoImage(file = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\images\logo_predict.png')
+            self.logo2 = tk.PhotoImage(file = pathPython+'images\logo_predict.png')
         self.boutonPredict.config(image=self.logo2, compound=tk.LEFT)
         self.small_logo2 = self.logo2.subsample(15,15)
         self.boutonPredict.config(image = self.small_logo2)
@@ -889,7 +908,7 @@ class Interface(tk.Frame):
         try:
             self.logo3 = tk.PhotoImage(file = os.path.join(sys._MEIPASS, 'logo_left_arrow.png'))
         except:
-            self.logo3 = tk.PhotoImage(file = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\images\logo_left_arrow.png')
+            self.logo3 = tk.PhotoImage(file = pathPython+'images\logo_left_arrow.png')
         self.boutonPrevious.config(image=self.logo3, compound=tk.LEFT)
         self.small_logo3 = self.logo3.subsample(15,15)
         self.boutonPrevious.config(image = self.small_logo3)
@@ -899,7 +918,7 @@ class Interface(tk.Frame):
         try:
             self.logo4 = tk.PhotoImage(file = os.path.join(sys._MEIPASS, 'logo_right_arrow.png'))
         except:
-            self.logo4 = tk.PhotoImage(file = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\images\logo_right_arrow.png')
+            self.logo4 = tk.PhotoImage(file = pathPython+'images\logo_right_arrow.png')
         self.boutonNext.config(image=self.logo4, compound=tk.LEFT)
         self.small_logo4 = self.logo4.subsample(15,15)
         self.boutonNext.config(image = self.small_logo4)
@@ -976,7 +995,7 @@ class Interface(tk.Frame):
         import sys,subprocess
         cmdline = {'win32':'explorer'}[sys.platform]
         try:
-            path = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\images\example.jpg'
+            path = pathPython+"images\example.jpg"
         except:
             path = os.path.join(sys._MEIPASS, 'example.jpg')
         subprocess.Popen([cmdline,path])
@@ -1058,17 +1077,19 @@ class Interface(tk.Frame):
         """!
             @param pathimage dossier de l'image
         """
+        #modify the following line to update head landmark model
+        name_predictor = 'predictor_head2.dat'
         try:
-            pathPredictor = os.path.join(sys._MEIPASS, 'predictor_head2.dat')
+            pathPredictor = os.path.join(sys._MEIPASS, name_predictor)
             a = ModelPoints(os.path.join(sys._MEIPASS,''),"")
-            a.predict(pathimage,os.path.join(sys._MEIPASS,''),"predictor_head2.dat")
+            a.predict(pathimage,os.path.join(sys._MEIPASS,''),name_predictor)
             listepoints = ML.ML_pointage.xmltolistY(os.path.join(sys._MEIPASS,"output.xml"),0)
 
         except:
-            pathPredictor = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\predictor_head2.dat'
-            a = ModelPoints(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\',"")
-            a.predict(pathimage,pypath2+"\models\\","predictor_head2.dat")
-            listepoints = ML.ML_pointage.xmltolistY(pypath2+"\models\\"+"output.xml",0)
+            pathPredictor = pathPython+"\models"+"\\"+name_predictor
+            a = ModelPoints(pathPython+"models\\","")
+            a.predict(pathimage,pathPython+"\models\\",name_predictor)
+            listepoints = ML.ML_pointage.xmltolistY(pathPython+"\models\\"+"output.xml",0)
 
         self.verbose_points(listepoints)
         return listepoints[0]
@@ -1084,10 +1105,10 @@ class Interface(tk.Frame):
             listepoints = ML.ML_pointage.xmltolistY(os.path.join(sys._MEIPASS,"output.xml"),0)
 
         except:
-            pathPredictor = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\predictor_scale3.dat'
-            a = ModelPoints(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\',"")
-            a.predict(pathimage,pypath2+"\models\\","predictor_scale3.dat")
-            listepoints = ML.ML_pointage.xmltolistY(pypath2+"\models\\"+"output.xml",0)
+            pathPredictor = pathPython+"models\\predictor_scale3.dat"
+            a = ModelPoints(pathPython+"\models\\","")
+            a.predict(pathimage,pathPython+"\models\\","predictor_scale3.dat")
+            listepoints = ML.ML_pointage.xmltolistY(pathPython+"\models\\"+"output.xml",0)
 
         return listepoints[0]
 
@@ -1100,10 +1121,10 @@ class Interface(tk.Frame):
             listepoints = ML.ML_pointage.xmltolistY(os.path.join(sys._MEIPASS,"output.xml"),0)
 
         except:
-            pathPredictor = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\predictor_LS3.dat'
-            a = ModelPoints(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\',"")
-            a.predict(pathimage,pypath2+"\models\\","predictor_LS3.dat")
-            listepoints = ML.ML_pointage.xmltolistY(pypath2+"\models\\"+"output.xml",0)
+            pathPredictor = pathPython+"models\\predictor_LS3.dat"
+            a = ModelPoints(pathPython+"models\\","")
+            a.predict(pathimage,pathPython+"\models\\","predictor_LS3.dat")
+            listepoints = ML.ML_pointage.xmltolistY(pathPython+"\models\\"+"output.xml",0)
 
         return listepoints[0]
 
@@ -1338,7 +1359,7 @@ class Interface(tk.Frame):
         Méthode permettant d'afficher des informations
         """
         message = "PROCEDURE DE SEXAGE DE L'EPINOCHE v"+str(Interface.version)
-        message += "\n\n- Modèle de placement de points par Machine Learning (learning : 200 individus)"
+        message += "\n\n- Modèle de placement de points par Machine Learning (learning : 385 individus)"
         message += "\n\n- Modèle de classification Male/Femelle par Machine Learning (learning : 336 individus)"
         message += "\n\n\n Interface développée par R. Masson pour l'INERIS"
         tk.messagebox.showinfo(title="Informations",message=message)
@@ -1626,7 +1647,8 @@ class ScaleClassC():
             self.previous_x = event.x
             self.previous_y = event.y
             px50mm = XY_tools.Externes.euclide(InterfaceC.canvasEchelle.coords(3),Interface.canvasEchelle.coords(5))
-
+            print("\n\n Point selectionné \n\n")
+            print(self.selected)
             if self.selected==5:
                 InterfaceC.canvasCorps.move(9,dx/3,dy/3)
                 InterfaceC.canvasCorps.update()
@@ -1794,6 +1816,7 @@ class ScaleClassBodyC():
             self.previous_y = event.y
 
             if self.selected==5:
+                print(self.selected)
                 InterfaceC.canvasCorps.move(5,dx/3,dy/3)
                 InterfaceC.canvasCorps.update()
                 InterfaceC.canvasCorps.move(BodyClass.nonodes[BodyClass.nodes.index(5)],dx/3,dy/3)
@@ -1809,6 +1832,7 @@ class ScaleClassBodyC():
                 InterfaceC.afficheLongueurBody()
 
             if self.selected==3:
+                print(self.selected)
                 InterfaceC.canvasCorps.move(3,dx/3,dy/3)
                 InterfaceC.canvasCorps.update()
                 InterfaceC.canvasCorps.move(BodyClass.nonodes[BodyClass.nodes.index(3)],dx/3,dy/3)
@@ -1823,6 +1847,8 @@ class ScaleClassBodyC():
                 BodyClass.update_points(InterfaceC.canvasCorps)
                 InterfaceC.afficheLongueurBody()
 
+            print("\n\n points \n\n")
+            print(self.selected)
 
 
         ScaleClassBodyC.update_points(canvas3)
@@ -1919,17 +1945,27 @@ class InterfaceC(tk.Frame):
 
     def add_canvas(self):
         """Canvas pour logo"""
-        pathLogo = InterfaceC.resource_path("logo2.png")
+
         self.canvasLogo = tk.Canvas(self.frame,bg='#f0f0f0')
         self.canvasLogo.config(width=157,height=84)
-        self.imgLogo = ImageTk.PhotoImage(Image.open(pathLogo).resize((157,84)))
+        try:
+            pathLogo = InterfaceC.resource_path("logo2.png")
+            self.imgLogo = ImageTk.PhotoImage(Image.open(pathLogo).resize((157,84)))
+        except:
+            pathLogo = pathPython+'\images\logo2.png'
+            self.imgLogo = ImageTk.PhotoImage(Image.open(pathLogo).resize((157,84)))
         self.canvasLogo.create_image(0, 0, anchor=tk.NW,image=self.imgLogo)
 
         ''' Canvas pour le schema '''
-        pathSchema = InterfaceC.resource_path("schema.png")
         self.canvasSchema = tk.Canvas(self.frame,bg='#f0f0f0')
         self.canvasSchema.config(width = 288,height=192)
-        self.imgSchema = ImageTk.PhotoImage(Image.open(pathSchema).resize((288,192)))
+
+        try:
+            pathSchema = InterfaceC.resource_path("schema.png")
+            self.imgSchema = ImageTk.PhotoImage(Image.open(pathSchema).resize((157,84)))
+        except:
+            pathSchema = pathPython+'\images\schema.png'
+            self.imgSchema = ImageTk.PhotoImage(Image.open(pathSchema).resize((157,84)))
         self.canvasSchema.create_image(0,0,anchor=tk.NW,image=self.imgSchema)
 
         ''' Canvas pour la tête '''
@@ -1946,10 +1982,10 @@ class InterfaceC(tk.Frame):
 
         ''' Canvas pour gérer les corrections '''
         InterfaceC.canvasEchelle2 = tk.Canvas(self.frame,bg='#f0f0f0')
+        # InterfaceC.canvasEchelle2.pack()
         InterfaceC.canvasEchelle = tk.Canvas(self.frame,bg='#f0f0f0')
 
     def add_labels(self):
-
         self.labelInfoPoints = tk.Label(self.frame,text="")
         self.labelNumImage = tk.Label(self.frame,text="Image :",font=("Purisa",11),fg='gray')
         self.labelNumImage.pack()
@@ -2036,12 +2072,13 @@ class InterfaceC(tk.Frame):
         f.close()
 
     def verbose_points(self,listepoints):
-        message = XY_tools.Externes.verbose_points(listepoints,self.listeImages, Interface.numImageActuelle)
+        message = XY_tools.Externes.verbose_points(listepoints,self.listeImages, InterfaceC.numImageActuelle)
         f = open(self.finalname,"a")
         f.write(message)
         f.close()
 
     def verbose_distances(self,df_distance):
+        print("toto")
         print(df_distance)
         print(type(df_distance))
         message = "\t Distances : "+str(list(df_distance.values[0]))[1:-1]
@@ -2128,7 +2165,7 @@ class InterfaceC(tk.Frame):
         Méthode permettant de remettre à zero les images chargées
         """
         self.listeImages = []
-        self.numImageActuelle = 0
+        InterfaceC.numImageActuelle = 0
 
     def updateVersion():
         """!
@@ -2150,17 +2187,19 @@ class InterfaceC(tk.Frame):
         Méthode permettant de calculer les points et de les disposer sur l'image
         """
 
-        path_global = '/'.join(self.listeImages[self.numImageActuelle].split('/')[:-1])
+        path_global = '/'.join(self.listeImages[InterfaceC.numImageActuelle].split('/')[:-1])
+
 
         #Points de la tête
-        points_tete = self.Model_Tete(self.listeImages[self.numImageActuelle])[0]
+        points_tete = self.Model_Tete(self.listeImages[InterfaceC.numImageActuelle])[0]
+        print(points_tete)
         points_tete_copy = points_tete
-
+        print(points_tete_copy)
         #Oeil du poisson
         HeadFishC.oeilXY = [0.5*(points_tete_copy[1][0]+points_tete_copy[2][0]),0.5*(points_tete_copy[1][1]+points_tete_copy[2][1])]
 
         #Points de l'échelle calculés par le modèle 2
-        points_echelle = self.Model_Echelle(self.listeImages[self.numImageActuelle])[0]
+        points_echelle = self.Model_Echelle(self.listeImages[InterfaceC.numImageActuelle])[0]
         points_echelle_copy = points_echelle
         ScaleFishC.left = points_echelle[0]
 
@@ -2168,19 +2207,19 @@ class InterfaceC(tk.Frame):
         # points_echelle = XY_tools.Externes.centerPoints2([points_echelle[0],points_echelle[1]],ScaleFish.left)
         points_echelle = XY_tools.Externes.centerPoints(points_echelle[0:2],ScaleFishC.left,25,50)
 
-        self.labelNomImage.config(text=self.listeImages[self.numImageActuelle])
-        self.labelNumImage.config(text=str(self.numImageActuelle+1)+"/"+str(len(self.listeImages)))
+        self.labelNomImage.config(text=self.listeImages[InterfaceC.numImageActuelle])
+        self.labelNumImage.config(text=str(InterfaceC.numImageActuelle+1)+"/"+str(len(self.listeImages)))
 
         #Image de la tête
-        self.ImagePIL = Image.open(self.listeImages[self.numImageActuelle])
-        HeadFishC(self.canvasTete,self.ImagePIL,cv2.imread(self.listeImages[self.numImageActuelle]),(1920,1440))
+        self.ImagePIL = Image.open(self.listeImages[InterfaceC.numImageActuelle])
+        HeadFishC(self.canvasTete,self.ImagePIL,cv2.imread(self.listeImages[InterfaceC.numImageActuelle]),(1920,1440))
 
         #Image entière
-        self.ImagePIL2 = Image.open(self.listeImages[self.numImageActuelle])
+        self.ImagePIL2 = Image.open(self.listeImages[InterfaceC.numImageActuelle])
         BodyFishC(InterfaceC.canvasCorps,self.ImagePIL2,(640,480))
 
         #Calcul des points du corps
-        listePoints3 = self.Model_Longueur(self.listeImages[self.numImageActuelle])[0]
+        listePoints3 = self.Model_Longueur(self.listeImages[InterfaceC.numImageActuelle])[0]
         listePoints3 = [[listePoints3[0][0]/3,listePoints3[0][1]/3],[listePoints3[1][0]/3,listePoints3[1][1]/3]]
         corpsStandard = listePoints3
 
@@ -2199,7 +2238,7 @@ class InterfaceC(tk.Frame):
         self.canvasTete.update()
 
         #Image de l'échelle
-        self.ImagePIL3 = Image.open(self.listeImages[self.numImageActuelle])
+        self.ImagePIL3 = Image.open(self.listeImages[InterfaceC.numImageActuelle])
         tete2 = points_tete
         ScaleFishC(InterfaceC.canvasEchelle,self.ImagePIL3,(1920,1440))
         ScaleFishC.left = points_tete[0]
@@ -2215,34 +2254,31 @@ class InterfaceC(tk.Frame):
         points_longueur = XY_tools.Externes.centerPoints([pt1,pt2],ScaleFishBodyC.left,25,50)
         print(points_longueur)
         # Image du corps
-        self.ImagePIL4 = Image.open(self.listeImages[self.numImageActuelle])
+        self.ImagePIL4 = Image.open(self.listeImages[InterfaceC.numImageActuelle])
         ScaleFishBodyC(InterfaceC.canvasEchelle2,self.ImagePIL4,(1920,1440))
         InterfaceC.PolygoneC = ScaleClassBodyC(InterfaceC.canvasEchelle2,points_longueur,'#ffffff')
-
-
 
     def Model_Tete(self,pathimage):
         """!
             @param pathimage dossier de l'image
         """
         print("points tête")
-        try:
-            pathPredictor = os.path.join(sys._MEIPASS, 'predictor_head2.dat')
-        except:
-            pathPredictor = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\predictor_head2.dat'
-        try:
-            a = ModelPoints(os.path.join(sys._MEIPASS,''),"")
-        except:
-            a = ModelPoints(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\',"")
-        try:
-            a.predict(pathimage,os.path.join(sys._MEIPASS,''),"predictor_head2.dat")
-        except:
-            a.predict(pathimage,pypath2+"\models\\","predictor_head2.dat")
+
+        #modify the following line to update head landmark model
+        name_predictor = 'predictor_head2.dat'
 
         try:
-            listepoints = ML.ML_pointage.xmltolistY(pypath2+"\models\\"+"output.xml",0)
-        except:
+            pathPredictor = os.path.join(sys._MEIPASS, name_predictor)
+            a = ModelPoints(os.path.join(sys._MEIPASS,''),"")
+            a.predict(pathimage,os.path.join(sys._MEIPASS,''),name_predictor)
             listepoints = ML.ML_pointage.xmltolistY(os.path.join(sys._MEIPASS,"output.xml"),0)
+
+        except:
+            pathPredictor = pathPython+'models\\'+name_predictor
+            a = ModelPoints(pathPython+'models\\',"")
+            a.predict(pathimage,pathPython+"\models\\",name_predictor)
+            listepoints = ML.ML_pointage.xmltolistY(pathPython+"\models\\"+"output.xml",0)
+
         self.verbose_points(listepoints)
         return listepoints
 
@@ -2253,23 +2289,15 @@ class InterfaceC(tk.Frame):
         print("points echelle")
         try:
             pathPredictor = os.path.join(sys._MEIPASS, 'predictor_scale3.dat')
-        except:
-            pathPredictor = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\predictor_scale3.dat'
-
-        try:
             a = ModelPoints(os.path.join(sys._MEIPASS,''),"")
-        except:
-            a = ModelPoints(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\',"")
-
-        try:
             a.predict(pathimage,os.path.join(sys._MEIPASS,''),"predictor_scale3.dat")
-        except:
-            a.predict(pathimage,pypath2+"\models\\","predictor_scale3.dat")
-
-        try:
-            listepoints = ML.ML_pointage.xmltolistY(pypath2+"\models\\"+"output.xml",0)
-        except:
             listepoints = ML.ML_pointage.xmltolistY(os.path.join(sys._MEIPASS,"output.xml"),0)
+
+        except:
+            pathPredictor = pathPython+'models\\predictor_scale3.dat'
+            a = ModelPoints(pathPython+'models\\',"")
+            a.predict(pathimage,pathPython+"\models\\","predictor_scale3.dat")
+            listepoints = ML.ML_pointage.xmltolistY(pathPython+"\models\\"+"output.xml",0)
 
         return listepoints
 
@@ -2278,46 +2306,49 @@ class InterfaceC(tk.Frame):
         print("points longueur")
         try:
             pathPredictor = os.path.join(sys._MEIPASS, 'predictor_LS3.dat')
-        except:
-            pathPredictor = r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\predictor_LS3.dat'
-        try:
             a = ModelPoints(os.path.join(sys._MEIPASS,''),"")
-        except:
-            a = ModelPoints(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\\',"")
-        try:
             a.predict(pathimage,os.path.join(sys._MEIPASS,''),"predictor_LS3.dat")
-        except:
-            a.predict(pathimage,pypath2+"\models\\","predictor_LS3.dat")
-
-        try:
-            listepoints = ML.ML_pointage.xmltolistY(pypath2+"\models\\"+"output.xml",0)
-        except:
             listepoints = ML.ML_pointage.xmltolistY(os.path.join(sys._MEIPASS,"output.xml"),0)
+
+        except:
+            pathPredictor = pathPython+'models\\predictor_LS3.dat'
+            a = ModelPoints(pathPython+"\models\\","")
+            a.predict(pathimage,pathPython+"\models\\","predictor_LS3.dat")
+            listepoints = ML.ML_pointage.xmltolistY(pathPython+"\models\\"+"output.xml",0)
+
         return listepoints
 
 
     def Model_Sexage(self):
         print("classification")
-        try:
-            InterfaceC.lenBody = XY_tools.Externes.euclide(InterfaceC.canvasEchelle2.coords(3),InterfaceC.canvasEchelle2.coords(5))
-        except:
-            pass
+        # try:
+        InterfaceC.lenBody = XY_tools.Externes.euclide(InterfaceC.canvasEchelle2.coords(3+6*InterfaceC.numImageActuelle),InterfaceC.canvasEchelle2.coords(5+6*InterfaceC.numImageActuelle))
+        print("\n\n Longueur standard \n\n")
+        print(InterfaceC.lenBody)
+        # except:
+        #     pass
         InterfaceC.allDist(InterfaceC.lenBody)
         from joblib import dump, load
         import pandas as pd
+
+        predictorGB = "GBClassifierFinal3.joblib"
+        predictorSVC = "SVCClassifierFinal3.joblib"
+        predictorXGB = "XGBClassifierFinal3.joblib"
+
         try:
-            clf = load(os.path.join(sys._MEIPASS,"GBClassifierFinal3.joblib"))
-            clf1 = load(os.path.join(sys._MEIPASS,"SVCClassifierFinal3.joblib"))
-            clf2 = load(os.path.join(sys._MEIPASS,"XGBClassifierFinal3.joblib"))
+            clf = load(os.path.join(sys._MEIPASS,predictorGB))
+            clf1 = load(os.path.join(sys._MEIPASS,predictorSVC))
+            clf2 = load(os.path.join(sys._MEIPASS,predictorXGB))
         except:
-            clf = load(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\GBClassifierFinal3.joblib')
-            clf1 = load(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\SVCClassifierFinal3.joblib')
-            clf2 = load(r'C:\Users\MASSON\Desktop\STAGE_EPINOCHE\moduleMorpho\models\XGBClassifierFinal3.joblib')
+            clf = load(pathPython+'models'+'\\'+predictorGB)
+            clf1 = load(pathPython+'models'+'\\'+predictorSVC)
+            clf2 = load(pathPython+'models'+'\\'+predictorXGB)
 
         pd.set_option('display.max_columns', None)
         pd.set_option('display.expand_frame_repr', False)
         pd.set_option('max_colwidth', None)
         ae = pd.DataFrame(InterfaceC.modeleDistances).T
+        print("\n\n All distances \n\n")
         print(ae)
         # print(ae)
         prediction = clf.predict(ae)
@@ -2352,13 +2383,13 @@ class InterfaceC(tk.Frame):
         self.verbose_distances(ae)
         self.verbose_sexe(text,proba)
 
-        nomImage = "".join(self.listeImages[self.numImageActuelle].split("/")[-1])
+        nomImage = "".join(self.listeImages[InterfaceC.numImageActuelle].split("/")[-1])
         self.NomImages.append(nomImage)
-        self.NumImages.append(self.numImageActuelle+1)
+        self.NumImages.append(InterfaceC.numImageActuelle+1)
         self.LS.append(list(ae.values[0])[0])
         self.sexe.append(text.split(">")[-1])
 
-        if(self.numImageActuelle==len(self.listeImages)-1):
+        if(InterfaceC.numImageActuelle==len(self.listeImages)-1):
 
             try:
                 self.verbose_conclusion()
@@ -2386,14 +2417,14 @@ class InterfaceC(tk.Frame):
         """!
         Méthode permettant de passer à l'image d'après
         """
-        if(self.numImageActuelle<len(self.listeImages)):
+        if(InterfaceC.numImageActuelle<len(self.listeImages)):
             self.blockButton(+1)
 
     def previousImage(self):
         """!
         Méthode permettant de revenir a l'image précédente
         """
-        if(self.numImageActuelle>0):
+        if(InterfaceC.numImageActuelle>0):
             self.blockButton(-1)
 
     def blockButton(self,param):
@@ -2404,7 +2435,7 @@ class InterfaceC(tk.Frame):
         import time
         self.unbind_all("<Control-Return>")
         self.unbind_all("<Control-BackSpace>")
-        self.numImageActuelle+=param
+        InterfaceC.numImageActuelle+=param
         nbPointNonDetectes = 0
         time.sleep(0.3)
         self.boutonPrevious.configure(state=tk.DISABLED)

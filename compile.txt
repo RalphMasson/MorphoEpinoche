@@ -1,0 +1,16 @@
+Première compilation (10 minutes) :
+
+- Ouvrir Powershell
+- pip install auto-py-to-exe
+- auto-py-to-exe
+- Import config From JSON File
+--> Convert .PY TO .EXE
+
+
+Si besoin pour faire l'installer (facultatif ~10 minutes) : 
+
+- Télécharger InnoSetup 
+- Ouvrir InnoSetup 
+- Importer fichier config inno0921.txt
+--> Build
+
