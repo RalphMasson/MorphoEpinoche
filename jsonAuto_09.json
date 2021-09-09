@@ -1,0 +1,137 @@
+{
+ "version": "auto-py-to-exe-configuration_v1",
+ "pyinstallerOptions": [
+  {
+   "optionDest": "noconfirm",
+   "value": true
+  },
+  {
+   "optionDest": "filenames",
+   "value": "C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho/DEPLOIEMENT_INERIS_2021/code/GUI_normal.py"
+  },
+  {
+   "optionDest": "onefile",
+   "value": false
+  },
+  {
+   "optionDest": "console",
+   "value": false
+  },
+  {
+   "optionDest": "ascii",
+   "value": false
+  },
+  {
+   "optionDest": "clean_build",
+   "value": false
+  },
+  {
+   "optionDest": "strip",
+   "value": false
+  },
+  {
+   "optionDest": "noupx",
+   "value": false
+  },
+  {
+   "optionDest": "uac_admin",
+   "value": false
+  },
+  {
+   "optionDest": "uac_uiaccess",
+   "value": false
+  },
+  {
+   "optionDest": "win_private_assemblies",
+   "value": false
+  },
+  {
+   "optionDest": "win_no_prefer_redirects",
+   "value": false
+  },
+  {
+   "optionDest": "bootloader_ignore_signals",
+   "value": false
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho/DEPLOIEMENT_INERIS_2021/images/example.JPG;."
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho/DEPLOIEMENT_INERIS_2021/images/logo_import.png;."
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho/DEPLOIEMENT_INERIS_2021/images/logo_left_arrow.png;."
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho/DEPLOIEMENT_INERIS_2021/images/logo_predict.png;."
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho/DEPLOIEMENT_INERIS_2021/images/logo_right_arrow.png;."
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho/DEPLOIEMENT_INERIS_2021/images/logo2.png;."
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho/DEPLOIEMENT_INERIS_2021/images/schema.png;."
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho/DEPLOIEMENT_INERIS_2021/images/logo_restart.png;."
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho/DEPLOIEMENT_INERIS_2021/images/logo_mini.png;."
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/MASSON/AppData/Local/Programs/Python/Python38/Lib/site-packages/xgboost;xgboost/"
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/MASSON/AppData/Local/Programs/Python/Python38/Lib/site-packages/sklearn;sklearn/"
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/MASSON/Desktop/Morphometrie/numpy;numpy/"
+  },
+  {
+   "optionDest": "excludes",
+   "value": "matplotlib"
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho/DEPLOIEMENT_INERIS_2021/models/GBClassifierFinal3.joblib;."
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho/DEPLOIEMENT_INERIS_2021/models/predictor_head2.dat;."
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho/DEPLOIEMENT_INERIS_2021/models/predictor_LS3.dat;."
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho/DEPLOIEMENT_INERIS_2021/models/predictor_scale3.dat;."
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho/DEPLOIEMENT_INERIS_2021/models/SVCClassifierFinal3.joblib;."
+  },
+  {
+   "optionDest": "datas",
+   "value": "C:/Users/MASSON/Desktop/STAGE_EPINOCHE/moduleMorpho/DEPLOIEMENT_INERIS_2021/models/XGBClassifierFinal3.joblib;."
+  }
+ ],
+ "nonPyinstallerOptions": {
+  "increaseRecursionLimit": true,
+  "manualArguments": ""
+ }
+}
